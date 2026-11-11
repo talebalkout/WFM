@@ -489,7 +489,9 @@ const USERS=[
   {id:'w2',name:'Mona Saad',emp:'M3004',role:'wfm',title:'Supervisor'}
 ];
 const STATUS={pending:'Pending',approved:'Accepted',rejected:'Rejected',cancelled:'Cancelled',returned:'Returned',waiting:'Waiting for colleague',declined:'Declined by colleague'};
-const KEY='wfm-requests-demo-v1';
+const KEY='wfm-requests-user';
+const SB_URL='https://gtwibzupaaxcrqqfnajl.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0d2lienVwYWF4Y3JxcWZuYWpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzODk0ODMsImV4cCI6MjEwOTk2NTQ4M30.6zumY6zmcimOIekDL1eoHOZ6NK6Y9vcvvHPsQ7qgo7A';
 
 /* ================= Helpers ================= */
 const $=s=>document.querySelector(s);
@@ -560,11 +562,54 @@ function seed(){
       {id:'BL-1',scope:'user',target:'u1',type:'change',from:d(-10),to:endOfMonth,reason:'Too many shift changes this month'},
       {id:'BL-2',scope:'all',target:null,type:'special',from:d(10),to:d(45),reason:'Next schedule already released'}]}};
 }
-function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&x.v===1)return x}catch(e){}return seed()}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Storage is full — remove large attachments',true)}}
+/* ---- Server (Supabase) ---- */
+async function api(path,{method='GET',body,prefer}={}){
+  const h={apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'};
+  if(prefer)h.Prefer=prefer;
+  const res=await fetch(`${SB_URL}/rest/v1/${path}`,{method,headers:h,body:body===undefined?undefined:JSON.stringify(body)});
+  if(!res.ok){let m='Error '+res.status;try{const j=await res.json();m=j.message||m}catch(e){}throw new Error(m)}
+  const t=await res.text();return t?JSON.parse(t):null;
+}
+const rpc=(fn,args)=>api('rpc/'+fn,{method:'POST',body:args||{}});
+const clone=o=>JSON.parse(JSON.stringify(o));
+const mkH=(action,comment)=>({at:Date.now(),by:S.current,action,comment:comment||''});
+const reqFromDb=r=>({id:r.id,type:r.type,userId:r.user_id,partnerId:r.partner_id,status:r.status,createdAt:+r.created_at,data:r.data,files:r.files||[],history:r.history||[]});
+const reqToDb=r=>({type:r.type,user_id:r.userId,partner_id:r.partnerId||null,status:r.status,data:r.data,files:r.files,history:r.history});
+const recFromDb=r=>({id:r.id,kind:r.kind,createdBy:r.created_by,createdAt:+r.created_at,recipients:r.recipients||[],requireAck:r.require_ack,acks:r.acks||{},reads:r.reads||{},data:r.data,files:r.files||[]});
+const recToDb=r=>({kind:r.kind,created_by:r.createdBy,recipients:r.recipients,require_ack:r.requireAck,data:r.data,files:r.files});
+const blockFromDb=b=>({id:b.id,scope:b.scope,target:b.target,type:b.type,from:b.from_date,to:b.to_date,reason:b.reason});
+let lastSig='';
+async function fetchAll(){
+  const [rq,rc,ru,bl]=await Promise.all([api('requests?select=*&order=created_at.desc'),api('records?select=*&order=created_at.desc'),api('rules?select=*'),api('blocks?select=*')]);
+  const r0=ru[0]||{leave_limit:2,count_pending:true};
+  S.requests=rq.map(reqFromDb);S.records=rc.map(recFromDb);
+  S.rules={leaveLimit:r0.leave_limit,countPending:r0.count_pending,blocks:bl.map(blockFromDb)};
+  const sig=JSON.stringify([rq,rc,ru,bl]),changed=sig!==lastSig;lastSig=sig;return changed;
+}
+async function seedServer(){
+  const d=seed();
+  await api('requests',{method:'POST',body:d.requests.map(r=>({id:r.id,...reqToDb(r),created_at:r.createdAt}))});
+  await api('records',{method:'POST',body:d.records.map(r=>({id:r.id,...recToDb(r),created_at:r.createdAt,acks:r.acks,reads:r.reads}))});
+  await api('blocks',{method:'POST',body:d.rules.blocks.map(b=>({scope:b.scope,target:b.target,type:b.type,from_date:b.from,to_date:b.to,reason:b.reason}))});
+}
+async function patchReq(r,expected){
+  const rows=await api(`requests?id=eq.${encodeURIComponent(r.id)}&status=eq.${expected}`,{method:'PATCH',prefer:'return=representation',
+    body:{status:r.status,data:r.data,files:r.files,history:r.history,partner_id:r.partnerId||null}});
+  if(!rows||!rows.length)throw new Error('someone else already changed this request');
+}
+let working=false;
+async function busy(fn){
+  if(working)return;working=true;document.body.style.cursor='progress';
+  try{await fn()}catch(e){toast('Couldn’t save: '+e.message,true);try{await fetchAll()}catch(_){}render()}
+  finally{working=false;document.body.style.cursor=''}
+}
+async function poll(){
+  if(document.hidden||working||!S.current)return;
+  try{const ch=await fetchAll();if(!ch)return;const a=document.activeElement;if(a&&a.matches('input,textarea,select'))return;render()}catch(e){}
+}
+function save(){try{S.current?localStorage.setItem(KEY,S.current):localStorage.removeItem(KEY)}catch(e){}}
 const me=()=>user(S.current);
 const isWfm=()=>me().role==='wfm';
-const nextId=p=>{S.seq[p]=(S.seq[p]||1000)+1;return `${p==='REQ'?'REQ':p}-${S.seq[p]}`};
 
 /* ================= Business rules ================= */
 function leaveUsage(date,excludeId){
@@ -650,7 +695,7 @@ function render(){
   <button class="user-btn" data-action="switchUser" title="Switch user">${avatar(u)}<div class="me-text"><b>${esc(u.name)}</b><span>${esc(teamOf(u))}</span></div>${ic('users',16)}</button></header>
   <div class="shell"><aside class="sidebar"><div class="side-label">${isWfm()?'WFM / Manager':'Staff'}</div>
   ${items.map(([k,i,l,b])=>`<button class="nav-item${k===act?' on':''}" data-action="nav" data-view="${k}">${ic(i,18)}<span>${l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`).join('')}
-  <div class="side-foot">Demo data is saved in this browser only.<button data-action="resetDemo">${ic('undo',14)} Reset demo data</button></div></aside>
+  <div class="side-foot">Shared test data · everyone with the link sees the same requests.<button data-action="resetDemo">${ic('undo',14)} Reset demo data</button></div></aside>
   <main id="main">${renderView()}</main></div>
   <nav class="bottom-nav">${items.map(([k,i,l,b])=>`<button class="${k===act?'on':''}" data-action="nav" data-view="${k}">${ic(i,22)}<span>${({'New request':'New','My requests':'My Requests'})[l]||l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`).join('')}</nav>`;
   if(ui.drawer)renderDrawer();
@@ -659,7 +704,7 @@ function renderSignin(){
   const row=u=>`<button data-action="login" data-id="${u.id}">${avatar(u)}<div><b>${esc(u.name)}</b><small>${esc(teamOf(u))} · ${u.emp}</small></div><span class="role-tag">${u.role==='wfm'?'WFM':'Staff'}</span></button>`;
   return `<div class="signin-page"><div class="card"><div class="logo">${ic('layers',24)}</div><h1>WFM Requests</h1><p>Real version: you’re signed in with your Microsoft work account.<br>Demo: pick who you want to test as.</p>
   <div class="user-pick"><div class="pick-label">WFM / Manager</div>${USERS.filter(u=>u.role==='wfm').map(row).join('')}<div class="pick-label">Staff</div>${staffUsers().map(row).join('')}</div>
-  <div class="side-foot" style="border:0;margin-top:14px;text-align:center">Data is saved in this browser only.<br><button data-action="resetDemo" style="margin:8px auto 0">${ic('undo',14)} Reset demo data</button></div></div></div>`;
+  <div class="side-foot" style="border:0;margin-top:14px;text-align:center">Shared test data · use dummy information only.<br><button data-action="resetDemo" style="margin:8px auto 0">${ic('undo',14)} Reset demo data</button></div></div></div>`;
 }
 function renderView(){
   const v=ui.view;
@@ -938,7 +983,7 @@ function viewRules(){
 
 /* ================= Drawer ================= */
 function openDrawer(kind,id){ui.drawer={kind,id};
-  if(kind==='rec'&&!isWfm()){const r=S.records.find(x=>x.id===id);if(r&&!r.reads[S.current]){r.reads[S.current]=Date.now();save()}}
+  if(kind==='rec'&&!isWfm()){const r=S.records.find(x=>x.id===id);if(r&&r.recipients.includes(S.current)&&!r.reads[S.current]){r.reads[S.current]=Date.now();rpc('mark_read',{p_id:id,p_uid:S.current}).catch(()=>{})}}
   render();$('#overlay').classList.add('open');$('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false')}
 function closeDrawer(silent){ui.drawer=null;$('#overlay').classList.remove('open');$('#drawer').classList.remove('open');$('#drawer').setAttribute('aria-hidden','true');if(!silent)render()}
 function renderDrawer(){
@@ -1016,7 +1061,6 @@ function recDrawer(r){
 
 /* ================= Actions ================= */
 function toast(msg,err){const t=$('#toast');t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(toast._t);toast._t=setTimeout(()=>t.className='toast'+(err?' err':''),2600)}
-function hist(r,action,comment){r.history.push({at:Date.now(),by:S.current,action,comment:comment||''})}
 
 function submitRequest(){
   const f=ui.form,v=f.vals,e={},uid=S.current,tIso=iso(today());
@@ -1043,14 +1087,17 @@ function submitRequest(){
   f.errors=e;
   if(Object.keys(e).length){render();toast('Please fix the highlighted fields',true);return}
   const status=f.type==='swap'?'waiting':'pending';
-  if(f.editingId){
-    const r=S.requests.find(x=>x.id===f.editingId);r.data=data;r.files=f.files;r.status=status;if(f.type==='swap')r.partnerId=v.partnerId;hist(r,'Resubmitted');
-    save();ui.mineFilter='all';go('mine');toast(`${r.id} resubmitted`);
-  }else{
-    const r={id:nextId('REQ'),type:f.type,userId:uid,status,createdAt:Date.now(),data,files:f.files,history:[]};
-    if(f.type==='swap')r.partnerId=v.partnerId;hist(r,'Submitted');S.requests.push(r);
-    save();ui.mineFilter='all';go('mine');toast(f.type==='swap'?`Sent to ${user(v.partnerId).name} for approval`:`${r.id} submitted to WFM`);
-  }
+  busy(async()=>{
+    if(f.editingId){
+      const orig=S.requests.find(x=>x.id===f.editingId),r=clone(orig);
+      r.data=data;r.files=f.files;r.status=status;if(f.type==='swap')r.partnerId=v.partnerId;r.history.push(mkH('Resubmitted'));
+      await patchReq(r,orig.status);await fetchAll();ui.mineFilter='all';go('mine');toast(`${r.id} resubmitted`);
+    }else{
+      const r={type:f.type,userId:uid,partnerId:f.type==='swap'?v.partnerId:null,status,data,files:f.files,history:[mkH('Submitted')]};
+      const rows=await api('requests',{method:'POST',prefer:'return=representation',body:reqToDb(r)});
+      await fetchAll();ui.mineFilter='all';go('mine');toast(f.type==='swap'?`Sent to ${user(v.partnerId).name} for approval`:`${rows[0].id} submitted to WFM`);
+    }
+  });
 }
 function submitRecord(){
   const f=ui.form,v=f.vals,e={};let data={},recipients=[v.staff];
@@ -1059,15 +1106,18 @@ function submitRecord(){
   if(f.kind==='adh'){if(!v.from)e.from='Required';if(!v.to)e.to='Required';if(v.from&&v.to&&v.to<v.from)e.to='Must be after “From”';data={reason:v.reason,from:v.from,to:v.to,note:v.note||''}}
   if(f.kind==='mom'){recipients=momRecipients(f);if(f.sendTo==='teams'&&!f.teams.length)e.teams='Pick at least one team';if(!(v.title||'').trim())e.title='Title is required';if(!v.date)e.date='Pick the date';if(!(v.summary||'').trim())e.summary='Summary is required';data={title:v.title,date:v.date,summary:v.summary||'',actions:v.actions||'',sendTo:f.sendTo,teams:[...f.teams]}}
   f.errors=e;if(Object.keys(e).length){render();toast('Please fix the highlighted fields',true);return}
-  const r={id:nextId(RECS[f.kind].pre),kind:f.kind,createdBy:S.current,createdAt:Date.now(),recipients,requireAck:f.kind==='adh'?false:!!v.requireAck,acks:{},reads:{},data,files:f.files};
-  S.records.push(r);save();go('create');
-  toast(f.kind==='adh'?`${r.id} saved`:`${r.id} sent to ${recipients.length===1?user(recipients[0]).name:recipients.length+' staff'}`);
+  const r={kind:f.kind,createdBy:S.current,recipients,requireAck:f.kind==='adh'?false:!!v.requireAck,data,files:f.files};
+  busy(async()=>{
+    const rows=await api('records',{method:'POST',prefer:'return=representation',body:recToDb(r)});const id=rows[0].id;
+    await fetchAll();go('create');
+    toast(f.kind==='adh'?`${id} saved`:`${id} sent to ${recipients.length===1?user(recipients[0]).name:recipients.length+' staff'}`);
+  });
 }
 function decide(id,d,comment){
   const r=S.requests.find(x=>x.id===id);if(!r||r.status!=='pending')return;
   if(d!=='accept'&&!comment){toast('Add a comment to '+(d==='return'?'return':'reject'),true);const c=$('#decisionComment');if(c)c.focus();return}
-  r.status=d==='accept'?'approved':d==='return'?'returned':'rejected';hist(r,d==='accept'?'Accepted':d==='return'?'Returned':'Rejected',comment);
-  save();closeDrawer();toast(`${r.id} ${d==='accept'?'accepted':d==='return'?'returned to '+user(r.userId).name:'rejected'}`);
+  const c=clone(r);c.status=d==='accept'?'approved':d==='return'?'returned':'rejected';c.history.push(mkH(d==='accept'?'Accepted':d==='return'?'Returned':'Rejected',comment));
+  busy(async()=>{await patchReq(c,'pending');await fetchAll();closeDrawer();toast(`${r.id} ${d==='accept'?'accepted':d==='return'?'returned to '+user(r.userId).name:'rejected'}`)});
 }
 function readFiles(list){
   const f=ui.form;if(!f)return;
@@ -1096,7 +1146,7 @@ document.addEventListener('click',ev=>{
   switch(a){
     case 'login':S.current=id;ui.view=user(id).role==='wfm'?'dash':'new';ui.form=null;ui.rulesDraft=null;save();render();window.scrollTo(0,0);toast(`Signed in as ${user(id).name}`);break;
     case 'switchUser':S.current=null;ui.drawer=null;closeDrawer(true);save();render();break;
-    case 'resetDemo':if(confirm('Reset all demo data? Everything you created will be removed.')){const c=S.current;S=seed();S.current=c;ui.form=null;ui.rulesDraft=null;save();closeDrawer(true);render();toast('Demo data reset')}break;
+    case 'resetDemo':if(confirm('Reset the shared demo data for EVERYONE testing? Everything created so far will be removed.')){busy(async()=>{await rpc('reset_demo');await seedServer();await fetchAll();ui.form=null;ui.rulesDraft=null;closeDrawer(true);if(S.current)ui.view=isWfm()?'dash':'new';render();toast('Demo data reset')})}break;
     case 'nav':go(el.dataset.view);break;
     case 'pickType':ui.form=newForm(el.dataset.type);go('form');break;
     case 'blockedType':toast(`Blocked until ${fmt(el.dataset.to)} · ${el.dataset.reason}`,true);break;
@@ -1113,12 +1163,13 @@ document.addEventListener('click',ev=>{
     case 'closeDrawer':closeDrawer();break;
     case 'decide':decide(id,el.dataset.d,(($('#decisionComment')||{}).value||'').trim());break;
     case 'quickDecide':openDrawer('req',id);setTimeout(()=>{const c=$('#decisionComment');if(c){c.focus();c.placeholder=`Comment required to ${el.dataset.d}`}},260);toast(`Add a comment, then tap ${el.dataset.d==='return'?'Return':'Reject'}`);break;
-    case 'cancelReq':{if(!confirm('Cancel this request?'))break;const r=S.requests.find(x=>x.id===id);r.status='cancelled';hist(r,'Cancelled');save();closeDrawer();toast(`${r.id} cancelled`);break}
+    case 'cancelReq':{if(!confirm('Cancel this request?'))break;const r=S.requests.find(x=>x.id===id),c=clone(r);c.status='cancelled';c.history.push(mkH('Cancelled'));
+      busy(async()=>{await patchReq(c,r.status);await fetchAll();closeDrawer();toast(`${r.id} cancelled`)});break}
     case 'editReq':{const r=S.requests.find(x=>x.id===id);ui.form=newForm(r.type,r);ui.view='form';closeDrawer(true);render();window.scrollTo(0,0);break}
     case 'swapAnswer':{const r=S.requests.find(x=>x.id===id);if(!r||r.status!=='waiting')break;
-      if(el.dataset.a==='accept'){r.status='pending';hist(r,'Colleague accepted');toast('Swap accepted · sent to WFM')}else{r.status='declined';hist(r,'Declined by colleague');toast('Swap declined')}
-      save();ui.drawer=null;closeDrawer();break}
-    case 'ack':{const r=S.records.find(x=>x.id===id);r.acks[S.current]={at:Date.now(),reply:(($('#ackReply')||{}).value||'').trim()};save();render();toast('Acknowledged');break}
+      const c=clone(r),acc=el.dataset.a==='accept';c.status=acc?'pending':'declined';c.history.push(mkH(acc?'Colleague accepted':'Declined by colleague'));
+      busy(async()=>{await patchReq(c,'waiting');await fetchAll();ui.drawer=null;closeDrawer();toast(acc?'Swap accepted · sent to WFM':'Swap declined')});break}
+    case 'ack':{const reply=(($('#ackReply')||{}).value||'').trim();busy(async()=>{await rpc('ack_record',{p_id:id,p_uid:S.current,p_reply:reply});await fetchAll();render();toast('Acknowledged')});break}
     case 'pickRec':ui.form=newRecForm(el.dataset.kind);go('createForm');break;
     case 'rate':ui.form.ratings[+el.dataset.c]=+el.dataset.n;ui.form.errors.ratings=null;render();break;
     case 'toggleVal':ui.form.vals[el.dataset.name]=!ui.form.vals[el.dataset.name];render();break;
@@ -1126,12 +1177,12 @@ document.addEventListener('click',ev=>{
     case 'momTeam':{const t=+el.dataset.t,arr=ui.form.teams,i=arr.indexOf(t);i>=0?arr.splice(i,1):arr.push(t);render();break}
     case 'limit':ui.rulesDraft.leaveLimit=Math.max(1,Math.min(20,ui.rulesDraft.leaveLimit+(+el.dataset.d)));render();break;
     case 'toggleCountPending':ui.rulesDraft.countPending=!ui.rulesDraft.countPending;render();break;
-    case 'saveRules':Object.assign(S.rules,ui.rulesDraft);save();render();toast('Rules saved');break;
-    case 'rmBlock':S.rules.blocks=S.rules.blocks.filter(b=>b.id!==id);save();render();toast('Block removed');break;
+    case 'saveRules':{const R=ui.rulesDraft;busy(async()=>{await api('rules?id=eq.1',{method:'PATCH',body:{leave_limit:R.leaveLimit,count_pending:R.countPending}});await fetchAll();ui.rulesDraft=null;render();toast('Rules saved')});break}
+    case 'rmBlock':busy(async()=>{await api(`blocks?id=eq.${encodeURIComponent(id)}`,{method:'DELETE'});await fetchAll();render();toast('Block removed')});break;
     case 'addBlock':{const b=ui.blockForm;
       if(!b.from||!b.to){toast('Set both dates',true);break}if(b.to<b.from){toast('“To” must be after “From”',true);break}if(!b.reason.trim()){toast('Add a reason staff will see',true);break}
-      S.seq.BL=(S.seq.BL||0)+1;S.rules.blocks.push({id:'BL-'+S.seq.BL,scope:b.scope,target:b.scope==='all'?null:b.target,type:b.type,from:b.from,to:b.to,reason:b.reason.trim()});
-      ui.blockForm={...b,reason:''};save();render();toast('Block added');break}
+      busy(async()=>{await api('blocks',{method:'POST',body:{scope:b.scope,target:b.scope==='all'?null:String(b.target),type:b.type,from_date:b.from,to_date:b.to,reason:b.reason.trim()}});
+        ui.blockForm={...b,reason:''};await fetchAll();render();toast('Block added')});break}
     case 'exportCsv':exportCsv();break;
   }
 });
@@ -1158,9 +1209,23 @@ document.addEventListener('dragover',ev=>{if(ev.target.closest('.drop'))ev.preve
 document.addEventListener('drop',ev=>{const d=ev.target.closest('.drop');if(d){ev.preventDefault();readFiles(ev.dataTransfer.files)}});
 
 /* ================= Boot ================= */
-S=load();
+S={current:null,requests:[],records:[],rules:{leaveLimit:2,countPending:true,blocks:[]}};
+try{S.current=localStorage.getItem(KEY)}catch(e){}
+if(S.current&&!USERS.some(u=>u.id===S.current))S.current=null;
 (function(){const T=today();ui.blockForm.from=iso(T);ui.blockForm.to=iso(addDays(T,14))})();
-if(S.current)ui.view=isWfm()?'dash':'new';
-render();
+async function boot(){
+  $('#app').innerHTML=`<div class="signin-page"><div class="card"><div class="logo">${ic('layers',24)}</div><h1>WFM Requests</h1><p>Loading shared data…</p></div></div>`;
+  try{
+    await fetchAll();
+    if(!S.requests.length&&!S.records.length){try{await seedServer()}catch(e){}await fetchAll()}
+  }catch(e){
+    $('#app').innerHTML=`<div class="signin-page"><div class="card"><div class="logo">${ic('layers',24)}</div><h1>Can’t reach the database</h1><p>${esc(e.message)}. Check your internet connection — some office networks block it.</p><button class="btn primary" onclick="boot()">Try again</button></div></div>`;return;
+  }
+  if(S.current)ui.view=isWfm()?'dash':'new';
+  render();
+}
+boot();
+setInterval(poll,15000);
+window.addEventListener('focus',poll);
 </script>
 </body></html>
