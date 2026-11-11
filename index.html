@@ -483,7 +483,56 @@ main{min-width:0}
 .ins span{display:block;font-size:11.5px;color:var(--muted)}
 .ins b{font-size:13.5px}
 .small-names{font-size:12px;color:var(--muted);margin-top:2px}
-@media (max-width:1000px){.grid-2[style]{grid-template-columns:1fr !important}}
+.tabs{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:12px;margin-bottom:18px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:1;border:0;background:none;padding:9px 14px;border-radius:9px;font-weight:600;font-size:13.5px;color:var(--muted);white-space:nowrap}
+.tabs button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.num input{width:56px;border:0;outline:0;text-align:center;font-weight:700;font-size:16px;background:var(--surface);color:var(--text);height:40px;-moz-appearance:textfield;appearance:textfield}
+.num input::-webkit-outer-spin-button,.num input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.num .num-unit{font-weight:700;color:var(--muted);padding-right:8px;background:var(--surface);height:40px;display:grid;place-items:center}
+.even-rules{grid-template-columns:1fr 1.3fr}
+.form-grid.two{grid-template-columns:1fr 1fr;gap:12px}
+.team-row{display:flex;gap:8px;align-items:center}
+.team-row .input{flex:1;min-width:0}
+.team-n{white-space:nowrap;font-size:12.5px;min-width:54px}
+.team-row.add{margin-top:14px;border-top:1px solid var(--border);padding-top:14px}
+.list-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr));gap:18px;align-items:start}
+.li-rows{display:flex;flex-direction:column;gap:6px}
+.li-row{display:flex;gap:6px;align-items:center}
+.li-row .input{flex:1;min-width:0;padding:8px 10px}
+.li-row.add{margin-top:10px}
+.req-card.inactive{opacity:.6}
+.req-card.editing{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+.req-card .avatar{flex:none}
+.login-form{display:flex;flex-direction:column;gap:14px;text-align:left}
+.login-form .btn{width:100%;padding:11px}
+.mini-h{font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin:16px 0 8px}
+.perf-grid{grid-template-columns:1fr 1fr}
+.type-card .lock-tag{margin-top:auto}
+.btn.bad.icon{color:var(--bad)}
+@media (max-width:1000px){.grid-2[style],.even-rules,.perf-grid{grid-template-columns:1fr !important}}
+@media (max-width:820px){
+  input,select,textarea,.input{font-size:16px}
+  .page-head{align-items:stretch}
+  .page-head>.btn{width:100%}
+  .page-head h1{font-size:21px}
+  .card-pad{padding:16px}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat{padding:14px}
+  .req-card{flex-wrap:wrap}
+  .req-card .req-main{min-width:calc(100% - 60px)}
+  .req-card .req-side,.req-card>.quick{margin-left:48px}
+  .incoming .quick{margin-left:0}
+  .d-foot .row{flex-wrap:wrap}
+  .crit-grid{grid-template-columns:1fr;gap:6px}
+  .crit-grid>b{display:none}
+  .crit-grid .rating{margin-bottom:6px}
+  .switch-row{flex-wrap:wrap}
+  .tabs button{flex:0 0 auto}
+  .bottom-nav button span:not(.badge){font-size:10.5px}
+  .heat .hc{min-width:38px;font-size:12px}
+  .mini-table th,.mini-table td{padding:9px 10px}
+}
 @media (max-width:820px){.user-btn .me-text{display:none}.user-btn{padding:4px}.q-filters select{flex:1;min-width:0}}
 </style></head><body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol><symbol id="i-swap" viewBox="0 0 24 24"><path d="M16 3l4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16"/></symbol><symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol><symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol><symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol><symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></symbol><symbol id="i-headset" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol><symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M16 13H8M16 17H8M10 9H8"/></symbol><symbol id="i-clip" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></symbol><symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol><symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol><symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol><symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol><symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol><symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol><symbol id="i-next" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol><symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol><symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol><symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol><symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol><symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol><symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol><symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2 10 5-10 5L2 7l10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></symbol><symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol><symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol></svg>
@@ -507,24 +556,27 @@ const RECS={
   eval:{name:'Call Evaluation',desc:'Score a monitored call and give feedback',c:'#6366f1',i:'headset',pre:'EV'},
   mom:{name:'Minutes of Meeting',desc:'Send minutes to a person or a group',c:'#0891b2',i:'file',pre:'MOM'}
 };
-const TEAMS=['Customer Care · Team A','Customer Care · Team B','Sales Support · Team C'];
-const SHIFTS=['Morning · 07:00–15:00','Mid · 11:00–19:00','Evening · 15:00–23:00','Night · 23:00–07:00'];
-const KPIS=['Adherence','AHT (Average handle time)','Quality score','Attendance'];
-const VTYPES=['Late login','Early logout','Unscheduled break','Other (types to be confirmed)'];
-const ADH_REASONS=['Sick leave','Emergency leave','System issue','Other'];
-const CRITERIA=['Greeting & opening','Customer verification','Understanding the need','Solution accuracy','Tone & empathy','Closing'];
-const CALL_TYPES=['Inquiry','Complaint','Sales','Technical support'];
-const PREFS=['Avoid mornings','Avoid evenings','Avoid nights','Specific days off','Other'];
-const USERS=[
-  {id:'u1',name:'Sara Ahmed',emp:'E1042',role:'staff',team:0},
-  {id:'u2',name:'Omar Khalid',emp:'E1055',role:'staff',team:0},
-  {id:'u3',name:'Fatima Hassan',emp:'E1061',role:'staff',team:1},
-  {id:'u4',name:'Yousef Ali',emp:'E1073',role:'staff',team:1},
-  {id:'u5',name:'Noura Saleh',emp:'E1088',role:'staff',team:2},
-  {id:'u6',name:'Ahmad Faisal',emp:'E1090',role:'staff',team:2},
-  {id:'w1',name:'Khaled Nasser',emp:'W2001',role:'wfm',title:'WFM'},
-  {id:'w2',name:'Mona Saad',emp:'M3004',role:'wfm',title:'Supervisor'}
-];
+const DEFAULT_LISTS={
+  shifts:['Morning · 07:00–15:00','Mid · 11:00–19:00','Evening · 15:00–23:00','Night · 23:00–07:00'],
+  kpis:['Adherence','AHT (Average handle time)','Quality score','Attendance'],
+  vtypes:['Late login','Early logout','Unscheduled break','Other'],
+  adh_reasons:['Sick leave','Emergency leave','System issue','Other'],
+  call_types:['Inquiry','Complaint','Sales','Technical support'],
+  criteria:['Greeting & opening','Customer verification','Understanding the need','Solution accuracy','Tone & empathy','Closing'],
+  prefs:['Avoid mornings','Avoid evenings','Avoid nights','Specific days off','Other']
+};
+const LIST_META={
+  vtypes:{name:'Violation types',hint:'Used on violation tickets'},
+  adh_reasons:{name:'Adherence note reasons',hint:'Used on adherence notes'},
+  kpis:{name:'KPI types',hint:'Shown to staff on KPI requests'},
+  criteria:{name:'Call evaluation criteria',hint:'Scored 1–5 each. Changes apply to new evaluations; past ones keep their own criteria.'},
+  call_types:{name:'Call types',hint:'Used on call evaluations'},
+  prefs:{name:'Schedule preferences',hint:'Shown to staff on schedule special requests'},
+  shifts:{name:'Shifts',hint:'Used on shift swap and shift change requests'}
+};
+let LISTS=JSON.parse(JSON.stringify(DEFAULT_LISTS));
+let TEAMS={},TEAM_LIST=[],USERS=[];
+const DEFAULT_CRIT=DEFAULT_LISTS.criteria;
 const STATUS={pending:'Pending',approved:'Accepted',rejected:'Rejected',cancelled:'Cancelled',returned:'Returned',waiting:'Waiting for colleague',declined:'Declined by colleague'};
 const KEY='wfm-requests-user';
 const SB_URL='https://gtwibzupaaxcrqqfnajl.supabase.co';
@@ -546,12 +598,13 @@ const fmtL=s=>{if(!s)return '—';const d=parse(s);return `${d.getDate()} ${MON[
 const fmtTs=t=>{const d=new Date(t);return `${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())}`};
 const ago=t=>{const m=Math.round((Date.now()-t)/60000);if(m<1)return 'just now';if(m<60)return m+'m ago';const h=Math.round(m/60);if(h<24)return h+'h ago';const d=Math.round(h/24);if(d<7)return d+'d ago';return Math.round(d/7)+'w ago'};
 const daysBetween=(a,b)=>Math.round((parse(b)-parse(a))/86400000)+1;
-const user=id=>USERS.find(u=>u.id===id)||{name:'Unknown',emp:'',role:'staff'};
-const teamOf=u=>u.role==='wfm'?(u.title||'WFM'):TEAMS[u.team];
+const user=id=>USERS.find(u=>u.id===id)||{id,name:'Unknown user',emp:'',role:'staff',team:null};
+const teamName=id=>id==null||id===''?'No team':(TEAMS[id]??'No team');
+const teamOf=u=>u.role==='wfm'?(u.title||'WFM'):teamName(u.team);
 const initials=n=>n.split(' ').map(x=>x[0]).slice(0,2).join('');
-const staffUsers=()=>USERS.filter(u=>u.role==='staff');
+const staffUsers=()=>USERS.filter(u=>u.role==='staff'&&u.active);
 const shortShift=s=>String(s||'').split(' · ')[0];
-const shiftFor=(uid,date)=>{let h=7;for(const c of uid+date)h=(h*31+c.charCodeAt(0))>>>0;return SHIFTS[[0,2,1][h%3]]};
+const shiftFor=(uid,date)=>{let h=7;for(const c of uid+date)h=(h*31+c.charCodeAt(0))>>>0;const L=LISTS.shifts;return L[[0,2,1][h%3]%L.length]||''};
 const fmtSize=b=>b>1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB';
 const ext=n=>(n.split('.').pop()||'FILE').toUpperCase().slice(0,4);
 const scoreOf=r=>Math.round(r.reduce((a,b)=>a+b,0)/r.length/5*100);
@@ -579,11 +632,16 @@ const recToDb=r=>({kind:r.kind,created_by:r.createdBy,recipients:r.recipients,re
 const blockFromDb=b=>({id:b.id,scope:b.scope,target:b.target,type:b.type,from:b.from_date,to:b.to_date,reason:b.reason});
 let lastSig='';
 async function fetchAll(){
-  const [rq,rc,ru,bl]=await Promise.all([api('requests?select=*&order=created_at.desc'),api('records?select=*&order=created_at.desc'),api('rules?select=*'),api('blocks?select=*')]);
+  const [rq,rc,ru,bl,us,tm,st,pf]=await Promise.all([api('requests?select=*&order=created_at.desc'),api('records?select=*&order=created_at.desc'),api('rules?select=*'),api('blocks?select=*'),
+    api('app_users?select=id,emp,name,role,title,team,active,must_change,created_at&order=name'),api('teams?select=*&order=sort,id'),api('settings?select=*'),api('performance?select=user_id,date,score,uploaded_at&order=date')]);
+  USERS=us.map(u=>({id:u.id,emp:u.emp,name:u.name,role:u.role,title:u.title,team:u.team,active:u.active,mustChange:u.must_change}));
+  TEAM_LIST=tm.map(t=>({id:t.id,name:t.name,sort:t.sort}));TEAMS=Object.fromEntries(TEAM_LIST.map(t=>[t.id,t.name]));
+  LISTS=JSON.parse(JSON.stringify(DEFAULT_LISTS));st.forEach(x=>{if(Array.isArray(x.value)&&x.value.length)LISTS[x.key]=x.value});
+  S.perf=pf.map(x=>({userId:x.user_id,date:x.date,score:+x.score,at:+x.uploaded_at}));
   const r0=ru[0]||{leave_limit:2,count_pending:true};
   S.requests=rq.map(reqFromDb);S.records=rc.map(recFromDb);
   S.rules={leaveLimit:r0.leave_limit,countPending:r0.count_pending,qualityTarget:r0.quality_target||85,blocks:bl.map(blockFromDb)};
-  const sig=JSON.stringify([rq,rc,ru,bl]),changed=sig!==lastSig;lastSig=sig;return changed;
+  const sig=JSON.stringify([rq,rc,ru,bl,us,tm,st,pf]),changed=sig!==lastSig;lastSig=sig;return changed;
 }
 async function patchReq(r,expected){
   const rows=await api(`requests?id=eq.${encodeURIComponent(r.id)}&status=eq.${expected}`,{method:'PATCH',prefer:'return=representation',
@@ -598,8 +656,12 @@ async function busy(fn){
 }
 async function poll(){
   if(document.hidden||working||!S.current)return;
-  try{const ch=await fetchAll();if(!ch)return;const a=document.activeElement;if(a&&a.matches('input,textarea,select'))return;render()}catch(e){}
+  try{const ch=await fetchAll();if(!ch)return;if(!sessionValid()){signOut('You were signed out — your account changed. Please sign in again.');return}const a=document.activeElement;if(a&&a.matches('input,textarea,select'))return;render()}catch(e){}
 }
+function signIn(id){S.current=id;if(!ui.blockForm.target)ui.blockForm.target=(staffUsers()[0]||{}).id;ui.pending=null;ui.view=user(id).role==='wfm'?'dash':'new';ui.form=null;ui.rulesDraft=null;ui.listDraft=null;save();closeDrawer(true);render();window.scrollTo(0,0);toast(`Welcome, ${user(id).name.split(' ')[0]}`)}
+function signOut(msg){S.current=null;ui.pending=null;ui.drawer=null;save();closeDrawer(true);render();if(msg)toast(msg,true)}
+const sessionValid=()=>{const u=USERS.find(x=>x.id===S.current);return !!(u&&u.active&&!u.mustChange)};
+const genPw=()=>{const c='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';let s='';const r=crypto.getRandomValues(new Uint32Array(8));r.forEach(n=>s+=c[n%c.length]);return s};
 function save(){try{S.current?localStorage.setItem(KEY,S.current):localStorage.removeItem(KEY)}catch(e){}}
 const me=()=>user(S.current);
 const isWfm=()=>me().role==='wfm';
@@ -609,9 +671,18 @@ function leaveUsage(date,excludeId){
   return S.requests.filter(r=>r.type==='leave'&&r.id!==excludeId&&user(r.userId).role==='staff'&&
     (r.status==='approved'||(S.rules.countPending&&r.status==='pending'))&&r.data.start<=date&&date<=r.data.end).length;
 }
-function activeBlock(uid,type){
-  const t=iso(today()),u=user(uid);
-  return S.rules.blocks.find(b=>b.type===type&&b.from<=t&&t<=b.to&&(b.scope==='all'||(b.scope==='user'&&b.target===uid)||(b.scope==='team'&&+b.target===u.team)));
+function blockApplies(b,uid){const u=user(uid);return b.scope==='all'||(b.scope==='user'&&b.target===uid)||(b.scope==='team'&&String(b.target)===String(u.team))}
+function blockOn(uid,type,date){return S.rules.blocks.find(b=>b.type===type&&blockApplies(b,uid)&&b.from<=date&&date<=b.to)}
+function blocksFor(uid,type){const t=iso(today());return S.rules.blocks.filter(b=>b.type===type&&blockApplies(b,uid)&&b.to>=t).sort((a,b)=>a.from.localeCompare(b.from))}
+function blockedInRange(uid,type,a,b){const out=[];for(let d=parse(a);d<=parse(b);d=addDays(d,1)){const s=iso(d),bl=blockOn(uid,type,s);if(bl)out.push(s)}return out}
+const monthRange=label=>{const [m,y]=String(label).split(' ');const mi=MONL.indexOf(m);return mi<0?[iso(today()),iso(today())]:[iso(new Date(+y,mi,1)),iso(new Date(+y,mi+1,0))]};
+const rangeTxt=b=>b.from===b.to?fmt(b.from):`${fmt(b.from)} – ${fmt(b.to)}`;
+function leaveProblem(start,end,excl){
+  const blocked=blockedInRange(S.current,'leave',start,end);
+  if(blocked.length){const b=blockOn(S.current,'leave',blocked[0]);return `${fmt(blocked[0])} is blocked by WFM${b&&b.reason?' ('+b.reason+')':''} — pick other dates`}
+  const full=fullDaysIn(start,end,excl);
+  if(full.length)return `${full.map(fmt).join(', ')} ${full.length>1?'are':'is'} full — pick other dates`;
+  return '';
 }
 function fullDaysIn(start,end,excludeId){
   const out=[];for(let d=parse(start);d<=parse(end);d=addDays(d,1)){const s=iso(d);if(leaveUsage(s,excludeId)>=S.rules.leaveLimit)out.push(s)}return out;
@@ -632,7 +703,7 @@ function recSummary(r){
     case 'eval':return `Score ${scoreOf(x.ratings)}% · Call on ${fmt(x.date)} · by ${user(r.createdBy).name}`;
     case 'mom':return `${x.title}${r.files.length?` · ${r.files.length} attachment(s)`:''}`;
     case 'vio':return `${x.vtype} · ${fmt(x.date)}`;
-    case 'adh':return `${x.reason} · ${fmt(x.from)}${x.to!==x.from?' → '+fmt(x.to):''}`;
+    case 'adh':return `${x.reason} · ${fmt(x.date||x.from)}`;
   }
 }
 const lastDecision=r=>[...r.history].reverse().find(h=>['Accepted','Rejected','Returned'].includes(h.action));
@@ -670,11 +741,11 @@ function quick(id){return `<div class="quick"><button class="btn sm bad" data-ac
 function navItems(){
   if(isWfm()){
     const p=S.requests.filter(r=>r.status==='pending').length;
-    return [['dash','grid','Dashboard'],['all','inbox','Requests',p],['quality','headset','Quality'],['create','plus','Create'],['rules','sliders','Rules']];
+    return [['dash','grid','Dashboard'],['all','inbox','Requests',p],['quality','headset','Quality'],['create','upload','Send to staff'],['admin','sliders','Admin']];
   }
   const uid=S.current,m=S.requests.filter(r=>r.userId===uid&&r.status==='returned').length+incomingSwaps(uid).length;
   const u=myInbox(uid).filter(r=>isUnread(r,uid)).length;
-  return [['new','plus','New request'],['mine','list','My requests',m],['inbox','inbox','From WFM',u]];
+  return [['new','plus','New request'],['mine','list','My requests',m],['inbox','inbox','From WFM',u],['perf','target','My performance']];
 }
 const activeNav=()=>ui.view==='form'?'new':ui.view==='createForm'?'create':ui.view;
 function go(view){ui.view=view;if(view!=='form'&&view!=='createForm')ui.form=null;closeDrawer(true);render();window.scrollTo(0,0)}
@@ -685,32 +756,34 @@ function render(){
   if(!S.current){app.innerHTML=renderSignin();return}
   const u=me(),items=navItems(),act=activeNav();
   app.innerHTML=`<header class="topbar"><div class="brand"><div class="logo">${ic('layers',18)}</div><span class="brand-name">WFM Requests</span><span class="proto">Demo</span></div>
-  <button class="user-btn" data-action="switchUser" title="Switch user">${avatar(u)}<div class="me-text"><b>${esc(u.name)}</b><span>${esc(teamOf(u))}</span></div>${ic('users',16)}</button></header>
+  <button class="user-btn" data-action="account" title="Account">${avatar(u)}<div class="me-text"><b>${esc(u.name)}</b><span>${esc(teamOf(u))}</span></div>${ic('next',16).replace('<svg','<svg style="transform:rotate(90deg)"')}</button></header>
   <div class="shell"><aside class="sidebar"><div class="side-label">${isWfm()?'WFM / Manager':'Staff'}</div>
   ${items.map(([k,i,l,b])=>`<button class="nav-item${k===act?' on':''}" data-action="nav" data-view="${k}">${ic(i,18)}<span>${l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`).join('')}
-  <div class="side-foot">Shared test data · everyone with the link sees the same requests.<button data-action="resetDemo">${ic('trash',14)} Clear all data</button></div></aside>
+  <div class="side-foot">Test version · shared data.${isWfm()?`<button data-action="resetDemo">${ic('trash',14)} Clear all data</button>`:''}<button data-action="signOut">${ic('back',14)} Sign out</button></div></aside>
   <main id="main">${renderView()}</main></div>
-  <nav class="bottom-nav">${items.map(([k,i,l,b])=>`<button class="${k===act?'on':''}" data-action="nav" data-view="${k}">${ic(i,22)}<span>${({'New request':'New','My requests':'My Requests'})[l]||l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`).join('')}</nav>`;
+  <nav class="bottom-nav">${items.map(([k,i,l,b])=>`<button class="${k===act?'on':''}" data-action="nav" data-view="${k}">${ic(i,22)}<span>${({'New request':'New','My requests':'Requests','From WFM':'Inbox','My performance':'Score','Send to staff':'Send'})[l]||l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`).join('')}</nav>`;
   if(ui.drawer)renderDrawer();
 }
 function renderSignin(){
-  const row=u=>`<button data-action="login" data-id="${u.id}">${avatar(u)}<div><b>${esc(u.name)}</b><small>${esc(teamOf(u))} · ${u.emp}</small></div><span class="role-tag">${u.role==='wfm'?'WFM':'Staff'}</span></button>`;
-  return `<div class="signin-page"><div class="card"><div class="logo">${ic('layers',24)}</div><h1>WFM Requests</h1><p>Real version: you’re signed in with your Microsoft work account.<br>Demo: pick who you want to test as.</p>
-  <div class="user-pick"><div class="pick-label">WFM / Manager</div>${USERS.filter(u=>u.role==='wfm').map(row).join('')}<div class="pick-label">Staff</div>${staffUsers().map(row).join('')}</div>
-  <div class="side-foot" style="border:0;margin-top:14px;text-align:center">Shared test data · use dummy information only.<br><button data-action="resetDemo" style="margin:8px auto 0">${ic('trash',14)} Clear all data</button></div></div></div>`;
+  if(ui.pending)return `<div class="signin-page"><div class="card"><div class="logo">${ic('lock',24)}</div><h1>Choose a new password</h1><p>Hi ${esc(user(ui.pending.id).name.split(' ')[0])} — please replace your temporary password before you continue.</p>
+   <form id="newPwForm" class="login-form" novalidate>${field('New password','<input type="password" name="new1" autocomplete="new-password" autofocus>',{hint:'At least 6 characters'})}${field('Repeat new password','<input type="password" name="new2" autocomplete="new-password">')}
+   <button type="submit" class="btn primary">${ic('check',16)} Save and continue</button><button type="button" class="btn" data-action="cancelPending">Back to sign in</button></form></div></div>`;
+  return `<div class="signin-page"><div class="card"><div class="logo">${ic('layers',24)}</div><h1>WFM Requests</h1><p>Sign in with your employee ID.</p>
+   <form id="loginForm" class="login-form" novalidate>${field('Employee ID',`<input name="emp" value="${esc(ui.lastEmp||'')}" autocomplete="username" autocapitalize="characters" placeholder="e.g. E1042">`)}${field('Password','<input type="password" name="pw" autocomplete="current-password">')}
+   <button type="submit" class="btn primary">${ic('next',16)} Sign in</button></form>
+   <div class="side-foot" style="border:0;margin-top:10px;text-align:center">Forgot your password? Ask WFM to reset it.<br>Test version · use dummy information only.</div></div></div>`;
 }
 function renderView(){
   const v=ui.view;
-  if(isWfm()){return v==='quality'?viewQuality():v==='all'?viewAll():v==='create'?viewCreate():v==='createForm'?viewCreateForm():v==='rules'?viewRules():viewDash()}
-  return v==='form'?viewForm():v==='mine'?viewMine():v==='inbox'?viewInbox():viewNew();
+  if(isWfm()){return v==='quality'?viewQuality():v==='all'?viewAll():v==='create'?viewCreate():v==='createForm'?viewCreateForm():v==='admin'?viewAdmin():viewDash()}
+  return v==='form'?viewForm():v==='mine'?viewMine():v==='inbox'?viewInbox():v==='perf'?viewMyPerf():viewNew();
 }
 
 /* ================= Staff views ================= */
 function viewNew(){
   const cards=Object.entries(TYPES).map(([k,t])=>{
-    const b=activeBlock(S.current,k);
-    if(b)return `<div class="type-card locked" style="--c:${t.c}" data-action="blockedType" data-reason="${esc(b.reason)}" data-to="${b.to}">${bubble(k)}<div><b>${t.name}</b><br><span>${t.desc}</span></div><span class="lock-tag">${ic('lock',12)} Blocked until ${fmt(b.to)}</span></div>`;
-    return `<button class="type-card" style="--c:${t.c}" data-action="pickType" data-type="${k}">${bubble(k)}<div><b>${t.name}</b><br><span>${t.desc}</span></div></button>`;
+    const bl=blocksFor(S.current,k);
+    return `<button class="type-card" style="--c:${t.c}" data-action="pickType" data-type="${k}">${bubble(k)}<div><b>${t.name}</b><br><span>${t.desc}</span></div>${bl.length?`<span class="lock-tag">${ic('lock',12)} Blocked ${rangeTxt(bl[0])}${bl.length>1?` +${bl.length-1}`:''}</span>`:''}</button>`;
   }).join('');
   return head('New request','What would you like to request?')+`<div class="type-grid">${cards}</div>`;
 }
@@ -721,10 +794,10 @@ function newForm(type,editing){
     if(type==='leave'){f.cal.start=editing.data.start;f.cal.end=editing.data.end;const s=parse(editing.data.start);f.cal.month=new Date(s.getFullYear(),s.getMonth(),1);if(f.cal.month<new Date(T.getFullYear(),T.getMonth(),1))f.cal.month=new Date(T.getFullYear(),T.getMonth(),1)}
     if(type==='swap')f.vals.partnerId=editing.partnerId;
   }else{
-    if(type==='swap'){f.vals.partnerId=staffUsers().find(u=>u.id!==S.current).id}
+    if(type==='swap'){f.vals.partnerId=(staffUsers().find(u=>u.id!==S.current)||{}).id}
     if(type==='change')f.vals.requested='';
     if(type==='special'){f.vals.schedule=nextMonths()[0];f.vals.period='Whole schedule'}
-    if(type==='kpi')f.vals.kpi=KPIS[0];
+    if(type==='kpi')f.vals.kpi=LISTS.kpis[0];
   }
   return f;
 }
@@ -742,10 +815,12 @@ function calendarHtml(f){
     const {start,end}=f.cal;
     if(start&&(s===start||s===end)){h+=`<button type="button" class="day sel" data-action="calPick" data-d="${s}">${d}</button>`;continue}
     if(start&&end&&s>start&&s<end){h+=`<button type="button" class="day mid" data-action="calPick" data-d="${s}">${d}</button>`;continue}
+    const bk=blockOn(S.current,'leave',s);
+    if(bk){h+=`<div class="day full" title="Blocked by WFM${bk.reason?': '+esc(bk.reason):''}">${d}<small>Blocked</small></div>`;continue}
     if(left<=0){h+=`<div class="day full" title="Leave limit reached for this day">${d}<small>Full</small></div>`;continue}
     h+=`<button type="button" class="day${left===1?' low':''}" data-action="calPick" data-d="${s}">${d}${left===1?'<small>1 left</small>':''}</button>`;
   }
-  h+='</div><div class="legend"><span><i style="background:var(--primary);border-color:var(--primary)"></i>Selected</span><span><i style="background:var(--warn-soft);border-color:transparent"></i>1 slot left</span><span><i style="background:repeating-linear-gradient(45deg,var(--surface-2) 0 3px,transparent 3px 6px)"></i>Full · can’t be picked</span></div>';
+  h+='</div><div class="legend"><span><i style="background:var(--primary);border-color:var(--primary)"></i>Selected</span><span><i style="background:var(--warn-soft);border-color:transparent"></i>1 slot left</span><span><i style="background:repeating-linear-gradient(45deg,var(--surface-2) 0 3px,transparent 3px 6px)"></i>Full or blocked · can’t be picked</span></div>';
   const {start,end}=f.cal;
   if(start)h+=`<div class="sel-sum">${ic('cal',16)} ${end?`${fmt(start)} → ${fmt(end)} · ${daysBetween(start,end)} day(s)`:`${fmt(start)} · tap another day to set the end, or submit for 1 day`}</div>`;
   else h+=`<div class="sel-sum" style="background:var(--surface-2);color:var(--muted)">${ic('cal',16)} Tap your first day, then your last day</div>`;
@@ -769,7 +844,7 @@ function viewForm(){
     const d=v.date,p=v.partnerId;
     body=callout('info','info','How a swap works',`<div class="flow" style="margin-top:6px"><span class="flow-step">You submit</span><span class="flow-arrow">${ic('arrow',14)}</span><span class="flow-step">Colleague accepts</span><span class="flow-arrow">${ic('arrow',14)}</span><span class="flow-step">WFM decides</span></div>`)+
     `<div class="form-grid">${field('Date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}
-    ${field('Swap with',`<select name="partnerId">${others.map(o=>opt(o.id,`${o.name} · ${TEAMS[o.team].split(' · ')[1]}`,o.id===p)).join('')}</select>`,{req:1})}
+    ${field('Swap with',`<select name="partnerId">${others.map(o=>opt(o.id,`${o.name} · ${teamName(o.team)}`,o.id===p)).join('')}</select>`,{req:1})}
     ${field('Your shift that day',`<input value="${esc(d?shiftFor(uid,d):'Pick a date')}" disabled>`,{hint:'From the published schedule (demo)'})}
     ${field('Their shift that day',`<input value="${esc(d?shiftFor(p,d):'Pick a date')}" disabled>`,{hint:'From the published schedule (demo)'})}
     ${field('Reason',ta('reason','Why do you need the swap? (optional)'),{full:1})}
@@ -778,18 +853,18 @@ function viewForm(){
     const cur=v.date?shiftFor(uid,v.date):'';
     body=`<div class="form-grid">${field('Date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}
     ${field('Current shift',`<input value="${esc(cur||'Pick a date')}" disabled>`,{hint:'From the published schedule (demo)'})}
-    ${field('Requested shift',`<select name="requested"><option value="">Choose…</option>${SHIFTS.filter(s=>s!==cur).map(s=>opt(s,s,s===v.requested)).join('')}</select>`,{req:1,invalid:e.requested,hint:e.requested})}
+    ${field('Requested shift',`<select name="requested"><option value="">Choose…</option>${LISTS.shifts.filter(s=>s!==cur).map(s=>opt(s,s,s===v.requested)).join('')}</select>`,{req:1,invalid:e.requested,hint:e.requested})}
     ${field('Reason',ta('reason','Why do you need this change?'),{full:1,req:1,invalid:e.reason,hint:e.reason})}
     ${files(false,'Optional')}</div>`;
   }else if(f.type==='special'){
-    body=`<div class="form-grid">${field('For schedule',`<select name="schedule">${nextMonths().map(s=>opt(s,s,s===v.schedule)).join('')}</select>`,{req:1})}
+    body=`<div class="form-grid">${field('For schedule',`<select name="schedule">${nextMonths().map(s=>opt(s,s,s===v.schedule)).join('')}</select>`,{req:1,invalid:e.schedule,hint:e.schedule})}
     ${field('Period',`<select name="period">${['Whole schedule','Specific dates'].map(s=>opt(s,s,s===v.period)).join('')}</select>`)}
     ${v.period==='Specific dates'?field('Which dates',inp('dates','text','e.g. 3–10 and 20–24'),{full:1,req:1,invalid:e.dates,hint:e.dates}):''}
-    ${field('Preference',`<div class="opt-chips">${PREFS.map(p=>`<span class="chip${f.prefs.includes(p)?' on':''}" data-action="togglePref" data-p="${esc(p)}">${p}</span>`).join('')}</div>`,{full:1,req:1,invalid:e.prefs,hint:e.prefs||'Pick one or more'})}
+    ${field('Preference',`<div class="opt-chips">${LISTS.prefs.map(p=>`<span class="chip${f.prefs.includes(p)?' on':''}" data-action="togglePref" data-p="${esc(p)}">${p}</span>`).join('')}</div>`,{full:1,req:1,invalid:e.prefs,hint:e.prefs||'Pick one or more'})}
     ${field('Details',ta('details','Explain your request'),{full:1,req:1,invalid:e.details,hint:e.details})}
     ${files(false,'Optional · supporting document')}</div>`;
   }else if(f.type==='kpi'){
-    body=`<div class="form-grid">${field('KPI affected',`<select name="kpi">${KPIS.map(s=>opt(s,s,s===v.kpi)).join('')}</select>`,{req:1})}
+    body=`<div class="form-grid">${field('KPI affected',`<select name="kpi">${LISTS.kpis.map(s=>opt(s,s,s===v.kpi)).join('')}</select>`,{req:1})}
     ${field('Date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}
     ${field('Justification',ta('justification','What happened and why it affected your KPI'),{full:1,req:1,invalid:e.justification,hint:e.justification})}
     ${files(true,'Required for KPI requests')}</div>`;
@@ -798,6 +873,7 @@ function viewForm(){
   return `<button class="back" data-action="nav" data-view="${f.editingId?'mine':'new'}">${ic('back',16)} ${f.editingId?'My requests':'All request types'}</button>`+
     head(f.editingId?`Edit ${t.name}`:t.name,f.editingId?`${f.editingId} · make the changes and resubmit`:t.desc,'',bubble(f.type))+
     (lastRet&&lastRet.action==='Returned'?callout('ret','undo',`${esc(user(lastRet.by).name)} returned this for changes`,esc(lastRet.comment)):'')+
+    (blocksFor(uid,f.type).length?callout('warn','lock','Some dates are blocked by WFM',blocksFor(uid,f.type).map(b=>`${rangeTxt(b)}${b.reason?' · '+esc(b.reason):''}`).join('<br>')):'')+
     `<form class="card card-pad" id="reqForm" novalidate>${requester}${body}<div class="form-actions"><button type="button" class="btn" data-action="nav" data-view="${f.editingId?'mine':'new'}">Cancel</button><button type="submit" class="btn primary">${ic('check',16)} ${f.type==='swap'?(f.editingId?'Resend to colleague':'Send to colleague'):(f.editingId?'Resubmit':'Submit request')}</button></div></form>`;
 }
 function viewMine(){
@@ -851,9 +927,9 @@ function viewDash(){
     const ev=S.records.filter(r=>r.kind==='eval'&&r.recipients.includes(u.id)&&r.data.countInScore);
     const avg=ev.length?Math.round(ev.reduce((a,r)=>a+scoreOf(r.data.ratings),0)/ev.length)+'%':'—';
     const kpi=S.requests.filter(r=>r.type==='kpi'&&r.userId===u.id&&r.status==='approved').length;
-    return `<tr><td style="white-space:nowrap"><span class="av">${initials(u.name)}</span><b style="font-weight:600">${esc(u.name)}</b> <span class="muted" style="font-size:12px">· ${TEAMS[u.team].split(' · ')[1]}</span></td><td class="num-cell">${leave}</td><td class="num-cell">${adh}</td><td class="num-cell">${vio}</td><td class="num-cell">${avg}</td><td class="num-cell">${kpi}</td></tr>`;
+    return `<tr><td style="white-space:nowrap"><span class="av">${initials(u.name)}</span><b style="font-weight:600">${esc(u.name)}</b> <span class="muted" style="font-size:12px">· ${teamName(u.team)}</span></td><td class="num-cell">${leave}</td><td class="num-cell">${adh}</td><td class="num-cell">${vio}</td><td class="num-cell">${avg}</td><td class="num-cell">${kpi}</td></tr>`;
   }).join('');
-  return head('Dashboard',`Department overview · ${y} year to date`,`<button class="btn primary" data-action="nav" data-view="create">${ic('plus',16)} Create</button>`)+
+  return head('Dashboard',`Department overview · ${y} year to date`,`<button class="btn primary" data-action="nav" data-view="create">${ic('upload',16)} Send to staff</button>`)+
   `<div class="stats"><div class="card stat"><span>Needs your decision</span><b style="color:var(--warn)">${pend.length}</b><small>${pend.length?'oldest '+ago(pend[0].createdAt):'all clear'}</small></div>
   <div class="card stat"><span>Waiting for colleague</span><b style="color:var(--primary)">${waiting}</b><small>shift swaps</small></div>
   <div class="card stat"><span>Not yet acknowledged</span><b style="color:var(--ret)">${unack}</b><small>evaluations, tickets, minutes</small></div>
@@ -871,7 +947,7 @@ function filteredRequests(){
     if(f.type!=='all'&&r.type!==f.type)return false;
     if(f.status!=='all'&&r.status!==f.status)return false;
     if(f.team!=='all'&&String(u.team)!==f.team)return false;
-    if(q&&![r.id,u.name,u.emp,TEAMS[u.team],TYPES[r.type].name,summary(r)].join(' ').toLowerCase().includes(q))return false;
+    if(q&&![r.id,u.name,u.emp,teamName(u.team),TYPES[r.type].name,summary(r)].join(' ').toLowerCase().includes(q))return false;
     return true;
   }).sort((a,b)=>b.createdAt-a.createdAt);
 }
@@ -879,7 +955,7 @@ function resultsHtml(){
   const list=filteredRequests();
   if(!list.length)return '<div class="count">0 requests</div><div class="card empty"><b>No matches</b>Try different filters.</div>';
   const rows=list.map(r=>{const u=user(r.userId);return `<tr data-action="openReq" data-id="${r.id}"><td><div class="cell-type">${bubble(r.type,1)}<div>${TYPES[r.type].name}<div class="muted" style="font-weight:500;font-size:12px">${r.id}</div></div></div></td>
-    <td><b style="font-weight:600">${esc(u.name)}${r.type==='swap'?` ⇄ ${esc(user(r.partnerId).name)}`:''}</b><div class="muted" style="font-size:12px">${esc(TEAMS[u.team])}</div></td><td class="muted">${esc(summary(r))}</td><td class="muted" style="white-space:nowrap">${ago(r.createdAt)}</td><td>${pill(r.status)}</td></tr>`}).join('');
+    <td><b style="font-weight:600">${esc(u.name)}${r.type==='swap'?` ⇄ ${esc(user(r.partnerId).name)}`:''}</b><div class="muted" style="font-size:12px">${esc(teamName(u.team))}</div></td><td class="muted">${esc(summary(r))}</td><td class="muted" style="white-space:nowrap">${ago(r.createdAt)}</td><td>${pill(r.status)}</td></tr>`}).join('');
   return `<div class="count">${list.length} request${list.length===1?'':'s'}</div><div class="card table-wrap desktop-only"><table><thead><tr><th>Request</th><th>Employee</th><th>Details</th><th>Submitted</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
   <div class="req-list mobile-only">${list.map(r=>reqCard(r)).join('')}</div>`;
 }
@@ -889,30 +965,30 @@ function viewAll(){
   `<div class="filters"><div class="search">${ic('search',16)}<input class="input" data-filter="q" placeholder="Search name, ID, team…" value="${esc(f.q)}"></div>
   <select class="input" data-filter="type">${opt('all','All types',f.type==='all')}${Object.entries(TYPES).map(([k,t])=>opt(k,t.name,f.type===k)).join('')}</select>
   <select class="input" data-filter="status">${opt('all','All statuses',f.status==='all')}${Object.entries(STATUS).map(([k,l])=>opt(k,l,f.status===k)).join('')}</select>
-  <select class="input" data-filter="team">${opt('all','All teams',f.team==='all')}${TEAMS.map((t,i)=>opt(String(i),t,f.team===String(i))).join('')}</select></div>
+  <select class="input" data-filter="team">${opt('all','All teams',f.team==='all')}${TEAM_LIST.map(t=>opt(String(t.id),t.name,f.team===String(t.id))).join('')}</select></div>
   <div id="results">${resultsHtml()}</div>`;
 }
 function viewCreate(){
   const recent=[...S.records].sort((a,b)=>b.createdAt-a.createdAt).slice(0,12);
-  return head('Create','What would you like to create?')+
+  return head('Send to staff','What would you like to send?')+
   `<div class="type-grid">${Object.entries(RECS).map(([k,t])=>`<button class="type-card" style="--c:${t.c}" data-action="pickRec" data-kind="${k}">${bubble(k,0,1)}<div><b>${t.name}</b><br><span>${t.desc}</span></div></button>`).join('')}</div>
   <div class="flow-note" style="margin-top:14px">Adherence notes stay internal. Violation tickets, call evaluations and minutes go to the staff member’s “From WFM” inbox.</div>
-  <h2 class="section-title">Recently created</h2><div class="req-list">${recent.map(r=>{
-    const n=r.recipients.length,a=Object.keys(r.acks).length,to=r.kind==='mom'?(r.data.sendTo==='all'?'Whole department':r.data.sendTo==='teams'?r.data.teams.map(t=>TEAMS[t].split(' · ')[1]).join(', '):user(r.recipients[0]).name):user(r.recipients[0]).name;
+  <h2 class="section-title">Recently sent</h2><div class="req-list">${recent.map(r=>{
+    const n=r.recipients.length,a=Object.keys(r.acks).length,to=r.kind==='mom'?(r.data.sendTo==='all'?'Whole department':r.data.sendTo==='teams'?r.data.teams.map(t=>teamName(t)).join(', '):user(r.recipients[0]).name):user(r.recipients[0]).name;
     return `<div class="req-card" data-action="openRec" data-id="${r.id}" role="button" tabindex="0">${bubble(r.kind,1,1)}<div class="req-main"><div class="req-title">${RECS[r.kind].name} <small>${r.id}</small></div><div class="req-sub">${esc(recSummary(r))}</div><div class="req-meta">To ${esc(to)} · ${ago(r.createdAt)}</div></div><div class="req-side">${r.requireAck?`<span class="pill ${a===n?'ack':'need'}">${a}/${n} acknowledged</span>`:'<span class="pill cancelled">Internal</span>'}</div></div>`}).join('')}</div>`;
 }
 function newRecForm(kind){
   const T=today();
-  const f={kind,vals:{staff:staffUsers()[0].id,requireAck:kind!=='adh',countInScore:true},files:[],errors:{},ratings:CRITERIA.map(()=>0),teams:[0],sendTo:'teams'};
-  if(kind==='vio'){f.vals.vtype=VTYPES[0];f.vals.date=iso(T)}
-  if(kind==='adh'){f.vals.reason=ADH_REASONS[0];f.vals.from=iso(T);f.vals.to=iso(T)}
-  if(kind==='eval'){f.vals.date=iso(T);f.vals.callType=CALL_TYPES[0]}
+  const f={kind,vals:{staff:(staffUsers()[0]||{}).id,requireAck:kind!=='adh',countInScore:true},files:[],errors:{},ratings:LISTS.criteria.map(()=>0),teams:TEAM_LIST.length?[TEAM_LIST[0].id]:[],sendTo:'teams'};
+  if(kind==='vio'){f.vals.vtype=LISTS.vtypes[0];f.vals.date=iso(T)}
+  if(kind==='adh'){f.vals.reason=LISTS.adh_reasons[0];f.vals.date=iso(T)}
+  if(kind==='eval'){f.vals.date=iso(T);f.vals.callType=LISTS.call_types[0]}
   if(kind==='mom'){f.vals.date=iso(T)}
   return f;
 }
 function viewCreateForm(){
   const f=ui.form,k=f.kind,t=RECS[k],v=f.vals,e=f.errors;
-  const staffSel=`<select name="staff">${staffUsers().map(u=>opt(u.id,`${u.name} · ${TEAMS[u.team].split(' · ')[1]}`,u.id===v.staff)).join('')}</select>`;
+  const staffSel=`<select name="staff">${staffUsers().map(u=>opt(u.id,`${u.name} · ${teamName(u.team)}`,u.id===v.staff)).join('')}</select>`;
   const inp=(name,type='text',ph='')=>`<input name="${name}" type="${type}" value="${esc(v[name]||'')}" placeholder="${esc(ph)}">`;
   const ta=(name,ph='')=>`<textarea name="${name}" placeholder="${esc(ph)}">${esc(v[name]||'')}</textarea>`;
   const files=hint=>field('Attachments',`<div class="files">${fileList(f.files,true)}${dropZone(f.files.length?'Add another file':'')}</div>`,{full:1,hint});
@@ -920,28 +996,28 @@ function viewCreateForm(){
   let main='',side='';
   if(k==='eval'){
     const sc=f.ratings.every(x=>x)?scoreOf(f.ratings):null;
-    main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Call date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}${field('Call time',inp('time','time'))}${field('Call ID',inp('callId','text','e.g. CL-77219034'))}${field('Call type',`<select name="callType">${CALL_TYPES.map(c=>opt(c,c,c===v.callType)).join('')}</select>`,{req:1})}</div>
-    <h2 style="margin:20px 0 12px">Scores ${e.ratings?`<span class="err-text" style="font-weight:500">· ${e.ratings}</span>`:''}</h2><div class="crit-grid">${CRITERIA.map((c,i)=>`<span>${c}</span><div class="rating">${[1,2,3,4,5].map(n=>`<i class="${n<=f.ratings[i]?'on':''}" data-action="rate" data-c="${i}" data-n="${n}">${n}</i>`).join('')}</div><b style="text-align:right">${f.ratings[i]?f.ratings[i]*20+'%':'—'}</b>`).join('')}</div>
+    main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Call date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}${field('Call time',inp('time','time'))}${field('Call ID',inp('callId','text','e.g. CL-77219034'))}${field('Call type',`<select name="callType">${LISTS.call_types.map(c=>opt(c,c,c===v.callType)).join('')}</select>`,{req:1})}</div>
+    <h2 style="margin:20px 0 12px">Scores ${e.ratings?`<span class="err-text" style="font-weight:500">· ${e.ratings}</span>`:''}</h2><div class="crit-grid">${LISTS.criteria.map((c,i)=>`<span>${c}</span><div class="rating">${[1,2,3,4,5].map(n=>`<i class="${n<=f.ratings[i]?'on':''}" data-action="rate" data-c="${i}" data-n="${n}">${n}</i>`).join('')}</div><b style="text-align:right">${f.ratings[i]?f.ratings[i]*20+'%':'—'}</b>`).join('')}</div>
     <div class="form-grid" style="margin-top:18px">${field('Feedback',ta('feedback','What went well, and what to improve'),{full:1,req:1,invalid:e.feedback,hint:e.feedback})}${files('e.g. evaluation form or call notes')}</div>`;
-    side=`<div class="card card-pad"><div class="score-box" style="margin:0"><div class="score-num" style="${sc===null?'color:var(--faint)':''}">${sc===null?'—':sc+'%'}</div><div><b>Total score</b><span style="display:block">Average of ${CRITERIA.length} criteria</span></div></div></div>
+    side=`<div class="card card-pad"><div class="score-box" style="margin:0"><div class="score-num" style="${sc===null?'color:var(--faint)':''}">${sc===null?'—':sc+'%'}</div><div><b>Total score</b><span style="display:block">Average of ${LISTS.criteria.length} criteria</span></div></div></div>
     <div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Staff must tap “I’ve read this”')}${sw('countInScore','Count in end-of-cycle score','Included in the staff member’s average')}</div>`;
   }else if(k==='vio'){
-    main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Violation type',`<select name="vtype">${VTYPES.map(s=>opt(s,s,s===v.vtype)).join('')}</select>`,{req:1})}${field('Date of violation',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}<div></div>${field('Details',ta('details','What happened'),{full:1,req:1,invalid:e.details,hint:e.details})}${files('Optional')}</div>`;
+    main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Violation type',`<select name="vtype">${LISTS.vtypes.map(s=>opt(s,s,s===v.vtype)).join('')}</select>`,{req:1})}${field('Date of violation',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}<div></div>${field('Details',ta('details','What happened'),{full:1,req:1,invalid:e.details,hint:e.details})}${files('Optional')}</div>`;
     side=`<div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Staff must tap “I’ve read this”')}</div>`;
   }else if(k==='adh'){
-    main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Reason',`<select name="reason">${ADH_REASONS.map(s=>opt(s,s,s===v.reason)).join('')}</select>`,{req:1})}${field('From',inp('from','date'),{req:1,invalid:e.from,hint:e.from})}${field('To',inp('to','date'),{req:1,invalid:e.to,hint:e.to})}${field('Note',ta('note','e.g. certificate received'),{full:1})}${files('e.g. sick certificate')}</div>`;
+    main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Reason',`<select name="reason">${LISTS.adh_reasons.map(s=>opt(s,s,s===v.reason)).join('')}</select>`,{req:1})}${field('Date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}${field('Note',ta('note','e.g. certificate received'),{full:1})}${files('e.g. sick certificate')}</div>`;
     side=callout('info','info','Internal only','Adherence notes are not sent to the staff member. They adjust adherence data and appear in the dashboard.');
   }else if(k==='mom'){
     const seg=[['person','One person'],['teams','Team(s)'],['all','Whole department']];
     const n=momRecipients(f).length;
     main=`<div class="form-grid">${field('Send to',`<div class="seg">${seg.map(([s,l])=>`<button type="button" class="${f.sendTo===s?'on':''}" data-action="momTo" data-s="${s}">${l}</button>`).join('')}</div>`,{full:1,req:1})}
-    ${f.sendTo==='person'?field('Staff member',staffSel,{full:1,req:1}):f.sendTo==='teams'?field('Teams',`<div class="opt-chips">${TEAMS.map((tm,i)=>`<span class="chip${f.teams.includes(i)?' on':''}" data-action="momTeam" data-t="${i}">${tm.split(' · ')[1]} · ${staffUsers().filter(u=>u.team===i).length}</span>`).join('')}</div>`,{full:1,req:1,invalid:e.teams,hint:e.teams}):''}
+    ${f.sendTo==='person'?field('Staff member',staffSel,{full:1,req:1}):f.sendTo==='teams'?field('Teams',`<div class="opt-chips">${TEAM_LIST.map(tm=>`<span class="chip${f.teams.includes(tm.id)?' on':''}" data-action="momTeam" data-t="${tm.id}">${esc(tm.name)} · ${staffUsers().filter(u=>u.team===tm.id).length}</span>`).join('')}</div>`,{full:1,req:1,invalid:e.teams,hint:e.teams}):''}
     ${field('Title',inp('title','text','e.g. Team A weekly huddle'),{req:1,invalid:e.title,hint:e.title})}${field('Meeting date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}
     ${field('Summary',ta('summary','Main points discussed'),{full:1,req:1,invalid:e.summary,hint:e.summary})}${field('Action items',ta('actions','Optional'),{full:1})}${files('Optional · slides, documents')}</div>`;
     side=`<div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Track who has read it')}${sw('emailCopy','Email a copy','Official record in Outlook · coming in the real version',true)}</div>
     <div class="card card-pad"><h2>Recipients</h2><div class="exp-summary" style="margin:0"><span style="color:var(--primary)">${ic('users',26)}</span><div><b>${n}</b> <span>staff will receive this</span></div></div></div>`;
   }
-  return `<button class="back" data-action="nav" data-view="create">${ic('back',16)} Create</button>`+head(t.name,t.desc,'',bubble(k,0,1))+
+  return `<button class="back" data-action="nav" data-view="create">${ic('back',16)} Send to staff</button>`+head(t.name,t.desc,'',bubble(k,0,1))+
    `<form id="recForm" novalidate><div class="grid-2"><div class="card card-pad">${main}<div class="form-actions"><button type="button" class="btn" data-action="nav" data-view="create">Cancel</button><button type="submit" class="btn primary">${ic('check',16)} ${k==='adh'?'Save note':k==='mom'?'Send minutes':k==='vio'?'Send ticket':'Send to staff'}</button></div></div><div class="stack">${side}</div></div></form>`;
 }
 function momRecipients(f){
@@ -952,32 +1028,99 @@ function momRecipients(f){
 function viewRules(){
   const R=ui.rulesDraft||(ui.rulesDraft={leaveLimit:S.rules.leaveLimit,countPending:S.rules.countPending,qualityTarget:S.rules.qualityTarget});
   const b=ui.blockForm,t=iso(today());
-  const who=x=>x.scope==='all'?'All staff':x.scope==='team'?TEAMS[x.target]:user(x.target).name;
-  const rows=S.rules.blocks.slice().sort((a,b)=>a.from.localeCompare(b.from)).map(x=>{const active=x.from<=t&&t<=x.to,past=x.to<t;
-    return `<tr><td><b style="font-weight:600">${esc(who(x))}</b></td><td>${TYPES[x.type].name}</td><td class="muted" style="white-space:nowrap">${fmt(x.from)} → ${fmt(x.to)}<div style="font-size:11.5px;font-weight:600;color:${active?'var(--bad)':past?'var(--faint)':'var(--warn)'}">${active?'Active':past?'Ended':'Upcoming'}</div></td><td class="muted">${esc(x.reason)}</td><td style="text-align:right"><button class="btn sm icon" data-action="rmBlock" data-id="${x.id}" title="Remove">${ic('trash',15)}</button></td></tr>`}).join('');
-  const targetSel=b.scope==='user'?`<select data-bf="target">${staffUsers().map(u=>opt(u.id,`${u.name} · ${TEAMS[u.team].split(' · ')[1]}`,u.id===b.target)).join('')}</select>`:
-    b.scope==='team'?`<select data-bf="target">${TEAMS.map((tm,i)=>opt(String(i),tm,String(i)===String(b.target))).join('')}</select>`:'<input value="Everyone except managers" disabled>';
-  const changed=R.leaveLimit!==S.rules.leaveLimit||R.countPending!==S.rules.countPending||R.qualityTarget!==S.rules.qualityTarget;
-  return head('Rules','Limits and blocks that apply to staff requests.')+
-  `<div class="grid-2" style="grid-template-columns:1fr 1.4fr"><div class="stack"><div class="card card-pad"><h2>Daily leave limit</h2>
-  <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px"><div class="num"><button type="button" data-action="limit" data-d="-1">−</button><b>${R.leaveLimit}</b><button type="button" data-action="limit" data-d="1">+</button></div><span class="muted">staff on annual leave per day</span></div>
-  <div class="switch-row" style="margin-top:10px"><div><b>Applies to</b><span>Whole department · managers excluded</span></div></div>
+  const who=x=>x.scope==='all'?'All staff':x.scope==='team'?teamName(x.target):user(x.target).name;
+  const list=S.rules.blocks.slice().sort((a,b)=>a.from.localeCompare(b.from));
+  const rows=list.map(x=>{const active=x.from<=t&&t<=x.to,past=x.to<t;
+    return `<div class="req-card${b.id===x.id?' editing':''}"><span class="bubble sm" style="--c:${TYPES[x.type].c}">${ic('lock',16)}</span><div class="req-main"><div class="req-title">${TYPES[x.type].name}</div>
+    <div class="req-sub">${esc(who(x))} · ${rangeTxt(x)}</div><div class="req-meta">${x.reason?esc(x.reason)+' · ':''}<span style="font-weight:600;color:${active?'var(--bad)':past?'var(--faint)':'var(--warn)'}">${active?'Active':past?'Ended':'Upcoming'}</span></div></div>
+    <div class="quick"><button class="btn sm" data-action="editBlock" data-id="${x.id}">${ic('edit',14)}<span class="desktop-only">Edit</span></button><button class="btn sm icon bad" data-action="rmBlock" data-id="${x.id}" title="Remove">${ic('trash',15)}</button></div></div>`}).join('');
+  const targetSel=b.scope==='user'?`<select data-bf="target">${staffUsers().map(u=>opt(u.id,`${u.name} · ${teamName(u.team)}`,u.id===b.target)).join('')}</select>`:
+    b.scope==='team'?`<select data-bf="target">${TEAM_LIST.map(tm=>opt(String(tm.id),tm.name,String(tm.id)===String(b.target))).join('')}</select>`:'<input value="Everyone except managers" disabled>';
+  return `<div class="grid-2 even-rules"><div class="stack"><div class="card card-pad"><h2>Limits</h2>
+  <div class="switch-row"><div><b>Daily leave limit</b><span>Staff on annual leave per day · managers excluded</span></div><div class="num"><button type="button" data-action="limit" data-d="-1">−</button><input type="number" min="1" max="50" data-rd="leaveLimit" value="${R.leaveLimit}" aria-label="Daily leave limit"><button type="button" data-action="limit" data-d="1">+</button></div></div>
   <div class="switch-row"><div><b>Count pending requests</b><span>Pending leave takes a slot until decided</span></div><button type="button" class="switch${R.countPending?'':' off'}" data-action="toggleCountPending" aria-label="Count pending requests"></button></div>
-  <div class="switch-row"><div><b>Call quality target</b><span>Below this, calls count as under target</span></div><div class="num"><button type="button" data-action="qTarget" data-d="-5">−</button><b>${R.qualityTarget}%</b><button type="button" data-action="qTarget" data-d="5">+</button></div></div>
-  <div class="form-actions" style="margin-top:12px"><button class="btn primary" data-action="saveRules" ${changed?'':'disabled style="opacity:.5"'}>${ic('check',16)} Save</button></div></div></div>
-  <div class="stack"><div class="card"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Blocks</h2></div>${rows?`<div class="table-wrap"><table class="mini-table"><thead><tr><th>Who</th><th>Request type</th><th>Period</th><th>Reason</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="card-pad empty-mini">No blocks.</div>'}</div>
-  <div class="card card-pad"><h2>Add a block</h2><div class="form-grid">
+  <div class="switch-row"><div><b>Call quality target</b><span>Calls below this count as under target</span></div><div class="num"><button type="button" data-action="qTarget" data-d="-1">−</button><input type="number" min="50" max="100" data-rd="qualityTarget" value="${R.qualityTarget}" aria-label="Call quality target"><span class="num-unit">%</span><button type="button" data-action="qTarget" data-d="1">+</button></div></div>
+  <div class="form-actions" style="margin-top:12px"><button class="btn primary" data-action="saveRules">${ic('check',16)} Save limits</button></div></div></div>
+  <div class="stack"><div class="card card-pad"><h2>Blocks <span class="muted" style="font-weight:500">· staff can’t request these dates</span></h2>${rows?`<div class="req-list">${rows}</div>`:'<div class="empty-mini">No blocks.</div>'}</div>
+  <div class="card card-pad" id="blockForm"><h2>${b.id?'Edit block':'Add a block'}</h2><div class="form-grid">
   ${field('Who',`<select data-bf="scope">${[['user','One staff member'],['team','A team'],['all','All staff']].map(([k,l])=>opt(k,l,b.scope===k)).join('')}</select>`)}
-  ${field(b.scope==='team'?'Team':'Staff member',targetSel)}
+  ${field(b.scope==='team'?'Team':b.scope==='all'?'Applies to':'Staff member',targetSel)}
   ${field('Request type',`<select data-bf="type">${Object.entries(TYPES).map(([k,x])=>opt(k,x.name,b.type===k)).join('')}</select>`)}
-  <div class="form-grid" style="gap:12px">${field('From',`<input type="date" data-bf="from" value="${b.from}">`)}${field('To',`<input type="date" data-bf="to" value="${b.to}">`)}</div>
-  ${field('Reason (shown to staff)',`<input data-bf="reason" value="${esc(b.reason)}" placeholder="e.g. Swap limit reached for this month">`,{full:1})}
-  </div><div class="form-actions"><button class="btn primary" data-action="addBlock">${ic('lock',16)} Add block</button></div></div></div></div>`;
+  <div class="form-grid two">${field('From',`<input type="date" data-bf="from" value="${b.from}">`)}${field('To',`<input type="date" data-bf="to" value="${b.to}">`)}</div>
+  ${field('Reason (shown to staff)',`<input data-bf="reason" value="${esc(b.reason)}" placeholder="e.g. Peak period — no leave">`,{full:1})}
+  </div><div class="form-actions">${b.id?`<button class="btn" data-action="cancelBlockEdit">Cancel</button>`:''}<button class="btn primary" data-action="addBlock">${ic(b.id?'check':'lock',16)} ${b.id?'Save changes':'Add block'}</button></div></div></div></div>`;
+}
+function viewAdmin(){
+  const tabs=[['users','Users'],['teams','Teams'],['lists','Lists'],['rules','Rules & blocks']];
+  const tab=ui.adminTab||'users';
+  const body=tab==='teams'?adminTeams():tab==='lists'?adminLists():tab==='rules'?viewRules():adminUsers();
+  return head('Admin','Users, teams, lists and rules.',tab==='users'?`<button class="btn primary" data-action="userNew">${ic('plus',16)} Add user</button>`:'')+
+    `<div class="tabs">${tabs.map(([k,l])=>`<button class="${k===tab?'on':''}" data-action="adminTab" data-t="${k}">${l}</button>`).join('')}</div>${body}`;
+}
+function adminUsers(){
+  const q=(ui.userSearch||'').toLowerCase();
+  const list=[...USERS].sort((a,b)=>(a.role===b.role?0:a.role==='wfm'?-1:1)||a.name.localeCompare(b.name)).filter(u=>!q||[u.name,u.emp,teamOf(u)].join(' ').toLowerCase().includes(q));
+  return `<div class="filters"><div class="search">${ic('search',16)}<input class="input" data-us="1" placeholder="Search name, ID, team…" value="${esc(ui.userSearch||'')}"></div></div>
+  <div class="count">${USERS.filter(u=>u.active).length} active · ${USERS.filter(u=>!u.active).length} inactive</div>
+  <div class="req-list">${list.map(u=>`<div class="req-card${u.active?'':' inactive'}">${avatar(u)}<div class="req-main"><div class="req-title">${esc(u.name)} <small>${esc(u.emp)}</small></div>
+   <div class="req-sub">${esc(teamOf(u))}</div><div class="req-meta"><span class="role-tag">${u.role==='wfm'?'WFM / Manager':'Staff'}</span>${u.active?'':' <span class="pill cancelled">Inactive</span>'}${u.mustChange&&u.active?' <span class="pill need">Must set password</span>':''}</div></div>
+   <div class="quick"><button class="btn sm" data-action="userEdit" data-id="${u.id}">${ic('edit',14)}<span class="desktop-only">Edit</span></button><button class="btn sm" data-action="userPw" data-id="${u.id}" title="Reset password">${ic('lock',14)}<span class="desktop-only">Reset password</span></button></div></div>`).join('')}</div>`;
+}
+function adminTeams(){
+  return `<div class="card card-pad"><h2>Teams</h2><div class="req-list">${TEAM_LIST.map(t=>{const n=USERS.filter(u=>u.team===t.id&&u.active).length;
+    return `<div class="team-row"><input class="input" data-team="${t.id}" value="${esc(t.name)}" aria-label="Team name"><span class="muted team-n">${n} staff</span>
+    <button class="btn sm" data-action="saveTeam" data-id="${t.id}">${ic('check',14)}<span class="desktop-only">Save</span></button>
+    <button class="btn sm icon bad" data-action="delTeam" data-id="${t.id}" title="${n?'Move its staff to another team first':'Delete team'}" ${n?'disabled style="opacity:.4"':''}>${ic('trash',15)}</button></div>`}).join('')}</div>
+    <div class="team-row add"><input class="input" id="newTeam" placeholder="New team name"><button class="btn primary sm" data-action="addTeam">${ic('plus',14)} Add team</button></div>
+    <div class="flow-note">Renaming a team updates it everywhere. To move people between teams, edit the user under Users.</div></div>`;
+}
+function adminLists(){
+  ui.listDraft=ui.listDraft||{};
+  return `<div class="list-grid">${Object.entries(LIST_META).map(([k,m])=>{
+    const d=ui.listDraft[k]||(ui.listDraft[k]=[...LISTS[k]]),dirty=JSON.stringify(d)!==JSON.stringify(LISTS[k]);
+    return `<div class="card card-pad"><h2>${m.name}${dirty?' <span class="pill need">Unsaved</span>':''}</h2><div class="flow-note" style="margin:-8px 0 12px">${m.hint}</div>
+    <div class="li-rows">${d.map((v,i)=>`<div class="li-row"><input class="input" data-li="${k}" data-i="${i}" value="${esc(v)}" aria-label="${m.name} item ${i+1}">
+      <button class="btn sm icon" data-action="liMove" data-k="${k}" data-i="${i}" data-d="-1" ${i?'':'disabled style="opacity:.35"'} title="Move up">${ic('back',14).replace('<svg','<svg style="transform:rotate(90deg)"')}</button>
+      <button class="btn sm icon" data-action="liMove" data-k="${k}" data-i="${i}" data-d="1" ${i<d.length-1?'':'disabled style="opacity:.35"'} title="Move down">${ic('back',14).replace('<svg','<svg style="transform:rotate(-90deg)"')}</button>
+      <button class="btn sm icon bad" data-action="liDel" data-k="${k}" data-i="${i}" ${d.length>1?'':'disabled style="opacity:.35"'} title="Remove">${ic('trash',14)}</button></div>`).join('')}</div>
+    <div class="li-row add"><input class="input" data-lnew="${k}" placeholder="Add new item"><button class="btn sm" data-action="liAdd" data-k="${k}">${ic('plus',14)} Add</button></div>
+    <div class="form-actions" style="margin-top:12px">${dirty?`<button class="btn" data-action="liReset" data-k="${k}">Undo changes</button>`:''}<button class="btn primary" data-action="liSave" data-k="${k}" ${dirty?'':'disabled style="opacity:.5"'}>${ic('check',16)} Save</button></div></div>`}).join('')}</div>`;
+}
+function userDrawer(id){
+  const f=ui.userForm,isNew=!f.id,self=f.id===S.current;
+  return `<div class="sheet-handle"></div><div class="d-head">${isNew?`<span class="bubble sm" style="--c:var(--primary)">${ic('users',17)}</span>`:avatar(user(f.id))}<div><h3>${isNew?'Add user':'Edit user'}</h3><small>${isNew?'They’ll set their own password at first sign-in':esc(user(f.id).name)}</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div>
+  <div class="d-body"><form id="userForm" novalidate><div class="form-grid" style="grid-template-columns:1fr">
+   ${field('Full name',`<input name="name" value="${esc(f.name)}" placeholder="e.g. Sara Ahmed">`,{req:1})}
+   ${field('Employee ID',`<input name="emp" value="${esc(f.emp)}" placeholder="e.g. E1042" autocapitalize="characters">`,{req:1,hint:'Used to sign in'})}
+   ${field('Role',`<select name="role" ${self?'disabled':''}>${opt('staff','Staff',f.role==='staff')}${opt('wfm','WFM / Manager',f.role==='wfm')}</select>`,{req:1,hint:self?'You can’t change your own role':''})}
+   ${f.role==='staff'?field('Team',`<select name="team">${TEAM_LIST.map(t=>opt(String(t.id),t.name,String(f.team)===String(t.id))).join('')}</select>`,{req:1}):field('Job title',`<input name="title" value="${esc(f.title||'')}" placeholder="e.g. WFM, Supervisor">`)}
+   ${isNew?field('Temporary password',`<input name="pw" value="${esc(f.pw)}" autocomplete="off">`,{req:1,hint:'At least 6 characters. They must change it at first sign-in.'}):''}
+   ${!isNew?`<div class="switch-row"><div><b>Active</b><span>Inactive users can’t sign in</span></div><button type="button" class="switch${f.active?'':' off'}" ${self?'disabled style="opacity:.5"':'data-action="ufActive"'} aria-label="Active"></button></div>`:''}
+  </div></form></div>
+  <div class="d-foot"><div class="row"><button class="btn" data-action="closeDrawer">Cancel</button><button class="btn primary" data-action="userSave">${ic('check',16)} ${isNew?'Create user':'Save changes'}</button></div></div>`;
+}
+function pwDrawer(id){
+  const u=user(id);
+  return `<div class="sheet-handle"></div><div class="d-head">${avatar(u)}<div><h3>Reset password</h3><small>${esc(u.name)} · ${esc(u.emp)}</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div>
+  <div class="d-body">${callout('info','info','How it works','Set a temporary password and share it with them. They’ll be signed out and must choose a new password at their next sign-in.')}
+  ${field('Temporary password',`<div style="display:flex;gap:8px"><input class="input" id="tmpPw" value="${esc(ui.tmpPw||'')}" autocomplete="off"><button class="btn" data-action="genPw">Generate</button></div>`,{req:1,hint:'At least 6 characters'})}</div>
+  <div class="d-foot"><div class="row"><button class="btn" data-action="closeDrawer">Cancel</button><button class="btn primary" data-action="pwReset" data-id="${id}">${ic('lock',16)} Reset password</button></div></div>`;
+}
+function accountDrawer(){
+  const u=me();
+  return `<div class="sheet-handle"></div><div class="d-head">${avatar(u)}<div><h3>${esc(u.name)}</h3><small>${esc(u.emp)} · ${esc(teamOf(u))}</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div>
+  <div class="d-body"><div class="d-section"><h4>Change password</h4><form id="acctPwForm" novalidate><div class="form-grid" style="grid-template-columns:1fr">
+   ${field('Current password','<input type="password" name="old" autocomplete="current-password">')}
+   ${field('New password','<input type="password" name="new1" autocomplete="new-password">',{hint:'At least 6 characters'})}
+   ${field('Repeat new password','<input type="password" name="new2" autocomplete="new-password">')}
+   <button type="submit" class="btn">${ic('lock',16)} Update password</button></div></form></div></div>
+  <div class="d-foot"><button class="btn bad" data-action="signOut">${ic('back',16)} Sign out</button></div>`;
 }
 
-
 /* ================= Quality analytics ================= */
-const SHORT_CRIT=['Greeting','Verification','Understanding','Solution','Tone','Closing'];
+const critOf=r=>r.data.criteria||DEFAULT_CRIT;
+const ratingFor=(r,name)=>{const i=critOf(r).indexOf(name);return i<0?null:r.data.ratings[i]};
+const critAvg=(evs,name)=>avgOf(evs.map(r=>ratingFor(r,name)).filter(v=>v!=null).map(v=>v*20));
 const evalTime=r=>parse(r.data.date).getTime();
 const avgOf=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
 const evalsOf=uid=>S.records.filter(r=>r.kind==='eval'&&r.recipients[0]===uid&&r.data.countInScore!==false).sort((a,b)=>evalTime(a)-evalTime(b));
@@ -986,9 +1129,10 @@ function staffQuality(uid){
   let trend='new',delta=0;
   if(sc.length>=4){const last=sc.slice(-3),prev=sc.slice(-6,-3);delta=avgOf(last)-avgOf(prev);trend=delta>3?'up':delta<-3?'down':'flat'}
   const coaching=sc.length>=2&&sc.slice(-2).every(x=>x<tgt);
-  const repeat=all.length>=3?CRITERIA.map((c,i)=>i).filter(i=>all.slice(-3).every(r=>r.data.ratings[i]<=3)).map(i=>SHORT_CRIT[i]):[];
-  const crit=CRITERIA.map((c,i)=>avgOf(all.map(r=>r.data.ratings[i]*20)));
-  let strong=null,weak=null;if(all.length){const ix=crit.map((v,i)=>i);strong=ix.reduce((a,b)=>crit[b]>crit[a]?b:a,0);weak=ix.reduce((a,b)=>crit[b]<crit[a]?b:a,0)}
+  const repeat=all.length>=3?LISTS.criteria.filter(n=>all.slice(-3).every(r=>{const v=ratingFor(r,n);return v!=null&&v<=3})):[];
+  const crit=LISTS.criteria.map(n=>critAvg(all,n));
+  let strong=null,weak=null;const ix=crit.map((v,i)=>i).filter(i=>crit[i]!=null);
+  if(ix.length){strong=ix.reduce((a,b)=>crit[b]>crit[a]?b:a);weak=ix.reduce((a,b)=>crit[b]<crit[a]?b:a);if(crit[strong]===crit[weak]){strong=null;weak=null}}
   return {all,sc,trend,delta,coaching,repeat,crit,strong,weak,recent:avgOf(sc.slice(-6))};
 }
 function mostImproved(uids){let best=null;uids.forEach(u=>{const q=staffQuality(u);if(q.trend==='up'&&q.delta>5&&(!best||q.delta>best.d))best={u,d:q.delta}});return best&&best.u}
@@ -1027,7 +1171,9 @@ function qScope(){
   const evs=S.records.filter(r=>r.kind==='eval'&&ids.includes(r.recipients[0])&&r.data.countInScore!==false);
   return {days,from,staff,ids,cur:evs.filter(r=>evalTime(r)>=from),prev:evs.filter(r=>evalTime(r)>=pfrom&&evalTime(r)<from)};
 }
-function viewQuality(){
+function qTabs(){const t=ui.qTab||'calls';return `<div class="tabs">${[['calls','Call quality'],['perf','Daily performance']].map(([k,l])=>`<button class="${k===t?'on':''}" data-action="qTab" data-t="${k}">${l}</button>`).join('')}</div>`}
+function viewQuality(){return (ui.qTab||'calls')==='perf'?head('Quality','Daily performance scores uploaded by WFM.',`<button class="btn" data-action="exportCycle">${ic('download',16)} Cycle summary</button>`)+qTabs()+viewPerfAdmin():viewCallQuality()}
+function viewCallQuality(){
   const Q=qScope(),tgt=S.rules.qualityTarget,star=mostImproved(Q.ids);
   const curAvg=avgOf(Q.cur.map(r=>scoreOf(r.data.ratings))),prevAvg=avgOf(Q.prev.map(r=>scoreOf(r.data.ratings)));
   const diff=curAvg!=null&&prevAvg!=null?curAvg-prevAvg:null;
@@ -1035,24 +1181,24 @@ function viewQuality(){
   const reqAck=Q.cur.filter(r=>r.requireAck),acked=reqAck.filter(r=>r.acks[r.recipients[0]]);
   const qs=Object.fromEntries(Q.staff.map(u=>[u.id,staffQuality(u.id)]));
   const attention=Q.staff.filter(u=>qs[u.id].coaching||qs[u.id].repeat.length);
-  const per=u=>{const e=Q.cur.filter(r=>r.recipients[0]===u.id);return {n:e.length,avg:avgOf(e.map(r=>scoreOf(r.data.ratings))),last:e.length?e.reduce((a,b)=>evalTime(b)>evalTime(a)?b:a):null,crit:CRITERIA.map((c,i)=>avgOf(e.map(r=>r.data.ratings[i]*20)))}};
+  const per=u=>{const e=Q.cur.filter(r=>r.recipients[0]===u.id);return {n:e.length,avg:avgOf(e.map(r=>scoreOf(r.data.ratings))),last:e.length?e.reduce((a,b)=>evalTime(b)>evalTime(a)?b:a):null,crit:LISTS.criteria.map(n=>critAvg(e,n))}};
   const P=Object.fromEntries(Q.staff.map(u=>[u.id,per(u)]));
   const order=[...Q.staff].sort((a,b)=>(P[b.id].avg??-1)-(P[a.id].avg??-1));
   const lb=order.map(u=>{const p=P[u.id],q=qs[u.id];return `<tr data-action="openStaff" data-id="${u.id}">
-    <td style="white-space:nowrap"><span class="av">${initials(u.name)}</span><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:12px;margin-left:36px">${TEAMS[u.team].split(' · ')[1]}</div></td>
+    <td style="white-space:nowrap"><span class="av">${initials(u.name)}</span><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:12px;margin-left:36px">${teamName(u.team)}</div></td>
     <td class="num-cell"><span class="score-cell${p.avg!=null&&p.avg<tgt?' below':''}">${p.avg!=null?p.avg+'%':'—'}</span>${p.avg!=null&&p.avg<tgt?`<div style="font-size:11px;color:var(--bad);font-weight:600">${ic('alert',11)} below target</div>`:''}</td>
     <td>${sparkline(q.sc)}</td><td class="num-cell">${p.n}</td><td>${trendBadge(q.trend)}</td><td style="min-width:160px">${flagsHtml(q,u.id,star)||'<span class="muted">—</span>'}</td>
     <td class="muted" style="white-space:nowrap">${p.last?fmt(p.last.data.date):'Not in period'}</td></tr>`}).join('');
-  const teamCrit=CRITERIA.map((c,i)=>avgOf(Q.cur.map(r=>r.data.ratings[i]*20)));
+  const teamCrit=LISTS.criteria.map(n=>critAvg(Q.cur,n));
   const weakI=teamCrit.every(v=>v==null)?null:teamCrit.reduce((a,v,i)=>v!=null&&(teamCrit[a]==null||v<teamCrit[a])?i:a,0);
   const cell=(v,tip)=>`<td><span class="hc" style="background:${heatBg(v)};color:${heatInk(v)}" title="${tip}">${v!=null?v:'—'}</span></td>`;
-  const heat=order.map(u=>`<tr data-action="openStaff" data-id="${u.id}"><td style="white-space:nowrap;font-weight:600">${esc(u.name)}</td>${P[u.id].crit.map((v,i)=>cell(v,`${esc(u.name)} · ${CRITERIA[i]}: ${v??'no data'}%`)).join('')}</tr>`).join('');
-  const types=CALL_TYPES.map(t=>{const e=Q.cur.filter(r=>r.data.callType===t);return [t,avgOf(e.map(r=>scoreOf(r.data.ratings))),e.length]});
+  const heat=order.map(u=>`<tr data-action="openStaff" data-id="${u.id}"><td style="white-space:nowrap;font-weight:600">${esc(u.name)}</td>${P[u.id].crit.map((v,i)=>cell(v,`${esc(u.name)} · ${LISTS.criteria[i]}: ${v??'no data'}%`)).join('')}</tr>`).join('');
+  const types=LISTS.call_types.map(t=>{const e=Q.cur.filter(r=>r.data.callType===t);return [t,avgOf(e.map(r=>scoreOf(r.data.ratings))),e.length]});
   const evaluators=USERS.filter(u=>u.role==='wfm').map(u=>{const e=Q.cur.filter(r=>r.createdBy===u.id);return [u,avgOf(e.map(r=>scoreOf(r.data.ratings))),e.length]}).filter(x=>x[2]);
   const label={30:'last 30 days',90:'last 90 days',365:'last 12 months'}[Q.days];
-  return head('Call quality',`Evaluation results · ${label}`,`<button class="btn" data-action="exportCycle">${ic('download',16)} Cycle summary</button>`)+
+  return head('Quality',`Call evaluations · ${label}`,`<button class="btn" data-action="exportCycle">${ic('download',16)} Cycle summary</button>`)+qTabs()+
   `<div class="q-filters"><select class="input" data-q="days">${[[30,'Last 30 days'],[90,'Last 90 days'],[365,'Last 12 months']].map(([v,l])=>opt(v,l,Q.days===v)).join('')}</select>
-   <select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAMS.map((t,i)=>opt(String(i),t,ui.q.team===String(i))).join('')}</select></div>
+   <select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select></div>
   <div class="stats">
    <div class="card stat"><span>Team average</span><b${curAvg!=null&&curAvg<tgt?' style="color:var(--bad)"':''}>${curAvg!=null?curAvg+'%':'—'}</b><small>${diff==null?`target ${tgt}%`:`<span class="delta ${diff>=0?'up':'down'}">${diff>=0?'▲':'▼'} ${Math.abs(diff)} pts</span> vs previous period`}</small></div>
    <div class="card stat"><span>Evaluations</span><b>${Q.cur.length}</b><small>${Q.prev.length} in previous period</small></div>
@@ -1062,9 +1208,9 @@ function viewQuality(){
   ${attention.length?callout('warn','alert',`${attention.length} staff need attention`,attention.map(u=>`${esc(u.name)}: ${[qs[u.id].coaching?'below target twice in a row':'',...qs[u.id].repeat.map(c=>'low '+c+' 3 times')].filter(Boolean).join(', ')}`).join(' · ')):''}
   <div class="card" style="margin-bottom:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Leaderboard <span class="muted" style="font-weight:500">· tap a name for the full profile</span></h2></div>
    <div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Average</th><th>Last 6 calls</th><th class="num-cell">Calls</th><th>Trend</th><th>Flags</th><th>Last evaluated</th></tr></thead><tbody>${lb}</tbody></table></div></div>
-  <div class="card" style="margin-bottom:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Criteria heatmap ${weakI!=null?`<span class="muted" style="font-weight:500">· team’s weakest: ${CRITERIA[weakI]} (${teamCrit[weakI]}%)</span>`:''}</h2></div>
-   <div class="table-wrap"><table class="heat"><thead><tr><th>Staff</th>${SHORT_CRIT.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${heat}</tbody>
-   <tfoot><tr><td>Team</td>${teamCrit.map((v,i)=>cell(v,`Team · ${CRITERIA[i]}: ${v??'no data'}%`)).join('')}</tr></tfoot></table></div>
+  <div class="card" style="margin-bottom:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Criteria heatmap ${weakI!=null?`<span class="muted" style="font-weight:500">· team’s weakest: ${LISTS.criteria[weakI]} (${teamCrit[weakI]}%)</span>`:''}</h2></div>
+   <div class="table-wrap"><table class="heat"><thead><tr><th>Staff</th>${LISTS.criteria.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${heat}</tbody>
+   <tfoot><tr><td>Team</td>${teamCrit.map((v,i)=>cell(v,`Team · ${LISTS.criteria[i]}: ${v??'no data'}%`)).join('')}</tr></tfoot></table></div>
    <div class="heat-legend">50%<i></i>100% · average score per criterion</div></div>
   <div class="grid-2" style="grid-template-columns:1fr 1fr">
    <div class="card card-pad"><h2>By call type</h2><div class="bars">${types.map(([t,a,n])=>`<div class="bar-row" style="grid-template-columns:130px 1fr 72px"><span>${t}</span><div class="bar-track"><div class="bar-fill" style="width:${a||0}%;--c:var(--primary)"></div></div><b>${a!=null?a+'%':'—'} <span class="muted" style="font-weight:500">· ${n}</span></b></div>`).join('')}</div><div class="flow-note">Average score · number of calls</div></div>
@@ -1078,28 +1224,183 @@ function staffDrawer(uid){
   const y=today().getFullYear(),leave=S.requests.filter(r=>r.type==='leave'&&r.userId===uid&&r.status==='approved'&&r.data.start.slice(0,4)==String(y)).reduce((a,r)=>a+daysBetween(r.data.start,r.data.end),0);
   const list=[...q.all].reverse().map(r=>{const sc=scoreOf(r.data.ratings);return `<div class="req-card" data-action="openRec" data-id="${r.id}" role="button" tabindex="0"><div class="req-main"><div class="req-title"><span class="score-cell${sc<tgt?' below':''}">${sc}%</span> <small>${fmt(r.data.date)} · ${esc(r.data.callType||'—')} · by ${esc(user(r.createdBy).name)}</small></div><div class="req-sub" style="white-space:normal">${esc(r.data.feedback)}</div></div><div class="req-side">${r.requireAck?ackPill(!!r.acks[uid]):''}</div></div>`}).join('');
   const fl=flagsHtml(q,uid,star);
-  return `<div class="sheet-handle"></div><div class="d-head">${avatar(u)}<div><h3>${esc(u.name)}</h3><small>${u.emp} · ${esc(TEAMS[u.team])}</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div>
+  return `<div class="sheet-handle"></div><div class="d-head">${avatar(u)}<div><h3>${esc(u.name)}</h3><small>${u.emp} · ${esc(teamName(u.team))}</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div>
   <div class="d-body">
-   <div class="score-box"><div class="score-num" style="color:${q.recent==null?'var(--faint)':q.recent>=tgt?'var(--ok)':'var(--bad)'}">${q.recent!=null?q.recent+'%':'—'}</div><div><b>Average of last ${Math.min(6,q.sc.length)} calls</b><span style="display:block">Target ${tgt}% · ${q.sc.length} evaluation(s) in total</span><div style="margin-top:6px">${trendBadge(q.trend)}</div></div></div>
+   <div class="score-box"><div class="score-num" style="color:${q.recent==null?'var(--faint)':q.recent>=tgt?'var(--ok)':'var(--bad)'}">${q.recent!=null?q.recent+'%':'—'}</div><div><b>${q.sc.length===1?'Last call':`Average of last ${Math.min(6,q.sc.length)} calls`}</b><span style="display:block">Target ${tgt}% · ${q.sc.length} evaluation(s) in total</span><div style="margin-top:6px">${trendBadge(q.trend)}</div></div></div>
    ${fl?`<div class="d-section">${fl}</div>`:''}
-   <div class="d-section"><h4>Score over time</h4>${lineChart(q.all)}</div>
-   ${q.all.length?`<div class="d-section"><h4>Strengths &amp; focus</h4><div class="ins"><div><span>Strongest</span><b>${CRITERIA[q.strong]} · ${q.crit[q.strong]}%</b></div><div><span>Focus area</span><b>${CRITERIA[q.weak]} · ${q.crit[q.weak]}%</b></div></div></div>`:''}
+   <div class="d-section"><h4>Daily performance</h4>${perfSummaryHtml(uid,1)}${perfOf(uid).length>1?perfChart(perfOf(uid).slice(-30)):''}</div>
+   <div class="d-section"><h4>Call quality over time</h4>${lineChart(q.all)}</div>
+   ${q.strong!=null?`<div class="d-section"><h4>Strengths &amp; focus</h4><div class="ins"><div><span>Strongest</span><b>${LISTS.criteria[q.strong]} · ${q.crit[q.strong]}%</b></div><div><span>Focus area</span><b>${LISTS.criteria[q.weak]} · ${q.crit[q.weak]}%</b></div></div></div>`:''}
    <div class="d-section"><h4>Other records · ${y}</h4><div class="ins"><div><span>Violations</span><b>${vio}</b></div><div><span>Adherence notes</span><b>${adh}</b></div><div><span>KPI requests accepted</span><b>${kpi}</b></div><div><span>Leave days taken</span><b>${leave}</b></div></div></div>
    <div class="d-section"><h4>Feedback history</h4>${list?`<div class="req-list">${list}</div>`:'<div class="empty-mini">No evaluations yet.</div>'}</div>
   </div><div class="d-foot"><button class="btn primary" data-action="newEvalFor" data-id="${uid}">${ic('plus',16)} New call evaluation</button></div>`;
 }
 function exportCycle(){
-  const Q=qScope(),from=Q.from,star=mostImproved(Q.ids),trendTxt={up:'Improving',down:'Slipping',flat:'Steady',new:'Too few calls'};
-  const cols=['Employee','Employee ID','Team','Evaluations','Avg call score %','Trend','Flags','KPI requests accepted','Violations','Adherence notes'];
-  const rows=Q.staff.map(u=>{const e=Q.cur.filter(r=>r.recipients[0]===u.id),q=staffQuality(u.id);
+  const Q=qScope(),from=Q.from,fromIso=iso(new Date(from)),star=mostImproved(Q.ids),trendTxt={up:'Improving',down:'Slipping',flat:'Steady',new:'Too few calls'};
+  const head=['Employee','Employee ID','Team','Evaluations','Avg call score %','Trend','Flags','Latest daily performance %','Avg daily performance % (period)','KPI requests accepted','Violations','Adherence notes'];
+  const rows=Q.staff.map(u=>{const e=Q.cur.filter(r=>r.recipients[0]===u.id),q=staffQuality(u.id),ps=perfOf(u.id),pp=ps.filter(p=>p.date>=fromIso);
     const fl=[q.coaching?'Needs coaching':'',...q.repeat.map(c=>'Repeat issue: '+c),star===u.id?'Most improved':''].filter(Boolean).join('; ');
-    return [u.name,u.emp,TEAMS[u.team],e.length,avgOf(e.map(r=>scoreOf(r.data.ratings)))??'',trendTxt[q.trend],fl,
+    return [u.name,u.emp,teamName(u.team),e.length,avgOf(e.map(r=>scoreOf(r.data.ratings)))??'',trendTxt[q.trend],fl,ps.length?ps.at(-1).score:'',pp.length?Math.round(pp.reduce((a,p)=>a+p.score,0)/pp.length*10)/10:'',
       S.requests.filter(r=>r.type==='kpi'&&r.userId===u.id&&r.status==='approved'&&r.createdAt>=from).length,
       S.records.filter(r=>r.kind==='vio'&&r.recipients.includes(u.id)&&r.createdAt>=from).length,
       S.records.filter(r=>r.kind==='adh'&&r.recipients.includes(u.id)&&r.createdAt>=from).length]});
-  const csv='﻿'+[cols,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=`cycle-summary-${iso(today())}.csv`;document.body.appendChild(a);a.click();a.remove();
+  const evRows=[['Date','Employee','Employee ID','Team','Call type','Call ID','Evaluator','Score %',...LISTS.criteria.map(c=>c+' (1–5)'),'Feedback','Acknowledged']];
+  Q.cur.slice().sort((a,b)=>evalTime(a)-evalTime(b)).forEach(r=>{const u=user(r.recipients[0]);evRows.push([{d:r.data.date},u.name,u.emp,teamName(u.team),r.data.callType||'',r.data.callId||'',user(r.createdBy).name,scoreOf(r.data.ratings),...LISTS.criteria.map(c=>ratingFor(r,c)??''),r.data.feedback||'',r.acks[u.id]?'Yes':'No'])});
+  downloadXlsx(`cycle-summary-${iso(today())}.xlsx`,[{name:'Cycle summary',rows:[head,...rows],widths:[22,13,24,12,15,14,40,18,20,14,11,14]},{name:'Call evaluations',rows:evRows,widths:[12,22,13,24,16,16,18,10,...LISTS.criteria.map(()=>14),50,13]}]);
   toast(`Cycle summary exported · ${rows.length} staff`);
+}
+
+/* ================= Excel (.xlsx) read & write ================= */
+const CRC_T=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(u8){let c=0xFFFFFFFF;for(let i=0;i<u8.length;i++)c=CRC_T[(c^u8[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+function zipStore(files){
+  const enc=new TextEncoder(),parts=[],central=[];let off=0;
+  files.forEach(f=>{const name=enc.encode(f.name),data=enc.encode(f.data),crc=crc32(data);
+    const lh=new DataView(new ArrayBuffer(30));lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(6,0x0800,true);lh.setUint16(12,0x21,true);
+    lh.setUint32(14,crc,true);lh.setUint32(18,data.length,true);lh.setUint32(22,data.length,true);lh.setUint16(26,name.length,true);
+    parts.push(new Uint8Array(lh.buffer),name,data);
+    const ch=new DataView(new ArrayBuffer(46));ch.setUint32(0,0x02014b50,true);ch.setUint16(4,20,true);ch.setUint16(6,20,true);ch.setUint16(8,0x0800,true);ch.setUint16(14,0x21,true);
+    ch.setUint32(16,crc,true);ch.setUint32(20,data.length,true);ch.setUint32(24,data.length,true);ch.setUint16(28,name.length,true);ch.setUint32(42,off,true);
+    central.push(new Uint8Array(ch.buffer),name);off+=30+name.length+data.length});
+  const cs=central.reduce((a,b)=>a+b.length,0),end=new DataView(new ArrayBuffer(22));
+  end.setUint32(0,0x06054b50,true);end.setUint16(8,files.length,true);end.setUint16(10,files.length,true);end.setUint32(12,cs,true);end.setUint32(16,off,true);
+  return new Blob([...parts,...central,new Uint8Array(end.buffer)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+const xesc=v=>String(v).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const colName=i=>{let s='';i++;while(i){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26)}return s};
+const excelSerial=isoDate=>{const [y,m,d]=isoDate.split('-').map(Number);return Math.round((Date.UTC(y,m-1,d)-Date.UTC(1899,11,30))/86400000)};
+// cells: string | number | {d:'yyyy-mm-dd'} | {dt:timestamp}
+function sheetXml(rows,widths){
+  const cell=(v,r,c)=>{const ref=colName(c)+(r+1),h=r===0;if(v===''||v==null)return '';
+    if(typeof v==='object'&&v.d)return `<c r="${ref}" s="2"><v>${excelSerial(v.d)}</v></c>`;
+    if(typeof v==='object'&&v.dt){const t=new Date(v.dt);return `<c r="${ref}" s="3"><v>${(excelSerial(iso(t))+(t.getHours()*3600+t.getMinutes()*60)/86400).toFixed(6)}</v></c>`}
+    if(typeof v==='number'&&isFinite(v))return `<c r="${ref}"${h?' s="1"':''}><v>${v}</v></c>`;
+    return `<c r="${ref}" t="inlineStr"${h?' s="1"':''}><is><t xml:space="preserve">${xesc(v)}</t></is></c>`};
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>${widths.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('')}</cols><sheetData>${rows.map((r,ri)=>`<row r="${ri+1}">${r.map((v,ci)=>cell(v,ri,ci)).join('')}</row>`).join('')}</sheetData>${rows.length>1?`<autoFilter ref="A1:${colName(rows[0].length-1)}${rows.length}"/>`:''}</worksheet>`;
+}
+function downloadXlsx(filename,sheets){ // sheets: [{name,rows,widths}]
+  const ns='http://schemas.openxmlformats.org/spreadsheetml/2006/main',rel='http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+  const safe=sheets.map((sh,i)=>({...sh,name:(String(sh.name).replace(/[\[\]:*?/\\]/g,' ').slice(0,31)||'Sheet'+(i+1)),widths:sh.widths||sh.rows[0].map(()=>16)}));
+  const files=[
+    {name:'[Content_Types].xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${safe.map((s,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`},
+    {name:'_rels/.rels',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${rel}/officeDocument" Target="xl/workbook.xml"/></Relationships>`},
+    {name:'xl/workbook.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="${ns}" xmlns:r="${rel}"><sheets>${safe.map((s,i)=>`<sheet name="${xesc(s.name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')}</sheets></workbook>`},
+    {name:'xl/_rels/workbook.xml.rels',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${safe.map((s,i)=>`<Relationship Id="rId${i+1}" Type="${rel}/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}<Relationship Id="rIdS" Type="${rel}/styles" Target="styles.xml"/></Relationships>`},
+    {name:'xl/styles.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="${ns}"><numFmts count="1"><numFmt numFmtId="164" formatCode="d mmm yyyy hh:mm"/></numFmts><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE8EDFC"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="15" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`},
+    ...safe.map((s,i)=>({name:`xl/worksheets/sheet${i+1}.xml`,data:sheetXml(s.rows,s.widths)}))
+  ];
+  const a=document.createElement('a');a.href=URL.createObjectURL(zipStore(files));a.download=filename;document.body.appendChild(a);a.click();a.remove();
+}
+async function readSpreadsheet(file){
+  const buf=await file.arrayBuffer(),u8=new Uint8Array(buf);
+  if(!(u8[0]===0x50&&u8[1]===0x4b)){ // CSV / text
+    const text=new TextDecoder().decode(u8).replace(/^﻿/,'');const sep=(text.split('\n')[0].match(/;/g)||[]).length>(text.split('\n')[0].match(/,/g)||[]).length?';':',';
+    const rows=[];let row=[],cur='',q=false;
+    for(let i=0;i<text.length;i++){const c=text[i];
+      if(q){if(c==='"'){if(text[i+1]==='"'){cur+='"';i++}else q=false}else cur+=c}
+      else if(c==='"')q=true;else if(c===sep){row.push(cur);cur=''}else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;row.push(cur);rows.push(row);row=[];cur=''}else cur+=c}
+    if(cur||row.length){row.push(cur);rows.push(row)}
+    return rows.filter(r=>r.some(c=>String(c).trim()!==''));
+  }
+  const dv=new DataView(buf);let e=u8.length-22;while(e>=0&&dv.getUint32(e,true)!==0x06054b50)e--;if(e<0)throw new Error('Not a valid Excel file');
+  const n=dv.getUint16(e+10,true);let off=dv.getUint32(e+16,true);const files={},dec=new TextDecoder();
+  for(let i=0;i<n;i++){const method=dv.getUint16(off+10,true),csize=dv.getUint32(off+20,true),nl=dv.getUint16(off+28,true),xl=dv.getUint16(off+30,true),cl=dv.getUint16(off+32,true),lho=dv.getUint32(off+42,true);
+    files[dec.decode(u8.subarray(off+46,off+46+nl))]={method,csize,lho};off+=46+nl+xl+cl}
+  const get=async name=>{const f=files[name];if(!f)return null;const l=f.lho,ln=dv.getUint16(l+26,true),lx=dv.getUint16(l+28,true),data=u8.subarray(l+30+ln+lx,l+30+ln+lx+f.csize);
+    if(f.method===0)return dec.decode(data);
+    if(typeof DecompressionStream==='undefined')throw new Error('This browser can’t read Excel files — save it as CSV instead');
+    return await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text()};
+  const xml=t=>new DOMParser().parseFromString(t,'application/xml');
+  const strings=[];const ss=await get('xl/sharedStrings.xml');
+  if(ss)[...xml(ss).getElementsByTagName('si')].forEach(si=>strings.push([...si.getElementsByTagName('t')].map(t=>t.textContent).join('')));
+  let sheetPath=null;const wb=await get('xl/workbook.xml'),wr=await get('xl/_rels/workbook.xml.rels');
+  if(wb&&wr){const first=xml(wb).getElementsByTagName('sheet')[0];const rid=first&&(first.getAttribute('r:id')||first.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id'));
+    const relEl=[...xml(wr).getElementsByTagName('Relationship')].find(r=>r.getAttribute('Id')===rid);if(relEl){const t=relEl.getAttribute('Target');sheetPath=t.startsWith('/')?t.slice(1):'xl/'+t.replace(/^\.\//,'')}}
+  if(!sheetPath||!files[sheetPath])sheetPath=Object.keys(files).filter(k=>/^xl\/worksheets\/sheet\d+\.xml$/.test(k)).sort()[0];
+  if(!sheetPath)throw new Error('No worksheet found in the file');
+  const sx=xml(await get(sheetPath)),rows=[];
+  [...sx.getElementsByTagName('row')].forEach(r=>{const row=[];[...r.getElementsByTagName('c')].forEach(c=>{const ref=c.getAttribute('r')||'';const letters=ref.replace(/\d+/g,'');let col=0;for(const ch of letters)col=col*26+(ch.charCodeAt(0)-64);col--;
+    const t=c.getAttribute('t'),vEl=c.getElementsByTagName('v')[0];let v=vEl?vEl.textContent:'';
+    if(t==='s')v=strings[+v]??'';else if(t==='inlineStr')v=[...c.getElementsByTagName('t')].map(x=>x.textContent).join('');else if(t!=='str'&&t!=='b'&&v!=='')v=Number(v);
+    row[col<0?row.length:col]=v});for(let i=0;i<row.length;i++)if(row[i]===undefined)row[i]='';rows.push(row)});
+  return rows.filter(r=>r.some(c=>String(c).trim()!==''));
+}
+
+/* ================= Daily performance ================= */
+const perfOf=uid=>S.perf.filter(p=>p.userId===uid).sort((a,b)=>a.date.localeCompare(b.date));
+const fmtScore=v=>v==null?'—':(Math.round(v*10)/10)+'%';
+function perfSpark(vals){
+  const pts=vals.slice(-10);if(!pts.length)return '<span class="muted">—</span>';
+  const lo=Math.min(...pts)-5,hi=Math.max(...pts)+5,W=84,H=26,y=v=>H-3-(v-lo)/(hi-lo||1)*(H-6),x=i=>pts.length===1?W/2:3+i*(W-6)/(pts.length-1);
+  return `<svg class="spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-label="Last ${pts.length} scores"><polyline fill="none" stroke="var(--primary)" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" points="${pts.map((v,i)=>x(i)+','+y(v)).join(' ')}"/><circle cx="${x(pts.length-1)}" cy="${y(pts.at(-1))}" r="3" fill="var(--primary)"/></svg>`;
+}
+function perfChart(ps){
+  if(!ps.length)return '<div class="empty-mini">No scores uploaded yet.</div>';
+  const v=ps.map(p=>p.score),W=420,H=170,L=34,R=12,Tp=12,B=26;
+  let lo=Math.floor((Math.min(...v)-5)/10)*10,hi=Math.ceil((Math.max(...v)+5)/10)*10;if(hi-lo<20){lo-=10;hi+=10}
+  const y=s=>Tp+(hi-s)/(hi-lo)*(H-Tp-B),x=i=>v.length===1?(L+W-R)/2:L+i*(W-L-R)/(v.length-1);
+  let g='';const step=(hi-lo)/4;for(let k=0;k<=4;k++){const t=Math.round(lo+k*step);g+=`<line class="gl" x1="${L}" x2="${W-R}" y1="${y(t)}" y2="${y(t)}"/><text x="${L-6}" y="${y(t)+3.5}" text-anchor="end">${t}</text>`}
+  g+=`<polyline class="ln" points="${v.map((s,i)=>x(i)+','+y(s)).join(' ')}"/>`;
+  g+=ps.map((p,i)=>`<circle class="pt" cx="${x(i)}" cy="${y(p.score)}" r="4.5"><title>${fmt(p.date)} · ${fmtScore(p.score)}</title></circle>`).join('');
+  g+=`<text x="${x(0)}" y="${H-6}" text-anchor="${v.length===1?'middle':'start'}">${fmt(ps[0].date)}</text>`;if(v.length>1)g+=`<text x="${x(v.length-1)}" y="${H-6}" text-anchor="end">${fmt(ps.at(-1).date)}</text>`;
+  return `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily performance over time">${g}</svg></div>`;
+}
+function perfSummaryHtml(uid,compact){
+  const ps=perfOf(uid),last=ps.at(-1),prev=ps.at(-2),d=last&&prev?Math.round((last.score-prev.score)*10)/10:null;
+  if(!last)return `<div class="empty-mini">No daily performance scores yet.</div>`;
+  return `<div class="score-box"${compact?' style="margin-bottom:12px"':''}><div class="score-num" style="color:var(--primary)">${fmtScore(last.score)}</div><div><b>Daily performance</b><span style="display:block">As of ${fmtL(last.date)}</span>${d!=null?`<span class="delta ${d>=0?'up':'down'}">${d>=0?'▲':'▼'} ${Math.abs(d)} pts</span> <span class="muted" style="font-size:12px">vs ${fmt(prev.date)}</span>`:''}</div></div>`;
+}
+function viewMyPerf(){
+  const uid=S.current,ps=perfOf(uid),q=staffQuality(uid),tgt=S.rules.qualityTarget,recent=[...q.all].reverse().slice(0,3);
+  return head('My performance','Your latest scores from WFM.')+
+  `<div class="grid-2 perf-grid"><div class="card card-pad"><h2>Daily performance</h2>${perfSummaryHtml(uid)}${ps.length>1?`<h4 class="mini-h">Last ${Math.min(30,ps.length)} scores</h4>${perfChart(ps.slice(-30))}`:''}</div>
+  <div class="card card-pad"><h2>Call quality</h2>${q.sc.length?`<div class="score-box"><div class="score-num" style="color:${q.recent>=tgt?'var(--ok)':'var(--bad)'}">${q.recent}%</div><div><b>${q.sc.length===1?'Last call':`Average of last ${Math.min(6,q.sc.length)} calls`}</b><span style="display:block">Target ${tgt}%</span><div style="margin-top:6px">${trendBadge(q.trend)}</div></div></div>
+   ${q.strong!=null?`<div class="ins" style="margin-bottom:14px"><div><span>Your strength</span><b>${esc(LISTS.criteria[q.strong])}</b></div><div><span>Focus area</span><b>${esc(LISTS.criteria[q.weak])}</b></div></div>`:''}
+   <h4 class="mini-h">Latest evaluations</h4><div class="req-list">${recent.map(r=>{const sc=scoreOf(r.data.ratings);return `<div class="req-card" data-action="openRec" data-id="${r.id}" role="button" tabindex="0"><div class="req-main"><div class="req-title"><span class="score-cell${sc<tgt?' below':''}">${sc}%</span> <small>${fmt(r.data.date)} · ${esc(r.data.callType||'')}</small></div><div class="req-sub">${esc(r.data.feedback)}</div></div></div>`}).join('')}</div>`
+   :'<div class="empty-mini">No call evaluations yet.</div>'}</div></div>`;
+}
+function viewPerfAdmin(){
+  const pv=ui.perfPreview,staff=staffUsers().filter(u=>ui.q.team==='all'||String(u.team)===ui.q.team);
+  const latestDate=S.perf.length?S.perf.reduce((a,p)=>p.date>a?p.date:a,''):null;
+  const rows=staff.map(u=>{const ps=perfOf(u.id),l=ps.at(-1),pr=ps.at(-2),d=l&&pr?Math.round((l.score-pr.score)*10)/10:null;
+    return `<tr data-action="openStaff" data-id="${u.id}"><td style="white-space:nowrap"><span class="av">${initials(u.name)}</span><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:12px;margin-left:36px">${esc(teamName(u.team))}</div></td>
+    <td class="num-cell"><span class="score-cell">${l?fmtScore(l.score):'—'}</span></td><td>${d!=null?`<span class="delta ${d>=0?'up':'down'}">${d>=0?'▲':'▼'} ${Math.abs(d)}</span>`:'<span class="muted">—</span>'}</td>
+    <td>${perfSpark(ps.map(p=>p.score))}</td><td class="muted" style="white-space:nowrap">${l?fmt(l.date):'No scores'}</td></tr>`}).join('');
+  const latestVals=staff.map(u=>perfOf(u.id).at(-1)).filter(Boolean).map(p=>p.score);
+  const preview=pv?`<div class="card card-pad" style="margin-bottom:18px"><h2>Check before uploading <span class="muted" style="font-weight:500">· ${esc(pv.file)}</span></h2>
+    <div class="ins" style="margin-bottom:14px"><div><span>Ready to upload</span><b style="color:var(--ok)">${pv.rows.filter(r=>r.ok).length} rows</b></div><div><span>Will be skipped</span><b style="color:${pv.rows.some(r=>!r.ok)?'var(--bad)':'var(--text)'}">${pv.rows.filter(r=>!r.ok).length} rows</b></div></div>
+    <div class="table-wrap" style="border:1px solid var(--border);border-radius:10px;max-height:340px;overflow:auto"><table class="mini-table"><thead><tr><th>Employee ID</th><th>Name</th><th>Date</th><th class="num-cell">Score</th><th>Status</th></tr></thead><tbody>
+    ${pv.rows.map(r=>`<tr><td>${esc(r.emp)}</td><td>${r.user?esc(r.user.name):'<span class="muted">—</span>'}</td><td class="muted">${r.date?fmt(r.date):'—'}</td><td class="num-cell">${r.score!=null?fmtScore(r.score):'—'}</td><td>${r.ok?'<span class="pill approved">Ready</span>':`<span class="pill rejected">${esc(r.msg)}</span>`}</td></tr>`).join('')}</tbody></table></div>
+    <div class="form-actions"><button class="btn" data-action="perfCancel">Cancel</button><button class="btn primary" data-action="perfConfirm" ${pv.rows.some(r=>r.ok)?'':'disabled style="opacity:.5"'}>${ic('upload',16)} Upload ${pv.rows.filter(r=>r.ok).length} scores</button></div></div>`:'';
+  return `<div class="q-filters"><select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select></div>
+  <div class="stats"><div class="card stat"><span>Team average (latest)</span><b>${latestVals.length?fmtScore(avgOf(latestVals)):'—'}</b><small>${latestVals.length} of ${staff.length} staff have a score</small></div>
+   <div class="card stat"><span>Last upload</span><b style="font-size:20px">${latestDate?fmtL(latestDate):'—'}</b><small>${S.perf.length} scores stored</small></div></div>
+  ${preview}
+  <div class="grid-2 perf-grid"><div class="card card-pad"><h2>Upload scores</h2>
+   <div class="form-grid" style="grid-template-columns:1fr">${field('Scores date',`<input type="date" data-pd="1" value="${ui.perfDate||iso(today())}">`,{hint:'Used for rows that don’t have their own Date column'})}
+   ${field('Excel or CSV file',`<label class="drop">${ic('upload',16)} <span>Drag the file here or <b>browse</b></span><input type="file" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" data-perf></label>`,{hint:'Columns: Employee ID and Score. Optional: Date. Uploading again for the same day replaces that day’s score.'})}</div>
+   <div class="form-actions"><button class="btn" data-action="perfTemplate">${ic('download',16)} Download template</button></div></div>
+   <div class="card card-pad"><h2>How staff see it</h2><div class="flow-note" style="margin:0 0 12px">Each staff member sees only their own score on their “My performance” page, with their history.</div>${staff[0]?perfSummaryHtml(staff[0].id,1):''}</div></div>
+  <div class="card" style="margin-top:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Latest scores</h2></div><div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Latest</th><th>Change</th><th>Last 10</th><th>Date</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+async function handlePerfFile(file){
+  try{
+    const rows=await readSpreadsheet(file);if(rows.length<2)throw new Error('The file has no data rows');
+    const hdr=rows[0].map(h=>String(h).trim().toLowerCase());
+    const find=(...keys)=>hdr.findIndex(h=>keys.some(k=>h===k||h.includes(k)));
+    const ci=find('employee id','emp id','employee','emp','id'),si=find('daily performance','performance','score'),di=find('date');
+    if(ci<0||si<0)throw new Error('Couldn’t find the “Employee ID” and “Score” columns');
+    const toIso=v=>{if(v===''||v==null)return null;if(typeof v==='number'&&v>20000){const d=new Date(Date.UTC(1899,11,30)+v*86400000);return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`}
+      const s=String(v).trim();let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return `${m[1]}-${pad(+m[2])}-${pad(+m[3])}`;m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/);if(m)return `${m[3]}-${pad(+m[2])}-${pad(+m[1])}`;return 'bad'};
+    const def=ui.perfDate||iso(today()),seen=new Set();
+    const out=rows.slice(1).map(r=>{const emp=String(r[ci]??'').trim();let sc=r[si];sc=typeof sc==='number'?sc:parseFloat(String(sc).replace('%','').replace(',','.'));
+      if(typeof r[si]==='number'&&sc>0&&sc<=1.5)sc=sc*100;sc=isFinite(sc)?Math.round(sc*10)/10:null;
+      const dd=di>=0?toIso(r[di])||def:def,u=USERS.find(x=>x.emp.toLowerCase()===emp.toLowerCase()&&x.role==='staff');
+      let msg='';if(!emp)msg='No employee ID';else if(!u)msg='Employee not found';else if(sc==null)msg='Score missing';else if(dd==='bad')msg='Date not readable';else if(seen.has(u.id+dd))msg='Duplicate row';
+      if(!msg&&u)seen.add(u.id+dd);
+      return {emp,user:u,score:sc,date:dd==='bad'?null:dd,ok:!msg,msg}}).filter(r=>r.emp||r.score!=null);
+    ui.perfPreview={file:file.name,rows:out};render();
+  }catch(e){toast(e.message||'Couldn’t read the file',true)}
 }
 
 /* ================= Drawer ================= */
@@ -1110,6 +1411,9 @@ function closeDrawer(silent){ui.drawer=null;$('#overlay').classList.remove('open
 function renderDrawer(){
   const d=ui.drawer,el=$('#drawer');
   if(d.kind==='staff'){el.innerHTML=staffDrawer(d.id);return}
+  if(d.kind==='user'){el.innerHTML=userDrawer(d.id);return}
+  if(d.kind==='pw'){el.innerHTML=pwDrawer(d.id);return}
+  if(d.kind==='account'){el.innerHTML=accountDrawer();return}
   if(d.kind==='req'){const r=S.requests.find(x=>x.id===d.id);if(!r)return closeDrawer();el.innerHTML=reqDrawer(r)}
   else{const r=S.records.find(x=>x.id===d.id);if(!r)return closeDrawer();el.innerHTML=recDrawer(r)}
 }
@@ -1135,7 +1439,8 @@ function reqDrawer(r){
   const ld=lastDecision(r);
   if(r.status==='returned'&&ld)extra+=callout('ret','undo',`${esc(user(ld.by).name)} returned this for changes`,esc(ld.comment));
   if(wfm&&r.type==='leave'&&['pending','returned'].includes(r.status)){
-    const full=fullDaysIn(r.data.start,r.data.end,r.id);
+    const full=fullDaysIn(r.data.start,r.data.end,r.id),bdays=blockedInRange(r.userId,'leave',r.data.start,r.data.end);
+    if(bdays.length)extra+=callout('warn','lock','Includes blocked dates',`${bdays.map(fmt).join(', ')} ${bdays.length>1?'are':'is'} blocked for this person.`);
     extra+=full.length?callout('warn','alert','Over the leave limit',`${full.map(fmt).join(', ')} already ${full.length>1?'have':'has'} ${S.rules.leaveLimit} staff on leave.`):callout('ok','check','Within the leave limit',`Every day has a free slot (limit ${S.rules.leaveLimit} per day).`);
   }
   if(r.type==='swap'&&r.status==='waiting')extra+=callout('info','info',`Waiting for ${esc(user(r.partnerId).name)}`,'WFM can decide once the colleague accepts.');
@@ -1148,7 +1453,7 @@ function reqDrawer(r){
   }
   return `<div class="sheet-handle"></div><div class="d-head">${bubble(r.type,1)}<div><h3>${TYPES[r.type].name}</h3><small>${r.id}</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div>
   <div class="d-body"><div class="d-section" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${pill(r.status)}<span class="muted" style="font-size:12.5px">Submitted ${fmtTs(r.createdAt)}</span></div>${extra}
-  <div class="d-section"><h4>Employee</h4><div class="kv">${kv('Name',esc(u.name))+kv('Employee ID',u.emp)+kv('Team',esc(TEAMS[u.team]),1)}</div></div>
+  <div class="d-section"><h4>Employee</h4><div class="kv">${kv('Name',esc(u.name))+kv('Employee ID',u.emp)+kv('Team',esc(teamName(u.team)),1)}</div></div>
   <div class="d-section"><h4>Request details</h4><div class="kv">${reqDetails(r)}</div></div>${reqNotes(r)}
   ${r.files.length?`<div class="d-section"><h4>Attachments</h4>${fileList(r.files)}</div>`:''}
   <div class="d-section"><h4>History</h4>${timeline(r)}</div></div>${foot}`;
@@ -1159,7 +1464,7 @@ function recDrawer(r){
     const sc=scoreOf(x.ratings);
     body=`<div class="score-box"><div class="score-num" style="color:${sc>=85?'var(--ok)':sc>=70?'var(--warn)':'var(--bad)'}">${sc}%</div><div><b>${sc>=85?'Good call':sc>=70?'Room to improve':'Needs attention'}</b><span style="display:block">Evaluated by ${esc(user(r.createdBy).name)} · ${fmtL(iso(new Date(r.createdAt)))}</span></div></div>
     <div class="d-section"><h4>Call</h4><div class="kv">${kv('Call date',`${fmtL(x.date)}${x.time?', '+esc(x.time):''}`)+kv('Call ID',esc(x.callId||'—'))+kv('Call type',esc(x.callType||'—'))+kv('Evaluator',esc(user(r.createdBy).name))}</div></div>
-    <div class="d-section"><h4>Scores</h4><div class="bars">${CRITERIA.map((c,i)=>{const v=x.ratings[i]*20;return `<div class="bar-row" style="grid-template-columns:150px 1fr 40px"><span>${c}</span><div class="bar-track"><div class="bar-fill" style="width:${v}%;--c:${v>=90?'var(--ok)':v>=80?'var(--primary)':'var(--warn)'}"></div></div><b>${v}%</b></div>`}).join('')}</div></div>
+    <div class="d-section"><h4>Scores</h4><div class="bars">${critOf(r).map((c,i)=>{const v=x.ratings[i]*20;return `<div class="bar-row" style="grid-template-columns:150px 1fr 40px"><span>${esc(c)}</span><div class="bar-track"><div class="bar-fill" style="width:${v}%;--c:${v>=90?'var(--ok)':v>=80?'var(--primary)':'var(--warn)'}"></div></div><b>${v}%</b></div>`}).join('')}</div></div>
     <div class="d-section"><h4>Feedback</h4><div class="note-box">${esc(x.feedback)}</div></div>`;
   }else if(r.kind==='mom'){
     body=`<div class="d-section"><div class="kv">${kv('Title',esc(x.title),1)+kv('Meeting date',fmtL(x.date))+kv('From',esc(user(r.createdBy).name))}</div></div>
@@ -1167,7 +1472,7 @@ function recDrawer(r){
   }else if(r.kind==='vio'){
     body=`<div class="d-section"><div class="kv">${kv('Violation type',esc(x.vtype))+kv('Date',fmtL(x.date))+kv('Issued by',esc(user(r.createdBy).name),1)}</div></div><div class="d-section"><h4>Details</h4><div class="note-box">${esc(x.details)}</div></div>`;
   }else if(r.kind==='adh'){
-    body=`<div class="d-section"><div class="kv">${kv('Staff member',esc(user(r.recipients[0]).name))+kv('Reason',esc(x.reason))+kv('From',fmtL(x.from))+kv('To',fmtL(x.to))+kv('Created by',esc(user(r.createdBy).name),1)}</div></div>${x.note?`<div class="d-section"><h4>Note</h4><div class="note-box">${esc(x.note)}</div></div>`:''}`;
+    body=`<div class="d-section"><div class="kv">${kv('Staff member',esc(user(r.recipients[0]).name))+kv('Reason',esc(x.reason))+kv('Date',fmtL(x.date||x.from))+kv('Created by',esc(user(r.createdBy).name),1)}</div></div>${x.note?`<div class="d-section"><h4>Note</h4><div class="note-box">${esc(x.note)}</div></div>`:''}`;
   }
   if(r.files.length)body+=`<div class="d-section"><h4>Attachments</h4>${fileList(r.files)}</div>`;
   let foot='';
@@ -1186,24 +1491,27 @@ function toast(msg,err){const t=$('#toast');t.textContent=msg;t.className='toast
 
 function submitRequest(){
   const f=ui.form,v=f.vals,e={},uid=S.current,tIso=iso(today());
-  const block=activeBlock(uid,f.type);if(block&&!f.editingId){toast(`Blocked until ${fmt(block.to)}: ${block.reason}`,true);return}
   let data={};
   if(f.type==='leave'){
     const {start,end}=f.cal;
     if(!start)e.dates='Pick your dates on the calendar';
-    else{const en=end||start,full=fullDaysIn(start,en,f.editingId);if(full.length)e.dates=`${full.map(fmt).join(', ')} ${full.length>1?'are':'is'} full — pick other dates`;data={start,end:en,cover:v.cover||'',notes:v.notes||''}}
+    else{const en=end||start,pr=leaveProblem(start,en,f.editingId);if(pr)e.dates=pr;data={start,end:en,cover:v.cover||'',notes:v.notes||''}}
   }else if(f.type==='swap'){
     if(!v.date||v.date<=tIso)e.date='Pick a future date';
+    if(!e.date&&blockOn(uid,'swap',v.date))e.date=`This date is blocked by WFM: ${blockOn(uid,'swap',v.date).reason||'no reason given'}`;
     data={date:v.date,myShift:v.date?shiftFor(uid,v.date):'',theirShift:v.date?shiftFor(v.partnerId,v.date):'',reason:v.reason||''};
   }else if(f.type==='change'){
     if(!v.date||v.date<=tIso)e.date='Pick a future date';if(!v.requested)e.requested='Choose a shift';if(!(v.reason||'').trim())e.reason='Please give a reason';
+    if(!e.date&&blockOn(uid,'change',v.date))e.date=`This date is blocked by WFM: ${blockOn(uid,'change',v.date).reason||'no reason given'}`;
     data={date:v.date,current:v.date?shiftFor(uid,v.date):'',requested:v.requested,reason:v.reason||''};
   }else if(f.type==='special'){
     if(!f.prefs.length)e.prefs='Pick at least one preference';if(!(v.details||'').trim())e.details='Please explain your request';
     if(v.period==='Specific dates'&&!(v.dates||'').trim())e.dates='Enter the dates';
+    {const [ma,mb]=monthRange(v.schedule);if(blockedInRange(uid,'special',ma,mb).length)e.schedule=`Requests for ${v.schedule} are blocked by WFM`}
     data={schedule:v.schedule,period:v.period,dates:v.dates||'',prefs:[...f.prefs],details:v.details||''};
   }else if(f.type==='kpi'){
     if(!v.date)e.date='Pick the date';if(!(v.justification||'').trim())e.justification='Please explain what happened';if(!f.files.length)e.files='Attach at least one supporting file';
+    if(!e.date&&v.date&&blockOn(uid,'kpi',v.date))e.date=`This date is blocked by WFM: ${blockOn(uid,'kpi',v.date).reason||'no reason given'}`;
     data={kpi:v.kpi,date:v.date,justification:v.justification||''};
   }
   f.errors=e;
@@ -1223,9 +1531,9 @@ function submitRequest(){
 }
 function submitRecord(){
   const f=ui.form,v=f.vals,e={};let data={},recipients=[v.staff];
-  if(f.kind==='eval'){if(!v.date)e.date='Pick the date';if(!f.ratings.every(x=>x))e.ratings='Score every criterion';if(!(v.feedback||'').trim())e.feedback='Feedback is required';data={date:v.date,time:v.time||'',callId:v.callId||'',callType:v.callType||CALL_TYPES[0],ratings:[...f.ratings],feedback:v.feedback||'',countInScore:!!v.countInScore}}
+  if(f.kind==='eval'){if(!v.date)e.date='Pick the date';if(!f.ratings.every(x=>x))e.ratings='Score every criterion';if(!(v.feedback||'').trim())e.feedback='Feedback is required';data={date:v.date,time:v.time||'',callId:v.callId||'',callType:v.callType||LISTS.call_types[0],criteria:[...LISTS.criteria],ratings:[...f.ratings],feedback:v.feedback||'',countInScore:!!v.countInScore}}
   if(f.kind==='vio'){if(!v.date)e.date='Pick the date';if(!(v.details||'').trim())e.details='Details are required';data={vtype:v.vtype,date:v.date,details:v.details||''}}
-  if(f.kind==='adh'){if(!v.from)e.from='Required';if(!v.to)e.to='Required';if(v.from&&v.to&&v.to<v.from)e.to='Must be after “From”';data={reason:v.reason,from:v.from,to:v.to,note:v.note||''}}
+  if(f.kind==='adh'){if(!v.date)e.date='Pick the date';data={reason:v.reason,date:v.date,note:v.note||''}}
   if(f.kind==='mom'){recipients=momRecipients(f);if(f.sendTo==='teams'&&!f.teams.length)e.teams='Pick at least one team';if(!(v.title||'').trim())e.title='Title is required';if(!v.date)e.date='Pick the date';if(!(v.summary||'').trim())e.summary='Summary is required';data={title:v.title,date:v.date,summary:v.summary||'',actions:v.actions||'',sendTo:f.sendTo,teams:[...f.teams]}}
   f.errors=e;if(Object.keys(e).length){render();toast('Please fix the highlighted fields',true);return}
   const r={kind:f.kind,createdBy:S.current,recipients,requireAck:f.kind==='adh'?false:!!v.requireAck,data,files:f.files};
@@ -1253,11 +1561,16 @@ function readFiles(list){
 }
 function exportCsv(){
   const list=filteredRequests();
-  const cols=['ID','Type','Employee','Employee ID','Team','Details','Status','Submitted','Last decision by','Decision date','Comment','Attachments'];
-  const rows=list.map(r=>{const u=user(r.userId),d=lastDecision(r);return [r.id,TYPES[r.type].name,u.name,u.emp,TEAMS[u.team],summary(r),STATUS[r.status],fmtTs(r.createdAt),d?user(d.by).name:'',d?fmtTs(d.at):'',d?d.comment:'',r.files.map(x=>x.name).join('; ')]});
-  const csv='﻿'+[cols,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=`wfm-requests-${iso(today())}.csv`;document.body.appendChild(a);a.click();a.remove();
-  toast(`Exported ${list.length} request(s)`);
+  const head=['ID','Type','Status','Employee','Employee ID','Team','Submitted','Start date','End date','Days','Date','Swap with','Current / own shift','Requested / other shift','KPI','Schedule','Preferences','Notes / reason','Attachments','Last decision by','Decision date','Comment'];
+  const rows=list.map(r=>{const u=user(r.userId),d=lastDecision(r),x=r.data;return [r.id,TYPES[r.type].name,STATUS[r.status],u.name,u.emp,teamName(u.team),{dt:r.createdAt},
+    x.start?{d:x.start}:'',x.end?{d:x.end}:'',x.start?daysBetween(x.start,x.end):'',x.date?{d:x.date}:'',r.partnerId?user(r.partnerId).name:'',x.myShift||x.current||'',x.theirShift||x.requested||'',x.kpi||'',x.schedule||'',(x.prefs||[]).join(', '),
+    x.notes||x.reason||x.details||x.justification||'',r.files.map(f=>f.name).join('; '),d?user(d.by).name:'',d?{dt:d.at}:'',d?d.comment:'']});
+  downloadXlsx(`wfm-requests-${iso(today())}.xlsx`,[{name:'Requests',rows:[head,...rows],widths:[11,22,20,20,12,24,18,12,12,7,12,18,22,22,18,16,24,40,24,18,18,36]}]);
+  toast(`Exported ${list.length} request(s) to Excel`);
+}
+function perfTemplate(){
+  const rows=[['Employee ID','Name','Team','Score','Date'],...staffUsers().map(u=>[u.emp,u.name,teamName(u.team),'',{d:ui.perfDate||iso(today())}])];
+  downloadXlsx('daily-performance-template.xlsx',[{name:'Daily performance',rows,widths:[14,24,26,10,13]}]);
 }
 
 /* ================= Events ================= */
@@ -1266,15 +1579,50 @@ document.addEventListener('click',ev=>{
   const a=el.dataset.action,id=el.dataset.id;
   if(el.tagName==='BUTTON'&&el.closest('.req-card')&&a!=='openReq')ev.stopPropagation();
   switch(a){
-    case 'login':S.current=id;ui.view=user(id).role==='wfm'?'dash':'new';ui.form=null;ui.rulesDraft=null;save();render();window.scrollTo(0,0);toast(`Signed in as ${user(id).name}`);break;
-    case 'switchUser':S.current=null;ui.drawer=null;closeDrawer(true);save();render();break;
-    case 'resetDemo':if(confirm('Delete ALL requests, records and blocks for EVERYONE testing? Users are kept. This can’t be undone.')){busy(async()=>{await rpc('reset_demo');await fetchAll();ui.form=null;ui.rulesDraft=null;closeDrawer(true);if(S.current)ui.view=isWfm()?'dash':'new';render();toast('All data cleared')})}break;
+    case 'account':openDrawer('account');break;
+    case 'signOut':signOut();break;
+    case 'cancelPending':ui.pending=null;render();break;
+    case 'adminTab':ui.adminTab=el.dataset.t;render();break;
+    case 'qTab':ui.qTab=el.dataset.t;render();break;
+    case 'userNew':ui.userForm={id:null,name:'',emp:'',role:'staff',team:String((TEAM_LIST[0]||{}).id??''),title:'',active:true,pw:genPw()};openDrawer('user','new');break;
+    case 'userEdit':{const u=user(id);ui.userForm={id:u.id,name:u.name,emp:u.emp,role:u.role,team:String(u.team??(TEAM_LIST[0]||{}).id??''),title:u.title||'',active:u.active};openDrawer('user',id);break}
+    case 'ufActive':ui.userForm.active=!ui.userForm.active;renderDrawer();break;
+    case 'userSave':{const f=ui.userForm,e=[];
+      if(!f.name.trim())e.push('name');if(!f.emp.trim())e.push('employee ID');if(f.role==='staff'&&(f.team===''||f.team==null))e.push('team');if(!f.id&&String(f.pw||'').length<6)e.push('a password of 6+ characters');
+      if(e.length){toast('Please add '+e.join(', '),true);break}
+      if(USERS.some(u=>u.emp.toLowerCase()===f.emp.trim().toLowerCase()&&u.id!==f.id)){toast('That employee ID is already used',true);break}
+      busy(async()=>{await rpc('admin_save_user',{p_id:f.id||null,p_emp:f.emp,p_name:f.name,p_role:f.role,p_title:f.role==='wfm'?(f.title||null):null,p_team:f.role==='staff'?+f.team:null,p_active:f.active,p_pw:f.id?null:f.pw});
+        await fetchAll();closeDrawer();toast(f.id?'User updated':`${f.name.trim()} created · temporary password: ${f.pw}`)});break}
+    case 'userPw':ui.tmpPw=genPw();openDrawer('pw',id);break;
+    case 'genPw':ui.tmpPw=genPw();const tp=$('#tmpPw');if(tp)tp.value=ui.tmpPw;break;
+    case 'pwReset':{const pw=(($('#tmpPw')||{}).value||'').trim();if(pw.length<6){toast('Use at least 6 characters',true);break}
+      busy(async()=>{await rpc('admin_reset_password',{p_id:id,p_pw:pw});await fetchAll();closeDrawer();toast(`Password reset · share it with ${user(id).name}: ${pw}`);if(id===S.current)signOut('Your password was reset. Sign in with the new one.')});break}
+    case 'saveTeam':{const inp=document.querySelector(`[data-team="${id}"]`),name=(inp&&inp.value||'').trim();if(!name){toast('Team name can’t be empty',true);break}
+      busy(async()=>{await api(`teams?id=eq.${id}`,{method:'PATCH',body:{name}});await fetchAll();render();toast('Team renamed')});break}
+    case 'addTeam':{const name=(($('#newTeam')||{}).value||'').trim();if(!name){toast('Type a team name first',true);break}
+      busy(async()=>{await api('teams',{method:'POST',body:{name,sort:Math.max(0,...TEAM_LIST.map(t=>t.sort))+1}});await fetchAll();render();toast('Team added')});break}
+    case 'delTeam':if(confirm(`Delete team “${teamName(+id)}”?`))busy(async()=>{await api(`teams?id=eq.${id}`,{method:'DELETE'});await fetchAll();render();toast('Team deleted')});break;
+    case 'liMove':{const k=el.dataset.k,i=+el.dataset.i,j=i+(+el.dataset.d),d=ui.listDraft[k];if(j<0||j>=d.length)break;[d[i],d[j]]=[d[j],d[i]];render();break}
+    case 'liDel':{const d=ui.listDraft[el.dataset.k];if(d.length>1){d.splice(+el.dataset.i,1);render()}break}
+    case 'liAdd':{const k=el.dataset.k,inp=document.querySelector(`[data-lnew="${k}"]`),v=(inp&&inp.value||'').trim();if(!v){toast('Type the new item first',true);break}
+      if(ui.listDraft[k].some(x=>x.toLowerCase()===v.toLowerCase())){toast('That item is already in the list',true);break}ui.listDraft[k].push(v);render();break}
+    case 'liReset':ui.listDraft[el.dataset.k]=[...LISTS[el.dataset.k]];render();break;
+    case 'liSave':{const k=el.dataset.k,d=ui.listDraft[k].map(x=>String(x).trim()).filter(Boolean);
+      if(!d.length){toast('A list needs at least one item',true);break}if(new Set(d.map(x=>x.toLowerCase())).size!==d.length){toast('Remove duplicate items first',true);break}
+      busy(async()=>{await api('settings?on_conflict=key',{method:'POST',prefer:'resolution=merge-duplicates',body:{key:k,value:d}});await fetchAll();ui.listDraft[k]=[...LISTS[k]];render();toast(`${LIST_META[k].name} saved`)});break}
+    case 'editBlock':{const b=S.rules.blocks.find(x=>x.id===id);if(!b)break;ui.blockForm={id:b.id,scope:b.scope,target:b.scope==='user'?b.target:b.scope==='team'?String(b.target):null,type:b.type,from:b.from,to:b.to,reason:b.reason||''};render();const bf=$('#blockForm');if(bf)bf.scrollIntoView({behavior:'smooth',block:'center'});break}
+    case 'cancelBlockEdit':{const T=today();ui.blockForm={scope:'user',target:(staffUsers()[0]||{}).id,type:'leave',from:iso(T),to:iso(addDays(T,14)),reason:''};render();break}
+    case 'perfTemplate':perfTemplate();break;
+    case 'perfCancel':ui.perfPreview=null;render();break;
+    case 'perfConfirm':{const ok=ui.perfPreview.rows.filter(r=>r.ok);
+      busy(async()=>{await api('performance?on_conflict=user_id,date',{method:'POST',prefer:'resolution=merge-duplicates',body:ok.map(r=>({user_id:r.user.id,date:r.date,score:r.score,uploaded_at:Date.now(),uploaded_by:S.current}))});
+        ui.perfPreview=null;await fetchAll();render();toast(`${ok.length} scores uploaded`)});break}
+    case 'resetDemo':if(confirm('Delete ALL requests, records, blocks and performance scores for EVERYONE? Users, teams and lists are kept. This can’t be undone.')){busy(async()=>{await rpc('reset_demo');await fetchAll();ui.form=null;ui.rulesDraft=null;closeDrawer(true);if(S.current)ui.view=isWfm()?'dash':'new';render();toast('All data cleared')})}break;
     case 'nav':go(el.dataset.view);break;
     case 'pickType':ui.form=newForm(el.dataset.type);go('form');break;
-    case 'blockedType':toast(`Blocked until ${fmt(el.dataset.to)} · ${el.dataset.reason}`,true);break;
     case 'calMove':{const m=ui.form.cal.month;ui.form.cal.month=new Date(m.getFullYear(),m.getMonth()+(+el.dataset.d),1);render();break}
     case 'calPick':{const c=ui.form.cal,d=el.dataset.d;ui.form.errors.dates=null;
-      if(!c.start||c.end||d<c.start){c.start=d;c.end=null}else if(d===c.start){c.start=null}else{const full=fullDaysIn(c.start,d,ui.form.editingId);if(full.length){toast(`${full.map(fmt).join(', ')} ${full.length>1?'are':'is'} full — pick a shorter range`,true)}else c.end=d}
+      if(!c.start||c.end||d<c.start){c.start=d;c.end=null}else if(d===c.start){c.start=null}else{const pr=leaveProblem(c.start,d,ui.form.editingId);if(pr){toast(pr,true)}else c.end=d}
       render();break}
     case 'togglePref':{const p=el.dataset.p,arr=ui.form.prefs,i=arr.indexOf(p);i>=0?arr.splice(i,1):arr.push(p);render();break}
     case 'rmFile':ui.form.files.splice(+el.dataset.i,1);render();break;
@@ -1300,15 +1648,18 @@ document.addEventListener('click',ev=>{
     case 'toggleVal':ui.form.vals[el.dataset.name]=!ui.form.vals[el.dataset.name];render();break;
     case 'momTo':ui.form.sendTo=el.dataset.s;render();break;
     case 'momTeam':{const t=+el.dataset.t,arr=ui.form.teams,i=arr.indexOf(t);i>=0?arr.splice(i,1):arr.push(t);render();break}
-    case 'limit':ui.rulesDraft.leaveLimit=Math.max(1,Math.min(20,ui.rulesDraft.leaveLimit+(+el.dataset.d)));render();break;
-    case 'qTarget':ui.rulesDraft.qualityTarget=Math.max(50,Math.min(100,ui.rulesDraft.qualityTarget+(+el.dataset.d)));render();break;
+    case 'limit':ui.rulesDraft.leaveLimit=Math.max(1,Math.min(50,(+ui.rulesDraft.leaveLimit||0)+(+el.dataset.d)));render();break;
+    case 'qTarget':ui.rulesDraft.qualityTarget=Math.max(50,Math.min(100,(+ui.rulesDraft.qualityTarget||0)+(+el.dataset.d)));render();break;
     case 'toggleCountPending':ui.rulesDraft.countPending=!ui.rulesDraft.countPending;render();break;
-    case 'saveRules':{const R=ui.rulesDraft;busy(async()=>{await api('rules?id=eq.1',{method:'PATCH',body:{leave_limit:R.leaveLimit,count_pending:R.countPending,quality_target:R.qualityTarget}});await fetchAll();ui.rulesDraft=null;render();toast('Rules saved')});break}
+    case 'saveRules':{const R=ui.rulesDraft;R.leaveLimit=Math.round(+R.leaveLimit);R.qualityTarget=Math.round(+R.qualityTarget);
+      if(!(R.leaveLimit>=1&&R.leaveLimit<=50)){toast('Leave limit must be between 1 and 50',true);break}if(!(R.qualityTarget>=50&&R.qualityTarget<=100)){toast('Quality target must be between 50 and 100',true);break}
+      busy(async()=>{await api('rules?id=eq.1',{method:'PATCH',body:{leave_limit:R.leaveLimit,count_pending:R.countPending,quality_target:R.qualityTarget}});await fetchAll();ui.rulesDraft=null;render();toast('Rules saved')});break}
     case 'rmBlock':busy(async()=>{await api(`blocks?id=eq.${encodeURIComponent(id)}`,{method:'DELETE'});await fetchAll();render();toast('Block removed')});break;
     case 'addBlock':{const b=ui.blockForm;
       if(!b.from||!b.to){toast('Set both dates',true);break}if(b.to<b.from){toast('“To” must be after “From”',true);break}if(!b.reason.trim()){toast('Add a reason staff will see',true);break}
-      busy(async()=>{await api('blocks',{method:'POST',body:{scope:b.scope,target:b.scope==='all'?null:String(b.target),type:b.type,from_date:b.from,to_date:b.to,reason:b.reason.trim()}});
-        ui.blockForm={...b,reason:''};await fetchAll();render();toast('Block added')});break}
+      const body={scope:b.scope,target:b.scope==='all'?null:String(b.target),type:b.type,from_date:b.from,to_date:b.to,reason:b.reason.trim()};
+      busy(async()=>{if(b.id)await api(`blocks?id=eq.${encodeURIComponent(b.id)}`,{method:'PATCH',body});else await api('blocks',{method:'POST',body});
+        const T=today();ui.blockForm={scope:b.scope,target:b.target,type:b.type,from:iso(T),to:iso(addDays(T,14)),reason:''};await fetchAll();render();toast(b.id?'Block updated':'Block added')});break}
     case 'exportCsv':exportCsv();break;
   }
 });
@@ -1320,26 +1671,43 @@ document.addEventListener('input',ev=>{
   const t=ev.target;
   if(t.dataset.filter){ui.filters[t.dataset.filter]=t.value;const res=$('#results');if(res)res.innerHTML=resultsHtml();return}
   if(t.dataset.bf){ui.blockForm[t.dataset.bf]=t.value;return}
+  if(t.dataset.rd){ui.rulesDraft[t.dataset.rd]=t.value;return}
+  if(t.dataset.li){ui.listDraft[t.dataset.li][+t.dataset.i]=t.value;return}
+  if(t.dataset.pd){ui.perfDate=t.value;return}
+  if(t.dataset.us){ui.userSearch=t.value;const box=$('#main');if(box){const pos=t.selectionStart;box.innerHTML=renderView();const n=$('[data-us]');if(n){n.focus();n.setSelectionRange(pos,pos)}}return}
+  if(t.id==='tmpPw'){ui.tmpPw=t.value;return}
+  if(ui.userForm&&t.name&&t.closest('#userForm')){ui.userForm[t.name]=t.value;return}
   if(ui.form&&t.name&&t.closest('#reqForm,#recForm')){ui.form.vals[t.name]=t.value;if(ui.form.errors[t.name]){ui.form.errors[t.name]=null;const fld=t.closest('.field');if(fld){fld.classList.remove('invalid')}}}
 });
 document.addEventListener('change',ev=>{
   const t=ev.target;
   if(t.matches('[data-file]')){readFiles(t.files);t.value='';return}
-  if(t.dataset.bf==='scope'){ui.blockForm.scope=t.value;ui.blockForm.target=t.value==='user'?staffUsers()[0].id:t.value==='team'?'0':null;render();return}
+  if(t.matches('[data-perf]')){const f=t.files[0];t.value='';if(f)handlePerfFile(f);return}
+  if(ui.userForm&&t.name&&t.closest('#userForm')){ui.userForm[t.name]=t.value;if(t.name==='role')renderDrawer();return}
+  if(t.dataset.bf==='scope'){ui.blockForm.scope=t.value;ui.blockForm.target=t.value==='user'?(staffUsers()[0]||{}).id:t.value==='team'?String((TEAM_LIST[0]||{}).id):null;render();return}
   if(t.dataset.filter){ui.filters[t.dataset.filter]=t.value;const res=$('#results');if(res)res.innerHTML=resultsHtml();return}
   if(t.dataset.q){ui.q[t.dataset.q]=t.dataset.q==='days'?+t.value:t.value;render();return}
   if(ui.form&&t.name&&t.closest('#reqForm,#recForm')){ui.form.vals[t.name]=t.value;
     if(['date','partnerId','period','staff'].includes(t.name))render();}
 });
-document.addEventListener('submit',ev=>{ev.preventDefault();if(ev.target.id==='reqForm')submitRequest();if(ev.target.id==='recForm')submitRecord()});
+document.addEventListener('submit',ev=>{ev.preventDefault();const f=ev.target;
+  if(f.id==='reqForm')submitRequest();if(f.id==='recForm')submitRecord();
+  if(f.id==='loginForm'){const emp=f.emp.value.trim(),pw=f.pw.value;ui.lastEmp=emp;if(!emp||!pw){toast('Enter your employee ID and password',true);return}
+    busy(async()=>{const r=await rpc('login',{p_emp:emp,p_pw:pw});if(!r){toast('Wrong employee ID or password',true);return}await fetchAll();
+      if(r.must_change){ui.pending={id:r.id,old:pw};render();return}signIn(r.id)})}
+  if(f.id==='newPwForm'){const a=f.new1.value,b=f.new2.value;if(a.length<6){toast('Use at least 6 characters',true);return}if(a!==b){toast('The two passwords don’t match',true);return}
+    if(a===ui.pending.old){toast('Choose a password different from the temporary one',true);return}
+    busy(async()=>{await rpc('change_password',{p_id:ui.pending.id,p_old:ui.pending.old,p_new:a});await fetchAll();signIn(ui.pending.id)})}
+  if(f.id==='acctPwForm'){const o=f.old.value,a=f.new1.value,b=f.new2.value;if(!o){toast('Enter your current password',true);return}if(a.length<6){toast('Use at least 6 characters',true);return}if(a!==b){toast('The two new passwords don’t match',true);return}
+    busy(async()=>{await rpc('change_password',{p_id:S.current,p_old:o,p_new:a});f.reset();toast('Password updated')})}
+});
 document.addEventListener('dragover',ev=>{if(ev.target.closest('.drop'))ev.preventDefault()});
 document.addEventListener('drop',ev=>{const d=ev.target.closest('.drop');if(d){ev.preventDefault();readFiles(ev.dataTransfer.files)}});
 
 /* ================= Boot ================= */
-S={current:null,requests:[],records:[],rules:{leaveLimit:2,countPending:true,qualityTarget:85,blocks:[]}};
+S={current:null,requests:[],records:[],perf:[],rules:{leaveLimit:2,countPending:true,qualityTarget:85,blocks:[]}};
 try{S.current=localStorage.getItem(KEY)}catch(e){}
-if(S.current&&!USERS.some(u=>u.id===S.current))S.current=null;
-(function(){const T=today();ui.blockForm.from=iso(T);ui.blockForm.to=iso(addDays(T,14))})();
+(function(){const T=today();ui.blockForm.type='leave';ui.blockForm.from=iso(T);ui.blockForm.to=iso(addDays(T,14))})();
 async function boot(){
   $('#app').innerHTML=`<div class="signin-page"><div class="card"><div class="logo">${ic('layers',24)}</div><h1>WFM Requests</h1><p>Loading shared data…</p></div></div>`;
   try{
@@ -1347,7 +1715,8 @@ async function boot(){
   }catch(e){
     $('#app').innerHTML=`<div class="signin-page"><div class="card"><div class="logo">${ic('layers',24)}</div><h1>Can’t reach the database</h1><p>${esc(e.message)}. Check your internet connection — some office networks block it.</p><button class="btn primary" onclick="boot()">Try again</button></div></div>`;return;
   }
-  if(S.current)ui.view=isWfm()?'dash':'new';
+  if(S.current&&!sessionValid()){S.current=null;save()}
+  if(S.current){ui.view=isWfm()?'dash':'new';if(!ui.blockForm.target)ui.blockForm.target=(staffUsers()[0]||{}).id}
   render();
 }
 boot();
