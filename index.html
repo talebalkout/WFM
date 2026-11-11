@@ -1,13 +1,7 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>WFM Requests</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WFM Requests – Screens v2</title>
 <style>
 :root{
   --bg:#f5f6fa; --surface:#ffffff; --surface-2:#f0f2f7; --border:#e3e6ee;
@@ -257,537 +251,341 @@ tbody tr:last-child td{border-bottom:0}
 @media (max-width:380px){
   .brand-name{display:none}
 }
-</style>
-</head>
-<body>
 
-<header class="topbar">
-  <div class="brand">
-    <div class="logo" id="logoIcon"></div>
-    <span class="brand-name">WFM Requests</span>
-    <span class="proto">Prototype</span>
-  </div>
-  <div class="role-toggle" role="tablist" aria-label="Preview as">
-    <button data-action="role" data-role="staff">Staff</button>
-    <button data-action="role" data-role="manager">Manager</button>
-  </div>
-  <div class="me">
-    <div class="avatar" id="meAvatar"></div>
-    <div class="me-text"><b id="meName"></b><span id="meTeam"></span></div>
-  </div>
-</header>
+.static-note{max-width:1120px;margin:0 auto;padding:16px 20px 0;color:var(--muted);font-size:13px}
+.toc{max-width:1120px;margin:0 auto;padding:12px 20px 4px;display:flex;flex-wrap:wrap;gap:8px}
+.toc a{font-size:12.5px;font-weight:600;color:var(--primary);background:var(--primary-soft);padding:6px 10px;border-radius:8px;text-decoration:none}
+.screen{max-width:1120px;margin:0 auto;padding:28px 20px 8px}
+.screen-label{display:flex;flex-direction:column;gap:2px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px dashed var(--border)}
+.screen-label b{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--primary)}
+.screen-label span{color:var(--muted);font-size:13px}
+.frame{background:var(--bg);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+.frame-body{padding:22px}
+.frame-nav{display:flex;border-top:1px solid var(--border);background:var(--surface);padding:6px}
+.frame-nav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;font-size:11px;font-weight:600;color:var(--faint);position:relative}
+.frame-nav button.on{color:var(--primary)}
+.frame-nav .badge{position:absolute;top:2px;left:calc(50% + 6px);margin:0;height:17px;min-width:17px;font-size:10px}
+.drawer-static{background:var(--surface);display:flex;flex-direction:column}
+.drawer-static .d-head .btn{display:none}
+.drawer-static .sheet-handle{display:none}
+.topbar{position:static}
+@media (max-width:820px){.frame-body{padding:16px}.screen{padding:24px 12px 4px}.static-note,.toc{padding-left:12px;padding-right:12px}}
 
-<div class="shell">
-  <nav class="sidebar" id="sidebar"></nav>
-  <main id="main"></main>
+.type-card .bubble{color:var(--c)}
+:root{--ret:#7c3aed;--ret-soft:#f1e9fe;--pink:#ec4899}
+@media (prefers-color-scheme: dark){:root{--ret:#b794ff;--ret-soft:#2c2142}}
+.pill.returned{background:var(--ret-soft);color:var(--ret)}
+.pill.waiting{background:var(--primary-soft);color:var(--primary)}
+.pill.ack{background:var(--ok-soft);color:var(--ok)}
+.pill.need{background:var(--warn-soft);color:var(--warn)}
+.t-item.returned::before{border-color:var(--ret);background:var(--ret)}
+.t-item.waiting::before{border-color:var(--primary);background:var(--primary)}
+
+/* Grouping */
+.group-head{max-width:1120px;margin:0 auto;padding:36px 20px 0}
+.group-head h2{margin:0;font-size:20px;letter-spacing:-.01em}
+.group-head p{margin:4px 0 0;color:var(--muted)}
+.toc .toc-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);align-self:center;margin-right:2px}
+.toc .br{flex-basis:100%;height:0}
+
+/* Sign in */
+.signin{display:grid;place-items:center;padding:40px 16px}
+.signin .card{width:100%;max-width:400px;padding:28px;text-align:center}
+.signin .logo{width:48px;height:48px;border-radius:14px;margin:0 auto 14px}
+.signin h1{font-size:20px;margin:0 0 4px}
+.signin p{margin:0 0 20px;color:var(--muted)}
+.ms-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:11px 16px;font-weight:600}
+.ms-logo{display:grid;grid-template-columns:9px 9px;gap:2px}
+.ms-logo i{width:9px;height:9px;display:block}
+.divider{display:flex;align-items:center;gap:10px;color:var(--faint);font-size:12px;margin:18px 0 12px}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--border)}
+.demo-roles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.demo-roles button{border:1px solid var(--border);background:var(--surface-2);border-radius:10px;padding:12px;text-align:left}
+.demo-roles button b{display:block;font-size:13.5px}
+.demo-roles button span{font-size:12px;color:var(--muted)}
+
+/* Locked type */
+.type-card.locked{opacity:.62;cursor:not-allowed;border-style:dashed}
+.type-card.locked:hover{transform:none;border-color:var(--border)}
+.lock-tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--bad);background:var(--bad-soft);padding:3px 8px;border-radius:6px;width:max-content}
+
+/* Calendar */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-head b{font-size:14px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal .dow{font-size:11px;font-weight:600;color:var(--faint);text-align:center;padding-bottom:2px}
+.day{height:48px;border:1px solid var(--border);border-radius:9px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-weight:600;font-size:13px}
+.day small{font-size:9.5px;font-weight:700;line-height:1}
+.day.blank{border:0;background:none}
+.day.past{color:var(--faint);background:var(--surface-2);border-color:transparent;opacity:.6}
+.day.full{color:var(--faint);cursor:not-allowed;border-color:transparent;background:repeating-linear-gradient(45deg,var(--surface-2) 0 5px,transparent 5px 10px)}
+.day.full small{color:var(--bad)}
+.day.low small{color:var(--warn)}
+.day.sel{background:var(--primary);border-color:var(--primary);color:var(--primary-ink)}
+.day.sel small{color:var(--primary-ink);opacity:.85}
+.day.mid{background:var(--primary-soft);border-color:transparent;color:var(--primary)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:4px;display:inline-block;border:1px solid var(--border)}
+.sel-sum{display:flex;align-items:center;gap:10px;margin-top:14px;padding:11px 14px;border-radius:10px;background:var(--primary-soft);color:var(--primary);font-weight:600;font-size:13px}
+
+/* Callouts */
+.callout{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:var(--surface-2);font-size:13px;margin-bottom:16px}
+.callout svg{flex:none;margin-top:1px}
+.callout b{display:block;margin-bottom:2px}
+.callout.ret{background:var(--ret-soft)}
+.callout.ret svg{color:var(--ret)}
+.callout.info{background:var(--primary-soft)}
+.callout.info svg{color:var(--primary)}
+.callout.ok{background:var(--ok-soft)}
+.callout.ok svg{color:var(--ok)}
+.callout.warn{background:var(--warn-soft)}
+.callout.warn svg{color:var(--warn)}
+
+/* Attachments */
+.drop{border:1.5px dashed var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--muted);font-size:13px;background:var(--surface)}
+.drop b{color:var(--primary)}
+.file{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:13px}
+.file .fi{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;background:var(--bad-soft);color:var(--bad);flex:none;font-size:10px;font-weight:800}
+.file .fi.img{background:var(--primary-soft);color:var(--primary)}
+.file small{display:block;color:var(--faint);font-size:11.5px}
+.file .x{margin-left:auto;color:var(--faint)}
+.files{display:flex;flex-direction:column;gap:8px}
+.hint{font-size:12px;color:var(--faint)}
+
+/* Option chips inside forms */
+.opt-chips{display:flex;gap:8px;flex-wrap:wrap}
+.opt-chips .chip{cursor:pointer}
+
+/* Incoming swap card */
+.incoming{border:1px solid color-mix(in srgb,var(--primary) 35%,var(--border));background:var(--primary-soft);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.incoming .req-main b{display:block}
+.incoming .req-sub{white-space:normal}
+
+/* Inbox */
+.unread-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);flex:none}
+.read-gap{width:8px;flex:none}
+.req-card.unread .req-title{font-weight:700}
+
+/* Score */
+.score-box{display:flex;align-items:center;gap:16px;padding:16px;border-radius:12px;background:var(--surface-2);margin-bottom:16px}
+.score-num{font-size:34px;font-weight:800;letter-spacing:-.02em;color:var(--ok);line-height:1}
+.score-box span{color:var(--muted);font-size:13px}
+.crit-grid{display:grid;grid-template-columns:1fr 140px 44px;gap:10px 12px;align-items:center;font-size:13px}
+.crit-grid .input{padding:7px 10px}
+.rating{display:flex;gap:4px}
+.rating i{flex:1;height:26px;border-radius:6px;background:var(--surface-2);display:grid;place-items:center;font-style:normal;font-size:11.5px;font-weight:700;color:var(--muted)}
+.rating i.on{background:var(--primary);color:var(--primary-ink)}
+
+/* Switch */
+.switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--border)}
+.switch-row:first-child{border-top:0}
+.switch-row b{display:block;font-size:13.5px}
+.switch-row span{font-size:12.5px;color:var(--muted)}
+.switch{width:38px;height:22px;border-radius:999px;background:var(--primary);position:relative;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:19px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.switch.off{background:var(--border)}
+.switch.off::after{left:3px}
+
+/* Capacity strip */
+.cap-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cap{border-radius:8px;padding:7px 4px;text-align:center;font-size:11px;color:var(--muted);background:var(--surface-2)}
+.cap b{display:block;font-size:13px;color:var(--text)}
+.cap.l1{background:var(--warn-soft)}
+.cap.l2{background:var(--bad-soft)}
+.cap.l2 b{color:var(--bad)}
+
+/* Number stepper */
+.num{display:flex;align-items:center;border:1px solid var(--border);border-radius:10px;overflow:hidden;width:max-content}
+.num button{border:0;background:var(--surface-2);width:38px;height:40px;font-size:18px;font-weight:600;color:var(--muted)}
+.num b{width:54px;text-align:center;font-size:16px}
+
+.mini-table td,.mini-table th{padding:10px 12px}
+.mini-table tbody tr{cursor:default}
+.num-cell{text-align:right;font-variant-numeric:tabular-nums}
+.av{width:28px;height:28px;border-radius:50%;background:var(--primary-soft);color:var(--primary);display:inline-grid;place-items:center;font-size:11px;font-weight:700;margin-right:8px;vertical-align:middle}
+.check-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.check-row .box{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--primary);background:var(--primary);display:grid;place-items:center;color:#fff}
+.d-foot .row .btn.ret{color:var(--ret);border-color:color-mix(in srgb,var(--ret) 35%,var(--border))}
+.btn.ret{color:var(--ret);border-color:color-mix(in srgb,var(--ret) 35%,var(--border))}
+@media (max-width:820px){.incoming .quick{width:100%}.incoming .quick .btn{flex:1}.crit-grid{grid-template-columns:1fr 120px 36px}.cap-strip{gap:4px}.demo-roles{grid-template-columns:1fr}}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol><symbol id="i-swap" viewBox="0 0 24 24"><path d="M16 3l4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16"/></symbol><symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol><symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol><symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol><symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></symbol><symbol id="i-headset" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol><symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M16 13H8M16 17H8M10 9H8"/></symbol><symbol id="i-clip" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></symbol><symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol><symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol><symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol><symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol><symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol><symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol><symbol id="i-next" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol><symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol><symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol><symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol><symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol><symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol><symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol><symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2 10 5-10 5L2 7l10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></symbol><symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol><symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol></svg>
+<header class="topbar"><div class="brand"><div class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-layers"/></svg></div><span class="brand-name">WFM Requests</span><span class="proto" style="display:inline">Screens v2</span></div></header>
+<p class="static-note">A static preview of every screen. Buttons don't work here. Two roles: Staff, and WFM / Manager (same powers).</p>
+<nav class="toc"><span class="toc-label">Staff</span><a href="#s0">Sign in</a><a href="#s1">New request</a><a href="#s2">Annual Leave</a><a href="#s3">Shift Swap</a><a href="#s4">Shift Change</a><a href="#s5">Schedule Special</a><a href="#s6">KPI Request</a><a href="#s7">My requests</a><a href="#s8">Returned request</a><a href="#s9">From WFM</a><a href="#s10">Call evaluation</a><span class="br"></span><span class="toc-label">WFM / Manager</span><a href="#s11">Dashboard</a><a href="#s12">Request pool</a><a href="#s13">Request details</a><a href="#s14">Create</a><a href="#s15">Call evaluation</a><a href="#s16">Violation & Adherence</a><a href="#s17">Minutes of meeting</a><a href="#s18">Rules</a></nav>
+<div class="group-head"><h2>Staff</h2><p>Submit requests, track them, and receive messages from WFM.</p></div>
+<section class="screen" id="s0">
+<div class="screen-label"><b>Sign in</b><span>Real version: staff are signed in automatically with their Microsoft work account. Demo version: pick a role.</span></div>
+<div class="frame"><div class="frame-body"><div class="signin"><div class="card">
+<div class="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-layers"/></svg></div><h1>WFM Requests</h1><p>Sign in with your work account to continue.</p>
+<button class="ms-btn"><span class="ms-logo"><i style="background:#f25022"></i><i style="background:#7fba00"></i><i style="background:#00a4ef"></i><i style="background:#ffb900"></i></span>Sign in with Microsoft</button>
+<div class="divider">Demo only</div>
+<div class="demo-roles"><button><b>Staff</b><span>Sara Ahmed · Team A</span></button><button><b>WFM / Manager</b><span>Khaled Nasser</span></button></div>
+</div></div></div></div></section>
+<section class="screen" id="s1">
+<div class="screen-label"><b>Staff · New request</b><span>Five request types. A type WFM has blocked for this person shows locked, with the end date.</span></div>
+<div class="frame"><div class="frame-body"><div class="page-head"><div style="display:flex;gap:14px;align-items:center"><div><h1>New request</h1><p>What would you like to request?</p></div></div></div><div class="type-grid"><button class="type-card" style="--c:#0ea5e9"><span class="bubble" style="--c:#0ea5e9"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sun"/></svg></span><div><b>Annual Leave</b><br><span>Planned time off</span></div></button><button class="type-card" style="--c:#8b5cf6"><span class="bubble" style="--c:#8b5cf6"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-swap"/></svg></span><div><b>Shift Swap</b><br><span>Trade a shift with a colleague</span></div></button><div class="type-card locked" style="--c:#f59e0b"><span class="bubble" style="--c:#f59e0b"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-clock"/></svg></span><div><b>Shift Change</b><br><span>Change the shift of one day</span></div><span class="lock-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-lock"/></svg> Blocked until 30 Nov</span></div><button class="type-card" style="--c:#10b981"><span class="bubble" style="--c:#10b981"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-cal"/></svg></span><div><b>Schedule Special Request</b><br><span>A preference for the next schedule</span></div></button><button class="type-card" style="--c:#ec4899"><span class="bubble" style="--c:#ec4899"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-target"/></svg></span><div><b>KPI Request</b><br><span>Justify something that affects your KPIs</span></div></button></div></div><nav class="frame-nav"><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>New</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-list"/></svg><span>My Requests</span><span class="badge">1</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>From WFM</span><span class="badge">2</span></button></nav></div></section><section class="screen" id="s2">
+<div class="screen-label"><b>Staff · Annual Leave</b><span>Days that reached WFM's daily limit are greyed out and can't be picked. Attachment is optional.</span></div>
+<div class="frame"><div class="frame-body"><button class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-back"/></svg> All request types</button><div class="page-head"><div style="display:flex;gap:14px;align-items:center"><span class="bubble" style="--c:#0ea5e9"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sun"/></svg></span><div><h1>Annual Leave</h1><p>Planned time off</p></div></div></div><div class="card card-pad"><div class="requester"><div class="avatar">SA</div><div><b>Sara Ahmed</b> · E1042<small>Customer Care · Team A · filled in automatically from your login</small></div></div><div class="grid-2" style="grid-template-columns:1.15fr 1fr;gap:22px"><div><div class="cal-head"><button class="btn icon sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-back"/></svg></button><b>November 2026</b><button class="btn icon sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-next"/></svg></button></div><div class="cal"><div class="dow">Sun</div><div class="dow">Mon</div><div class="dow">Tue</div><div class="dow">Wed</div><div class="dow">Thu</div><div class="dow">Fri</div><div class="dow">Sat</div><div class="day past">1</div><div class="day past">2</div><div class="day past">3</div><div class="day past">4</div><div class="day past">5</div><div class="day past">6</div><div class="day past">7</div><div class="day past">8</div><div class="day past">9</div><div class="day past">10</div><div class="day">11</div><div class="day">12</div><div class="day">13</div><div class="day">14</div><div class="day">15</div><div class="day">16</div><div class="day">17</div><div class="day low">18<small>1 left</small></div><div class="day full" title="Leave limit reached for this day">19<small>Full</small></div><div class="day">20</div><div class="day">21</div><div class="day sel">22</div><div class="day mid">23</div><div class="day sel">24</div><div class="day low">25<small>1 left</small></div><div class="day full" title="Leave limit reached for this day">26<small>Full</small></div><div class="day full" title="Leave limit reached for this day">27<small>Full</small></div><div class="day">28</div><div class="day">29</div><div class="day low">30<small>1 left</small></div><div class="day blank"></div><div class="day blank"></div><div class="day blank"></div><div class="day blank"></div><div class="day blank"></div></div><div class="legend"><span><i style="background:var(--primary);border-color:var(--primary)"></i>Selected</span><span><i style="background:var(--warn-soft);border-color:transparent"></i>1 slot left</span><span><i style="background:repeating-linear-gradient(45deg,var(--surface-2) 0 3px,transparent 3px 6px)"></i>Full · can't be picked</span></div><div class="sel-sum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-cal"/></svg> 22 Nov → 24 Nov · 3 days</div></div><div class="form-grid" style="grid-template-columns:1fr;align-content:start"><div class="field"><label>Cover arranged with</label><input type="text" value="Omar Khalid" placeholder=""></div><div class="field"><label>Notes</label><textarea placeholder="Anything WFM should know (optional)">Family trip</textarea></div><div class="field"><label>Attachment</label><div class="drop"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-upload"/></svg> <span>Drag a file here or <b>browse</b></span></div><span class="hint">Optional · PDF or image, up to 5 MB</span></div></div></div><div class="form-actions"><button type="button" class="btn">Cancel</button><button type="button" class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg> Submit request</button></div></div></div><nav class="frame-nav"><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>New</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-list"/></svg><span>My Requests</span><span class="badge">1</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>From WFM</span><span class="badge">2</span></button></nav></div></section><section class="screen" id="s3">
+<div class="screen-label"><b>Staff · Shift Swap</b><span>Goes to the colleague first. Only after they accept does it reach WFM.</span></div>
+<div class="frame"><div class="frame-body"><button class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-back"/></svg> All request types</button><div class="page-head"><div style="display:flex;gap:14px;align-items:center"><span class="bubble" style="--c:#8b5cf6"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-swap"/></svg></span><div><h1>Shift Swap</h1><p>Trade a shift with a colleague</p></div></div></div><div class="card card-pad"><div class="requester"><div class="avatar">SA</div><div><b>Sara Ahmed</b> · E1042<small>Customer Care · Team A · filled in automatically from your login</small></div></div><div class="callout info"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-info"/></svg><div><b>How a swap works</b><div class="flow"><span class="flow-step">You submit</span><span class="flow-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-arrow"/></svg></span><span class="flow-step">Colleague accepts</span><span class="flow-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-arrow"/></svg></span><span class="flow-step">WFM decides</span></div></div></div><div class="form-grid"><div class="field"><label>Date <span class="req">*</span></label><input type="date" value="2026-11-20" placeholder=""></div><div class="field"><label>Swap with <span class="req">*</span></label><select><option>Fatima Hassan · Team B</option><option>Omar Khalid · Team A</option><option>Yousef Ali · Team B</option></select></div><div class="field"><label>Your shift that day</label><input type="text" value="Morning · 07:00–15:00" placeholder=""><span class="hint">Filled from the published schedule</span></div><div class="field"><label>Their shift that day</label><input type="text" value="Evening · 15:00–23:00" placeholder=""><span class="hint">Filled from the published schedule</span></div><div class="field full"><label>Reason</label><textarea placeholder="Why do you need the swap? (optional)"></textarea></div></div><div class="form-actions"><button type="button" class="btn">Cancel</button><button type="button" class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg> Send to colleague</button></div></div></div><nav class="frame-nav"><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>New</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-list"/></svg><span>My Requests</span><span class="badge">1</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>From WFM</span><span class="badge">2</span></button></nav></div></section><section class="screen" id="s4">
+<div class="screen-label"><b>Staff · Shift Change</b><span>Change the shift of one specific day, for a personal reason.</span></div>
+<div class="frame"><div class="frame-body"><button class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-back"/></svg> All request types</button><div class="page-head"><div style="display:flex;gap:14px;align-items:center"><span class="bubble" style="--c:#f59e0b"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-clock"/></svg></span><div><h1>Shift Change</h1><p>Change the shift of one day</p></div></div></div><div class="card card-pad"><div class="requester"><div class="avatar">SA</div><div><b>Sara Ahmed</b> · E1042<small>Customer Care · Team A · filled in automatically from your login</small></div></div><div class="form-grid"><div class="field"><label>Date <span class="req">*</span></label><input type="date" value="2026-11-25" placeholder=""></div><div class="field"><label>Current shift</label><input type="text" value="Evening · 15:00–23:00" placeholder=""><span class="hint">Filled from the published schedule</span></div><div class="field"><label>Requested shift <span class="req">*</span></label><select><option>Morning · 07:00–15:00</option><option>Mid · 11:00–19:00</option><option>Night · 23:00–07:00</option></select></div><div class="field"><label>Attachment</label><div class="drop"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-upload"/></svg> <span>Drag a file here or <b>browse</b></span></div><span class="hint">Optional</span></div><div class="field full"><label>Reason <span class="req">*</span></label><textarea placeholder="Why do you need this change?">University exam in the evening</textarea></div></div><div class="form-actions"><button type="button" class="btn">Cancel</button><button type="button" class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg> Submit request</button></div></div></div><nav class="frame-nav"><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>New</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-list"/></svg><span>My Requests</span><span class="badge">1</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>From WFM</span><span class="badge">2</span></button></nav></div></section><section class="screen" id="s5">
+<div class="screen-label"><b>Staff · Schedule Special Request</b><span>A preference for the next schedule before it's released, e.g. avoid morning shifts.</span></div>
+<div class="frame"><div class="frame-body"><button class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-back"/></svg> All request types</button><div class="page-head"><div style="display:flex;gap:14px;align-items:center"><span class="bubble" style="--c:#10b981"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-cal"/></svg></span><div><h1>Schedule Special Request</h1><p>A preference for the next schedule</p></div></div></div><div class="card card-pad"><div class="requester"><div class="avatar">SA</div><div><b>Sara Ahmed</b> · E1042<small>Customer Care · Team A · filled in automatically from your login</small></div></div><div class="form-grid"><div class="field"><label>For schedule <span class="req">*</span></label><select><option>December 2026</option><option>January 2027</option></select></div><div class="field"><label>Period</label><select><option>Whole schedule</option><option>Specific dates</option></select></div><div class="field full"><label>Preference <span class="req">*</span></label><div class="opt-chips"><span class="chip on">Avoid mornings</span><span class="chip">Avoid evenings</span><span class="chip">Avoid nights</span><span class="chip">Specific days off</span><span class="chip">Other</span></div></div><div class="field full"><label>Details <span class="req">*</span></label><textarea placeholder="Explain your request">Dropping my child at school until end of term</textarea></div><div class="field full"><label>Attachment</label><div class="drop"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-upload"/></svg> <span>Drag a file here or <b>browse</b></span></div><span class="hint">Optional · supporting document</span></div></div><div class="form-actions"><button type="button" class="btn">Cancel</button><button type="button" class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg> Submit request</button></div></div></div><nav class="frame-nav"><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>New</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-list"/></svg><span>My Requests</span><span class="badge">1</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>From WFM</span><span class="badge">2</span></button></nav></div></section><section class="screen" id="s6">
+<div class="screen-label"><b>Staff · KPI Request</b><span>Staff justify something that affected their KPIs. WFM's decision is used when pulling end-of-cycle scores.</span></div>
+<div class="frame"><div class="frame-body"><button class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-back"/></svg> All request types</button><div class="page-head"><div style="display:flex;gap:14px;align-items:center"><span class="bubble" style="--c:#ec4899"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-target"/></svg></span><div><h1>KPI Request</h1><p>Justify something that affects your KPIs</p></div></div></div><div class="card card-pad"><div class="requester"><div class="avatar">SA</div><div><b>Sara Ahmed</b> · E1042<small>Customer Care · Team A · filled in automatically from your login</small></div></div><div class="form-grid"><div class="field"><label>KPI affected <span class="req">*</span></label><select><option>Adherence</option><option>AHT (Average handle time)</option><option>Quality score</option><option>Attendance</option></select></div><div class="field"><label>Date(s) <span class="req">*</span></label><input type="date" value="2026-11-09" placeholder=""></div><div class="field full"><label>Justification <span class="req">*</span></label><textarea placeholder="">System outage from 10:00 to 11:30 — I was logged in but couldn't take calls. IT ticket attached.</textarea></div><div class="field full"><label>Attachments <span class="req">*</span></label><div class="files"><div class="file"><span class="fi">PDF</span><div><b style="font-weight:600">IT-ticket-INC48213.pdf</b><small>182 KB</small></div><span class="x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-x"/></svg></span></div><div class="drop"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-upload"/></svg> <span>Add another file</span></div></div><span class="hint">Required for KPI requests</span></div></div><div class="form-actions"><button type="button" class="btn">Cancel</button><button type="button" class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg> Submit request</button></div></div></div><nav class="frame-nav"><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>New</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-list"/></svg><span>My Requests</span><span class="badge">1</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>From WFM</span><span class="badge">2</span></button></nav></div></section><section class="screen" id="s7">
+<div class="screen-label"><b>Staff · My requests</b><span>Staff only see their own requests. Swap requests from colleagues appear at the top for them to accept or decline.</span></div>
+<div class="frame"><div class="frame-body"><div class="page-head"><div style="display:flex;gap:14px;align-items:center"><div><h1>My requests</h1><p>Track everything you've submitted.</p></div></div><button class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg> New request</button></div><div class="incoming"><span class="bubble sm" style="--c:#8b5cf6"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-swap"/></svg></span><div class="req-main"><b>Omar Khalid wants to swap with you</b>
+<div class="req-sub">27 Nov · his Morning ⇄ your Evening · goes to WFM after you accept</div></div>
+<div class="quick"><button class="btn sm">Decline</button><button class="btn sm primary"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg> Accept</button></div></div><div class="chips"><span class="chip on">All<span class="n">5</span></span><span class="chip">Returned<span class="n">1</span></span><span class="chip">Waiting<span class="n">1</span></span><span class="chip">Pending<span class="n">1</span></span><span class="chip">Accepted<span class="n">1</span></span><span class="chip">Rejected<span class="n">1</span></span></div><div class="req-list"><div class="req-card "><span class="bubble sm" style="--c:#0ea5e9"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sun"/></svg></span>
+    <div class="req-main"><div class="req-title">Annual Leave <small>REQ-1031</small></div>
+    <div class="req-sub">19 Nov → 21 Nov · 3 days</div><div class="req-meta"><span style="color:var(--ret);font-weight:600">WFM: Please attach your travel booking and confirm cover.</span></div></div>
+    <div class="req-side"><span class="pill returned">Returned</span></div></div><div class="req-card "><span class="bubble sm" style="--c:#8b5cf6"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-swap"/></svg></span>
+    <div class="req-main"><div class="req-title">Shift Swap <small>REQ-1029</small></div>
+    <div class="req-sub">20 Nov · Morning ⇄ Evening with Fatima Hassan</div><div class="req-meta">Sent 3h ago</div></div>
+    <div class="req-side"><span class="pill waiting">Waiting for colleague</span></div></div><div class="req-card "><span class="bubble sm" style="--c:#ec4899"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-target"/></svg></span>
+    <div class="req-main"><div class="req-title">KPI Request <small>REQ-1027</small></div>
+    <div class="req-sub">Adherence · 9 Nov · 1 attachment</div><div class="req-meta">Submitted 1d ago</div></div>
+    <div class="req-side"><span class="pill pending">Pending</span></div></div><div class="req-card "><span class="bubble sm" style="--c:#f59e0b"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-clock"/></svg></span>
+    <div class="req-main"><div class="req-title">Shift Change <small>REQ-1019</small></div>
+    <div class="req-sub">4 Nov · Evening → Morning</div><div class="req-meta">Accepted by Khaled Nasser · 6d ago</div></div>
+    <div class="req-side"><span class="pill approved">Accepted</span></div></div><div class="req-card "><span class="bubble sm" style="--c:#10b981"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-cal"/></svg></span>
+    <div class="req-main"><div class="req-title">Schedule Special Request <small>REQ-1012</small></div>
+    <div class="req-sub">November schedule · Avoid nights</div><div class="req-meta">Rejected by Khaled Nasser · 3w ago</div></div>
+    <div class="req-side"><span class="pill rejected">Rejected</span></div></div></div></div><nav class="frame-nav"><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>New</span></button><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-list"/></svg><span>My Requests</span><span class="badge">1</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>From WFM</span><span class="badge">2</span></button></nav></div></section><section class="screen" id="s8">
+<div class="screen-label"><b>Staff · Returned request</b><span>WFM returned it with a comment. Staff edit and resubmit, and the history keeps every step.</span></div>
+<div class="frame"><div class="drawer-static"><div class="d-head"><span class="bubble sm" style="--c:#0ea5e9"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sun"/></svg></span><div><h3>Annual Leave</h3><small>REQ-1031</small></div></div>
+<div class="d-body">
+<div class="d-section" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="pill returned">Returned</span><span class="muted" style="font-size:12.5px">Returned 10 Nov 2026, 14:20</span></div>
+<div class="callout ret"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-undo"/></svg><div><b>Khaled Nasser (WFM) returned this for changes</b>Please attach your travel booking and confirm who is covering you.</div></div>
+<div class="d-section"><h4>Request details</h4><div class="kv">
+<div><span>Start date</span><b>19 Nov 2026</b></div><div><span>End date</span><b>21 Nov 2026</b></div>
+<div><span>Duration</span><b>3 days</b></div><div><span>Cover arranged with</span><b>—</b></div></div></div>
+<div class="d-section"><h4>Notes</h4><div class="note-box">Family trip</div></div>
+<div class="d-section"><h4>History</h4><div class="timeline">
+<div class="t-item"><b>Submitted</b><span>Sara Ahmed · 10 Nov 2026, 09:05</span></div>
+<div class="t-item returned"><b>Returned for changes</b><span>Khaled Nasser · 10 Nov 2026, 14:20</span><em>Please attach your travel booking and confirm who is covering you.</em></div>
+</div></div></div>
+<div class="d-foot"><div class="row"><button class="btn bad"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-x"/></svg> Cancel request</button><button class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-edit"/></svg> Edit &amp; resubmit</button></div></div></div><nav class="frame-nav"><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>New</span></button><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-list"/></svg><span>My Requests</span><span class="badge">1</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>From WFM</span><span class="badge">2</span></button></nav></div></section><section class="screen" id="s9">
+<div class="screen-label"><b>Staff · From WFM</b><span>Everything WFM and managers send: minutes, violation tickets, call evaluations. Items needing acknowledgement are flagged.</span></div>
+<div class="frame"><div class="frame-body"><div class="page-head"><div style="display:flex;gap:14px;align-items:center"><div><h1>From WFM</h1><p>Messages, evaluations and tickets sent to you.</p></div></div></div><div class="chips"><span class="chip on">All<span class="n">4</span></span><span class="chip">Unread<span class="n">2</span></span><span class="chip">Minutes<span class="n">2</span></span><span class="chip">Call evaluations<span class="n">1</span></span><span class="chip">Violations<span class="n">1</span></span></div><div class="req-list"><div class="req-card unread"><span class="unread-dot"></span><span class="bubble sm" style="--c:#6366f1"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-headset"/></svg></span>
+    <div class="req-main"><div class="req-title">Call Evaluation <small>EV-0214</small></div>
+    <div class="req-sub">Score 87% · Call on 9 Nov · by Mona Saad</div><div class="req-meta">Today, 10:15</div></div>
+    <div class="req-side"><span class="pill need">Needs acknowledgement</span></div></div><div class="req-card unread"><span class="unread-dot"></span><span class="bubble sm" style="--c:#0891b2"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-file"/></svg></span>
+    <div class="req-main"><div class="req-title">Minutes of Meeting <small>MOM-0088</small></div>
+    <div class="req-sub">Team A weekly huddle · 2 attachments</div><div class="req-meta">Yesterday · sent to Team A</div></div>
+    <div class="req-side"><span class="pill need">Needs acknowledgement</span></div></div><div class="req-card "><span class="read-gap"></span><span class="bubble sm" style="--c:#ef4444"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-alert"/></svg></span>
+    <div class="req-main"><div class="req-title">Violation Ticket <small>VT-0031</small></div>
+    <div class="req-sub">Late login · 3 Nov</div><div class="req-meta">5 Nov</div></div>
+    <div class="req-side"><span class="pill ack">Acknowledged</span></div></div><div class="req-card "><span class="read-gap"></span><span class="bubble sm" style="--c:#0891b2"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-file"/></svg></span>
+    <div class="req-main"><div class="req-title">Minutes of Meeting <small>MOM-0081</small></div>
+    <div class="req-sub">Holiday schedule briefing</div><div class="req-meta">28 Oct · sent to department</div></div>
+    <div class="req-side"><span class="pill ack">Acknowledged</span></div></div></div></div><nav class="frame-nav"><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>New</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-list"/></svg><span>My Requests</span><span class="badge">1</span></button><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>From WFM</span><span class="badge">2</span></button></nav></div></section><section class="screen" id="s10">
+<div class="screen-label"><b>Staff · Call evaluation</b><span>Staff read the feedback, can reply, and acknowledge. The acknowledgement is timestamped as the official record.</span></div>
+<div class="frame"><div class="drawer-static"><div class="d-head"><span class="bubble sm" style="--c:#6366f1"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-headset"/></svg></span><div><h3>Call Evaluation</h3><small>EV-0214</small></div></div>
+<div class="d-body">
+<div class="score-box"><div class="score-num">87%</div><div><b>Good call</b><span style="display:block">Evaluated by Mona Saad (Supervisor) · 11 Nov 2026</span></div></div>
+<div class="d-section"><h4>Call</h4><div class="kv"><div><span>Call date</span><b>9 Nov 2026, 13:42</b></div><div><span>Call ID</span><b>CL-77219034</b></div></div></div>
+<div class="d-section"><h4>Scores</h4><div class="bars"><div class="bar-row" style="grid-template-columns:170px 1fr 40px"><span>Greeting &amp; opening</span><div class="bar-track"><div class="bar-fill" style="width:100%;--c:var(--ok)"></div></div><b>100%</b></div><div class="bar-row" style="grid-template-columns:170px 1fr 40px"><span>Customer verification</span><div class="bar-track"><div class="bar-fill" style="width:100%;--c:var(--ok)"></div></div><b>100%</b></div><div class="bar-row" style="grid-template-columns:170px 1fr 40px"><span>Understanding the need</span><div class="bar-track"><div class="bar-fill" style="width:80%;--c:var(--primary)"></div></div><b>80%</b></div><div class="bar-row" style="grid-template-columns:170px 1fr 40px"><span>Solution accuracy</span><div class="bar-track"><div class="bar-fill" style="width:80%;--c:var(--primary)"></div></div><b>80%</b></div><div class="bar-row" style="grid-template-columns:170px 1fr 40px"><span>Tone &amp; empathy</span><div class="bar-track"><div class="bar-fill" style="width:80%;--c:var(--primary)"></div></div><b>80%</b></div><div class="bar-row" style="grid-template-columns:170px 1fr 40px"><span>Closing</span><div class="bar-track"><div class="bar-fill" style="width:80%;--c:var(--primary)"></div></div><b>80%</b></div></div></div>
+<div class="d-section"><h4>Feedback</h4><div class="note-box">Great verification and a warm opening. Try to summarise the solution before closing and offer further help — that's where the closing score dropped.</div></div>
+<div class="d-section"><h4>Attachment</h4><div class="file"><span class="fi">PDF</span><div><b style="font-weight:600">evaluation-form.pdf</b><small>96 KB</small></div><span class="x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-x"/></svg></span></div></div>
 </div>
-
-<nav class="bottom-nav" id="bottomNav"></nav>
-
-<div class="overlay" id="overlay" data-action="closeDrawer"></div>
-<aside class="drawer" id="drawer" aria-hidden="true"></aside>
-<div class="toast" id="toast"></div>
-
-<script>
-/* ---------- Icons ---------- */
-const ICONS={
-  plus:'<path d="M12 5v14M5 12h14"/>',
-  list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
-  grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
-  inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
-  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
-  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
-  heart:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
-  swap:'<path d="M16 3l4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16"/>',
-  clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
-  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
-  chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
-  check:'<path d="M20 6 9 17l-5-5"/>',
-  x:'<path d="M18 6 6 18M6 6l12 12"/>',
-  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
-  back:'<path d="m15 18-6-6 6-6"/>',
-  reset:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
-  sheet:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/>',
-  arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
-  layers:'<path d="m12 2 10 5-10 5L2 7l10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/>'
-};
-const icon=(n,s=18)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]||''}</svg>`;
-
-/* ---------- Helpers ---------- */
-const pad=n=>String(n).padStart(2,'0');
-const isoDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-const dOff=n=>{const d=new Date();d.setDate(d.getDate()+n);return isoDate(d)};
-const fmtD=s=>{if(!s)return '—';const d=new Date(s+'T00:00');return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})};
-const fmtShort=s=>{if(!s)return '—';const d=new Date(s+'T00:00');return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})};
-const fmtDT=s=>{const d=new Date(s);return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+', '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})};
-const fmtXlDT=s=>{const d=new Date(s);return `${isoDate(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}`};
-const days=(a,b)=>Math.round((new Date(b+'T00:00')-new Date(a+'T00:00'))/864e5)+1;
-const ago=s=>{const m=Math.round((Date.now()-new Date(s))/6e4);if(m<1)return 'just now';if(m<60)return m+'m ago';const h=Math.round(m/60);if(h<24)return h+'h ago';const d=Math.round(h/24);return d+'d ago'};
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const initials=n=>n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-const shortShift=s=>(s||'').split(' (')[0];
-
-/* ---------- Config: request types (sample — to be replaced) ---------- */
-const SHIFTS=['Morning (07:00–15:00)','Evening (15:00–23:00)','Night (23:00–07:00)','Day off'];
-const TYPES={
-  leave:{label:'Annual Leave',icon:'sun',color:'#0ea5e9',desc:'Planned time off',fields:[
-    {k:'start',label:'Start date',type:'date',req:1},
-    {k:'end',label:'End date',type:'date',req:1},
-    {k:'cover',label:'Cover arranged with',type:'text',ph:'Colleague name (optional)',full:1}],
-    summary:d=>`${fmtShort(d.start)} → ${fmtShort(d.end)} · ${days(d.start,d.end)} day(s)`},
-  sick:{label:'Sick Leave',icon:'heart',color:'#ef4444',desc:'Unplanned absence',fields:[
-    {k:'start',label:'First day',type:'date',req:1},
-    {k:'end',label:'Last day',type:'date',req:1},
-    {k:'cert',label:'Medical certificate',type:'select',opts:['Will provide','Provided','Not required'],req:1,full:1}],
-    summary:d=>`${fmtShort(d.start)} → ${fmtShort(d.end)} · Certificate: ${d.cert}`},
-  swap:{label:'Shift Swap',icon:'swap',color:'#8b5cf6',desc:'Trade a shift with a colleague',fields:[
-    {k:'date',label:'Shift date',type:'date',req:1},
-    {k:'with',label:'Swap with',type:'text',req:1,ph:'Colleague name'},
-    {k:'myShift',label:'My shift',type:'select',opts:SHIFTS,req:1},
-    {k:'theirShift',label:'Their shift',type:'select',opts:SHIFTS,req:1}],
-    summary:d=>`${fmtShort(d.date)} · ${shortShift(d.myShift)} ⇄ ${shortShift(d.theirShift)} with ${d.with}`},
-  overtime:{label:'Overtime',icon:'clock',color:'#f59e0b',desc:'Extra hours worked or offered',fields:[
-    {k:'date',label:'Date',type:'date',req:1},
-    {k:'hours',label:'Hours',type:'number',req:1,min:0.5,max:12,step:0.5,ph:'e.g. 2'},
-    {k:'reason',label:'Reason',type:'select',opts:['Volume spike','Cover absence','Project work','Training'],req:1,full:1}],
-    summary:d=>`${fmtShort(d.date)} · ${d.hours}h · ${d.reason}`},
-  schedule:{label:'Schedule Change',icon:'calendar',color:'#10b981',desc:'Change your regular shift',fields:[
-    {k:'effective',label:'Effective from',type:'date',req:1,full:1},
-    {k:'current',label:'Current shift',type:'select',opts:SHIFTS,req:1},
-    {k:'requested',label:'Requested shift',type:'select',opts:SHIFTS,req:1},
-    {k:'reason',label:'Reason',type:'text',req:1,full:1,ph:'Brief reason'}],
-    summary:d=>`From ${fmtShort(d.effective)} · ${shortShift(d.current)} → ${shortShift(d.requested)}`},
-  other:{label:'Other',icon:'chat',color:'#64748b',desc:'Anything else',fields:[
-    {k:'subject',label:'Subject',type:'text',req:1,ph:'What is this about?'},
-    {k:'date',label:'Related date',type:'date'}],
-    summary:d=>d.subject}
-};
-const STATUS={pending:'Pending',approved:'Approved',rejected:'Rejected',cancelled:'Cancelled'};
-
-/* ---------- People (demo) ---------- */
-const STAFF=[
-  {name:'Sara Ahmed',id:'E1042',team:'Customer Care · Team A'},
-  {name:'Omar Khalid',id:'E1018',team:'Customer Care · Team A'},
-  {name:'Fatima Hassan',id:'E1077',team:'Customer Care · Team B'},
-  {name:'Yousef Ali',id:'E1103',team:'Customer Care · Team B'},
-  {name:'Noura Saleh',id:'E1121',team:'Sales Support · Team C'},
-  {name:'Ahmad Faisal',id:'E1009',team:'Sales Support · Team C'}
-];
-const ME=STAFF[0];
-const MANAGER={name:'WFM Lead',id:'M001',team:'Workforce Management'};
-
-/* ---------- Data ---------- */
-const KEY='wfm-requests-proto-v1';
-function seed(){
-  const hAgo=h=>new Date(Date.now()-h*36e5).toISOString();
-  const rows=[
-    [0,'sick',{start:dOff(-13),end:dOff(-12),cert:'Provided'},'','approved',310,'Get well soon'],
-    [2,'leave',{start:dOff(-9),end:dOff(-7),cover:'Yousef Ali'},'','approved',290,''],
-    [5,'leave',{start:dOff(20),end:dOff(27),cover:''},'Wedding abroad','rejected',220,'Peak period — please choose other dates'],
-    [0,'overtime',{date:dOff(-6),hours:2,reason:'Cover absence'},'','approved',150,''],
-    [3,'swap',{date:dOff(-3),myShift:SHIFTS[1],with:'Fatima Hassan',theirShift:SHIFTS[0]},'','approved',110,''],
-    [4,'overtime',{date:dOff(-4),hours:4,reason:'Project work'},'','rejected',95,'Not pre-approved with team lead'],
-    [2,'overtime',{date:dOff(-2),hours:3,reason:'Volume spike'},'Stayed after shift during outage','approved',52,''],
-    [4,'schedule',{effective:dOff(14),current:SHIFTS[1],requested:SHIFTS[0],reason:'Started evening classes'},'','pending',30],
-    [3,'sick',{start:dOff(-1),end:dOff(-1),cert:'Will provide'},'','pending',20],
-    [1,'other',{subject:'Request to move to Team B',date:''},'Interested in the billing queue','pending',8],
-    [1,'swap',{date:dOff(3),myShift:SHIFTS[0],with:'Fatima Hassan',theirShift:SHIFTS[1]},'','pending',5],
-    [0,'leave',{start:dOff(10),end:dOff(14),cover:'Omar Khalid'},'Family trip','pending',2]
-  ];
-  return rows.map((r,i)=>{
-    const [si,type,data,notes,status,h,comment]=r;
-    const created=hAgo(h);
-    const req={id:'REQ-'+(1001+i),type,requester:STAFF[si],created,status,data,notes,history:[{at:created,by:STAFF[si].name,action:'Submitted'}]};
-    if(status==='approved'||status==='rejected'){
-      const at=new Date(new Date(created).getTime()+3*36e5).toISOString();
-      req.decidedBy=MANAGER.name;req.decidedAt=at;req.decisionComment=comment||'';
-      req.history.push({at,by:MANAGER.name,action:STATUS[status],comment:comment||''});
-    }
-    return req;
-  });
-}
-function load(){try{const s=localStorage.getItem(KEY);if(s)return JSON.parse(s)}catch(e){}return seed()}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S.reqs))}catch(e){}}
-
-/* ---------- State ---------- */
-const S={
-  reqs:load(), role:'staff', view:'new', type:null, mineStatus:'all',
-  filters:{q:'',type:'all',status:'all'},
-  exp:{from:dOff(-30),to:dOff(0),types:new Set(Object.keys(TYPES)),status:'all',layout:'pertype'},
-  drawer:null
-};
-const byNewest=(a,b)=>new Date(b.created)-new Date(a.created);
-const pendingCount=()=>S.reqs.filter(r=>r.status==='pending').length;
-const mine=()=>S.reqs.filter(r=>r.requester.id===ME.id).sort(byNewest);
-const getReq=id=>S.reqs.find(r=>r.id===id);
-
-/* ---------- Navigation ---------- */
-function navItems(){
-  if(S.role==='staff')return [
-    {v:'new',label:'New Request',short:'New',icon:'plus'},
-    {v:'mine',label:'My Requests',short:'My Requests',icon:'list',badge:mine().filter(r=>r.status==='pending').length}
-  ];
-  return [
-    {v:'dash',label:'Dashboard',short:'Dashboard',icon:'grid'},
-    {v:'all',label:'All Requests',short:'Requests',icon:'inbox',badge:pendingCount()},
-    {v:'export',label:'Export to Excel',short:'Export',icon:'download'}
-  ];
-}
-function renderNav(){
-  const items=navItems();
-  const btn=(i,cls)=>`<button class="${cls}${S.view===i.v?' on':''}" data-action="nav" data-view="${i.v}">${icon(i.icon,cls==='nav-item'?18:22)}<span>${cls==='nav-item'?i.label:i.short}</span>${i.badge?`<span class="badge">${i.badge}</span>`:''}</button>`;
-  document.getElementById('sidebar').innerHTML=
-    `<div class="side-label">${S.role==='staff'?'Staff':'Workforce Management'}</div>`+
-    items.map(i=>btn(i,'nav-item')).join('')+
-    `<div class="side-foot">Demo data is saved in this browser only.<button data-action="reset">${icon('reset',14)} Reset demo data</button></div>`;
-  document.getElementById('bottomNav').innerHTML=items.map(i=>btn(i,'')).join('');
-  const who=S.role==='staff'?ME:MANAGER;
-  document.getElementById('meAvatar').textContent=initials(who.name);
-  document.getElementById('meName').textContent=who.name;
-  document.getElementById('meTeam').textContent=who.team;
-  document.querySelectorAll('.role-toggle button').forEach(b=>b.classList.toggle('on',b.dataset.role===S.role));
-}
-
-/* ---------- Shared pieces ---------- */
-const pill=s=>`<span class="pill ${s}">${STATUS[s]}</span>`;
-const bubble=(t,sm)=>`<span class="bubble${sm?' sm':''}" style="--c:${TYPES[t].color}">${icon(TYPES[t].icon,sm?17:20)}</span>`;
-function reqCard(r,opts={}){
-  const t=TYPES[r.type];
-  return `<div class="req-card" data-action="open" data-id="${r.id}" role="button" tabindex="0">
-    ${bubble(r.type,true)}
-    <div class="req-main">
-      <div class="req-title">${t.label} <small>${r.id}</small></div>
-      <div class="req-sub">${esc(t.summary(r.data))}</div>
-      <div class="req-meta">${opts.showName?esc(r.requester.name)+' · ':''}Submitted ${ago(r.created)}</div>
-    </div>
-    <div class="req-side">
-      ${opts.quick&&r.status==='pending'?`<div class="quick">
-        <button class="btn sm bad" data-action="quickReject" data-id="${r.id}" title="Reject">${icon('x',15)}</button>
-        <button class="btn sm ok" data-action="approve" data-id="${r.id}" title="Approve">${icon('check',15)}<span class="desktop-only">Approve</span></button>
-      </div>`:pill(r.status)}
-    </div>
-  </div>`;
-}
-const emptyState=(title,sub)=>`<div class="empty card"><b>${title}</b>${sub}</div>`;
-
-/* ---------- Staff: New request ---------- */
-function fieldHTML(f){
-  const req=f.req?' required':'';
-  const lbl=`<label for="f_${f.k}">${f.label}${f.req?' <span class="req">*</span>':''}</label>`;
-  let ctrl;
-  if(f.type==='select'){
-    ctrl=`<select id="f_${f.k}" name="${f.k}"${req}><option value="">Select…</option>${f.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`;
-  }else{
-    const extra=(f.min!=null?` min="${f.min}"`:'')+(f.max!=null?` max="${f.max}"`:'')+(f.step?` step="${f.step}"`:'')+(f.ph?` placeholder="${esc(f.ph)}"`:'');
-    ctrl=`<input id="f_${f.k}" name="${f.k}" type="${f.type}"${req}${extra}>`;
-  }
-  return `<div class="field${f.full?' full':''}">${lbl}${ctrl}</div>`;
-}
-function viewNew(){
-  if(!S.type){
-    return `<div class="page-head"><div><h1>New request</h1><p>What would you like to request?</p></div></div>
-    <div class="type-grid">${Object.entries(TYPES).map(([k,t])=>`
-      <button class="type-card" style="--c:${t.color}" data-action="pickType" data-type="${k}">
-        ${bubble(k)}<div><b>${t.label}</b><br><span>${t.desc}</span></div>
-      </button>`).join('')}</div>`;
-  }
-  const t=TYPES[S.type];
-  return `<button class="back" data-action="backTypes">${icon('back',16)} All request types</button>
-  <div class="page-head"><div style="display:flex;gap:14px;align-items:center">${bubble(S.type)}<div><h1>${t.label}</h1><p>${t.desc}</p></div></div></div>
-  <form class="card card-pad" id="reqForm" novalidate>
-    <div class="requester"><div class="avatar">${initials(ME.name)}</div><div><b>${ME.name}</b> · ${ME.id}<small>${ME.team} · filled in automatically from your login</small></div></div>
-    <div class="form-grid">
-      ${t.fields.map(fieldHTML).join('')}
-      <div class="field full"><label for="f_notes">Notes</label><textarea id="f_notes" name="notes" placeholder="Anything your manager should know (optional)"></textarea></div>
-    </div>
-    <div class="form-actions">
-      <button type="button" class="btn" data-action="backTypes">Cancel</button>
-      <button type="submit" class="btn primary">${icon('check',16)} Submit request</button>
-    </div>
-  </form>`;
-}
-function submitRequest(form){
-  const t=TYPES[S.type];
-  const fd=new FormData(form);
-  const data={};
-  for(const f of t.fields){
-    let v=(fd.get(f.k)||'').toString().trim();
-    if(f.req&&!v){toast(`Please fill in “${f.label}”`,true);form.querySelector(`[name="${f.k}"]`).focus();return}
-    if(f.type==='number'&&v)v=Number(v);
-    data[f.k]=v;
-  }
-  if(data.start&&data.end&&data.end<data.start){toast('End date can’t be before start date',true);return}
-  if(S.type==='swap'&&data.myShift===data.theirShift){toast('The two shifts are the same',true);return}
-  const nextNum=Math.max(1000,...S.reqs.map(r=>+r.id.split('-')[1]))+1;
-  const now=new Date().toISOString();
-  const req={id:'REQ-'+nextNum,type:S.type,requester:ME,created:now,status:'pending',data,notes:(fd.get('notes')||'').toString().trim(),history:[{at:now,by:ME.name,action:'Submitted'}]};
-  S.reqs.push(req);save();
-  S.type=null;S.view='mine';S.mineStatus='all';
-  render();toast(`${req.id} submitted`);
-}
-
-/* ---------- Staff: My requests ---------- */
-function viewMine(){
-  const list=mine();
-  const counts=s=>s==='all'?list.length:list.filter(r=>r.status===s).length;
-  const shown=S.mineStatus==='all'?list:list.filter(r=>r.status===S.mineStatus);
-  return `<div class="page-head"><div><h1>My requests</h1><p>Track the status of everything you’ve submitted.</p></div>
-    <button class="btn primary" data-action="nav" data-view="new">${icon('plus',16)} New request</button></div>
-  <div class="chips">${['all','pending','approved','rejected','cancelled'].map(s=>`<button class="chip${S.mineStatus===s?' on':''}" data-action="mineStatus" data-status="${s}">${s==='all'?'All':STATUS[s]}<span class="n">${counts(s)}</span></button>`).join('')}</div>
-  ${shown.length?`<div class="req-list">${shown.map(r=>reqCard(r)).join('')}</div>`:emptyState('Nothing here','No requests with this status.')}`;
-}
-
-/* ---------- Manager: Dashboard ---------- */
-function viewDash(){
-  const since=Date.now()-30*864e5;
-  const recent=S.reqs.filter(r=>new Date(r.created)>=since);
-  const pend=S.reqs.filter(r=>r.status==='pending').sort((a,b)=>new Date(a.created)-new Date(b.created));
-  const n=s=>recent.filter(r=>r.status===s).length;
-  const byType=Object.keys(TYPES).map(k=>({k,c:recent.filter(r=>r.type===k).length}));
-  const max=Math.max(1,...byType.map(x=>x.c));
-  return `<div class="page-head"><div><h1>Dashboard</h1><p>Overview of team requests — last 30 days.</p></div>
-    <button class="btn primary" data-action="nav" data-view="export">${icon('download',16)} Export to Excel</button></div>
-  <div class="stats">
-    <div class="card stat"><span>Pending</span><b style="color:var(--warn)">${pend.length}</b><small>awaiting your decision</small></div>
-    <div class="card stat"><span>Approved</span><b style="color:var(--ok)">${n('approved')}</b><small>last 30 days</small></div>
-    <div class="card stat"><span>Rejected</span><b style="color:var(--bad)">${n('rejected')}</b><small>last 30 days</small></div>
-    <div class="card stat"><span>Total received</span><b>${recent.length}</b><small>last 30 days</small></div>
-  </div>
-  <div class="grid-2">
-    <div class="card card-pad">
-      <h2>Needs your action <span class="muted" style="font-weight:500">· oldest first</span></h2>
-      ${pend.length?`<div class="req-list">${pend.slice(0,6).map(r=>reqCard(r,{showName:1,quick:1})).join('')}</div>
-        ${pend.length>6?`<div style="margin-top:12px"><button class="btn sm" data-action="goPending">View all ${pend.length} pending</button></div>`:''}`
-        :`<div class="empty"><b>All caught up</b>No pending requests.</div>`}
-    </div>
-    <div class="stack">
-      <div class="card card-pad"><h2>By request type</h2><div class="bars">
-        ${byType.map(x=>`<div class="bar-row"><span>${TYPES[x.k].label}</span><div class="bar-track"><div class="bar-fill" style="width:${x.c/max*100}%;--c:${TYPES[x.k].color}"></div></div><b>${x.c}</b></div>`).join('')}
-      </div></div>
-      <div class="card card-pad"><h2>Approval flow</h2>
-        <div class="flow">
-          <span class="flow-step">Submitter</span><span class="flow-arrow">${icon('arrow',14)}</span>
-          <span class="flow-step planned">Maker</span><span class="flow-arrow">${icon('arrow',14)}</span>
-          <span class="flow-step planned">Checker</span><span class="flow-arrow">${icon('arrow',14)}</span>
-          <span class="flow-step">Approver</span>
-        </div>
-        <div class="flow-note">Today: staff submit, you approve. Dashed steps are planned for the maker–checker phase.</div>
-      </div>
-    </div>
-  </div>`;
-}
-
-/* ---------- Manager: All requests ---------- */
-function filtered(){
-  const {q,type,status}=S.filters;const qq=q.toLowerCase();
-  return S.reqs.filter(r=>(type==='all'||r.type===type)&&(status==='all'||r.status===status)&&
-    (!qq||[r.id,r.requester.name,r.requester.id,r.requester.team,TYPES[r.type].label,TYPES[r.type].summary(r.data)].join(' ').toLowerCase().includes(qq))
-  ).sort(byNewest);
-}
-function resultsHTML(){
-  const list=filtered();
-  if(!list.length)return emptyState('No matching requests','Try changing the filters.');
-  return `<div class="count">${list.length} request${list.length>1?'s':''}</div>
-  <div class="card table-wrap desktop-only"><table>
-    <thead><tr><th>Request</th><th>Employee</th><th>Details</th><th>Submitted</th><th>Status</th></tr></thead>
-    <tbody>${list.map(r=>`<tr data-action="open" data-id="${r.id}">
-      <td><div class="cell-type">${bubble(r.type,true)}<div>${TYPES[r.type].label}<div class="muted" style="font-weight:500;font-size:12px">${r.id}</div></div></div></td>
-      <td><b style="font-weight:600">${esc(r.requester.name)}</b><div class="muted" style="font-size:12px">${esc(r.requester.team)}</div></td>
-      <td class="muted">${esc(TYPES[r.type].summary(r.data))}</td>
-      <td class="muted" style="white-space:nowrap">${ago(r.created)}</td>
-      <td>${pill(r.status)}</td></tr>`).join('')}</tbody>
-  </table></div>
-  <div class="req-list mobile-only">${list.map(r=>reqCard(r,{showName:1})).join('')}</div>`;
-}
-function viewAll(){
-  const f=S.filters;
-  return `<div class="page-head"><div><h1>All requests</h1><p>Search, filter and review every request.</p></div></div>
-  <div class="filters">
-    <div class="search">${icon('search',16)}<input class="input" data-filter="q" placeholder="Search name, ID, team…" value="${esc(f.q)}"></div>
-    <select class="input" data-filter="type"><option value="all">All types</option>${Object.entries(TYPES).map(([k,t])=>`<option value="${k}"${f.type===k?' selected':''}>${t.label}</option>`).join('')}</select>
-    <select class="input" data-filter="status"><option value="all">All statuses</option>${Object.entries(STATUS).map(([k,l])=>`<option value="${k}"${f.status===k?' selected':''}>${l}</option>`).join('')}</select>
-  </div>
-  <div id="results">${resultsHTML()}</div>`;
-}
-
-/* ---------- Manager: Export ---------- */
-const BASE_COLS=['Request ID','Type','Employee','Employee ID','Team','Submitted','Status','Decided By','Decided On','Decision Comment'];
-function rowFor(r,fields){
-  const row={'Request ID':r.id,'Type':TYPES[r.type].label,'Employee':r.requester.name,'Employee ID':r.requester.id,'Team':r.requester.team,
-    'Submitted':fmtXlDT(r.created),'Status':STATUS[r.status],'Decided By':r.decidedBy||'','Decided On':r.decidedAt?fmtXlDT(r.decidedAt):'','Decision Comment':r.decisionComment||''};
-  fields.forEach(f=>{row[f.label]=r.data[f.k]??''});
-  row['Notes']=r.notes||'';
-  return row;
-}
-function expList(){
-  const e=S.exp;
-  return S.reqs.filter(r=>{const d=isoDate(new Date(r.created));
-    return d>=e.from&&d<=e.to&&e.types.has(r.type)&&(e.status==='all'||r.status===e.status)}).sort((a,b)=>new Date(a.created)-new Date(b.created));
-}
-function expPreviewHTML(){
-  const list=expList();const e=S.exp;
-  const typesIn=Object.keys(TYPES).filter(k=>list.some(r=>r.type===k));
-  const sheets=e.layout==='pertype'?['Summary',...typesIn.map(k=>TYPES[k].label)]:['Requests'];
-  return `<div class="exp-summary">${icon('sheet',28)}<div><b>${list.length}</b> <span>request${list.length===1?'':'s'} will be exported</span></div></div>
-  ${list.length?`<div class="count">Sheets in the file</div><div class="sheet-list">${sheets.map(s=>`<span class="sheet-tab">${icon('sheet',13)}${s}</span>`).join('')}</div>
-  <div class="count">Preview (first 5 rows)</div>
-  <div class="table-wrap" style="border:1px solid var(--border);border-radius:10px"><table>
-    <thead><tr><th>ID</th><th>Type</th><th>Employee</th><th>Status</th><th>Details</th></tr></thead>
-    <tbody>${list.slice(0,5).map(r=>`<tr style="cursor:default"><td>${r.id}</td><td style="white-space:nowrap">${TYPES[r.type].label}</td><td style="white-space:nowrap">${esc(r.requester.name)}</td><td>${STATUS[r.status]}</td><td class="muted">${esc(TYPES[r.type].summary(r.data))}</td></tr>`).join('')}</tbody>
-  </table></div>`:'<div class="empty">No requests match these settings.</div>'}`;
-}
-function viewExport(){
-  const e=S.exp;
-  return `<div class="page-head"><div><h1>Export to Excel</h1><p>Generate a ready-to-use .xlsx file from submitted requests.</p></div></div>
-  <div class="grid-2">
-    <div class="card card-pad">
-      <div class="form-grid">
-        <div class="field"><label>Submitted from</label><input type="date" data-exp="from" value="${e.from}"></div>
-        <div class="field"><label>Submitted to</label><input type="date" data-exp="to" value="${e.to}"></div>
-        <div class="field full"><label>Request types</label>
-          <div class="chips" style="margin:0">${Object.entries(TYPES).map(([k,t])=>`<button type="button" class="chip${e.types.has(k)?' on':''}" data-action="expType" data-type="${k}">${t.label}</button>`).join('')}</div></div>
-        <div class="field full"><label>Status</label>
-          <select data-exp="status"><option value="all">All statuses</option>${Object.entries(STATUS).map(([k,l])=>`<option value="${k}"${e.status===k?' selected':''}>${l} only</option>`).join('')}</select></div>
-        <div class="field full"><label>File layout</label>
-          <div class="seg">
-            <button type="button" class="${e.layout==='pertype'?'on':''}" data-action="expLayout" data-layout="pertype">One sheet per type</button>
-            <button type="button" class="${e.layout==='single'?'on':''}" data-action="expLayout" data-layout="single">Single sheet</button>
-          </div></div>
-      </div>
-      <div class="form-actions"><button class="btn primary" data-action="doExport">${icon('download',16)} Download Excel file</button></div>
-    </div>
-    <div class="card card-pad" id="expPreview">${expPreviewHTML()}</div>
-  </div>`;
-}
-function doExport(){
-  const list=expList();
-  if(!list.length){toast('Nothing to export with these settings',true);return}
-  const fname=`WFM_Requests_${S.exp.from}_to_${S.exp.to}`;
-  const sheetData=[];
-  if(S.exp.layout==='single'){
-    const seen=new Set();const fields=[];
-    Object.keys(TYPES).forEach(k=>TYPES[k].fields.forEach(f=>{if(!seen.has(f.label)){seen.add(f.label);fields.push(f)}}));
-    const cols=[...BASE_COLS,...fields.map(f=>f.label),'Notes'];
-    sheetData.push({name:'Requests',cols,rows:list.map(r=>rowFor(r,TYPES[r.type].fields))});
-  }else{
-    const sum=Object.keys(TYPES).map(k=>{const l=list.filter(r=>r.type===k);
-      return {'Request Type':TYPES[k].label,'Total':l.length,'Pending':l.filter(r=>r.status==='pending').length,'Approved':l.filter(r=>r.status==='approved').length,'Rejected':l.filter(r=>r.status==='rejected').length,'Cancelled':l.filter(r=>r.status==='cancelled').length}}).filter(x=>x.Total);
-    sheetData.push({name:'Summary',cols:['Request Type','Total','Pending','Approved','Rejected','Cancelled'],rows:sum});
-    Object.keys(TYPES).forEach(k=>{const l=list.filter(r=>r.type===k);if(!l.length)return;
-      const f=TYPES[k].fields;sheetData.push({name:TYPES[k].label.slice(0,31),cols:[...BASE_COLS,...f.map(x=>x.label),'Notes'],rows:l.map(r=>rowFor(r,f))})});
-  }
-  if(window.XLSX){
-    const wb=XLSX.utils.book_new();
-    sheetData.forEach(s=>{
-      const ws=XLSX.utils.json_to_sheet(s.rows,{header:s.cols});
-      ws['!cols']=s.cols.map(c=>({wch:Math.min(45,Math.max(c.length,...s.rows.map(r=>String(r[c]??'').length))+2)}));
-      ws['!autofilter']={ref:ws['!ref']};
-      XLSX.utils.book_append_sheet(wb,ws,s.name);
-    });
-    XLSX.writeFile(wb,fname+'.xlsx');
-    toast(`Excel file downloaded · ${list.length} requests`);
-  }else{
-    const s=sheetData.length>1?sheetData[1]:sheetData[0];
-    const csv=[s.cols,...s.rows.map(r=>s.cols.map(c=>r[c]??''))].map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download=fname+'.csv';a.click();
-    toast('Excel library unavailable offline — downloaded CSV instead',true);
-  }
-}
-
-/* ---------- Drawer ---------- */
-function renderDrawer(){
-  const dr=document.getElementById('drawer'),ov=document.getElementById('overlay');
-  const r=S.drawer&&getReq(S.drawer);
-  if(!r){dr.classList.remove('open');ov.classList.remove('open');dr.setAttribute('aria-hidden','true');return}
-  const t=TYPES[r.type];
-  const isMgr=S.role==='manager';
-  const canDecide=isMgr&&r.status==='pending';
-  const canCancel=!isMgr&&r.status==='pending'&&r.requester.id===ME.id;
-  const val=(f,v)=>f.type==='date'?fmtD(v):(v===''||v==null?'—':esc(v)+(f.k==='hours'?' h':''));
-  dr.innerHTML=`<div class="sheet-handle"></div>
-  <div class="d-head">${bubble(r.type,true)}<div><h3>${t.label}</h3><small>${r.id}</small></div>
-    <button class="btn icon" data-action="closeDrawer" aria-label="Close">${icon('x',18)}</button></div>
-  <div class="d-body">
-    <div class="d-section" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${pill(r.status)}<span class="muted" style="font-size:12.5px">Submitted ${fmtDT(r.created)}</span></div>
-    <div class="d-section"><h4>Employee</h4><div class="kv">
-      <div><span>Name</span><b>${esc(r.requester.name)}</b></div><div><span>Employee ID</span><b>${esc(r.requester.id)}</b></div>
-      <div style="grid-column:1/-1"><span>Team</span><b>${esc(r.requester.team)}</b></div></div></div>
-    <div class="d-section"><h4>Request details</h4><div class="kv">
-      ${t.fields.map(f=>`<div${f.full?' style="grid-column:1/-1"':''}><span>${f.label}</span><b>${val(f,r.data[f.k])}</b></div>`).join('')}
-      ${r.data.start&&r.data.end?`<div><span>Duration</span><b>${days(r.data.start,r.data.end)} day(s)</b></div>`:''}
-    </div></div>
-    ${r.notes?`<div class="d-section"><h4>Notes</h4><div class="note-box">${esc(r.notes)}</div></div>`:''}
-    <div class="d-section"><h4>History</h4><div class="timeline">
-      ${r.history.map(h=>`<div class="t-item ${h.action.toLowerCase()}"><b>${h.action}</b><span>${esc(h.by)} · ${fmtDT(h.at)}</span>${h.comment?`<em>${esc(h.comment)}</em>`:''}</div>`).join('')}
-    </div></div>
-  </div>
-  ${canDecide?`<div class="d-foot">
-    <textarea class="input" id="decisionComment" rows="2" placeholder="Comment (required when rejecting)"></textarea>
-    <div class="row"><button class="btn bad" data-action="reject" data-id="${r.id}">${icon('x',16)} Reject</button>
-    <button class="btn ok" data-action="approve" data-id="${r.id}">${icon('check',16)} Approve</button></div></div>`:''}
-  ${canCancel?`<div class="d-foot"><button class="btn bad" data-action="cancelReq" data-id="${r.id}">Cancel this request</button></div>`:''}`;
-  dr.classList.add('open');ov.classList.add('open');dr.setAttribute('aria-hidden','false');
-}
-function decide(id,status,comment){
-  const r=getReq(id);if(!r||r.status!=='pending')return;
-  const at=new Date().toISOString();
-  r.status=status;r.decidedBy=MANAGER.name;r.decidedAt=at;r.decisionComment=comment||'';
-  r.history.push({at,by:MANAGER.name,action:STATUS[status],comment:comment||''});
-  save();render();toast(`${r.id} ${status}`);
-}
-
-/* ---------- Toast ---------- */
-let toastT;
-function toast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(toastT);toastT=setTimeout(()=>t.className='toast'+(err?' err':''),2600)}
-
-/* ---------- Render ---------- */
-const VIEWS={new:viewNew,mine:viewMine,dash:viewDash,all:viewAll,export:viewExport};
-function render(){
-  renderNav();
-  document.getElementById('main').innerHTML=VIEWS[S.view]();
-  renderDrawer();
-}
-
-/* ---------- Events ---------- */
-document.addEventListener('click',e=>{
-  const el=e.target.closest('[data-action]');if(!el)return;
-  const a=el.dataset.action,id=el.dataset.id;
-  switch(a){
-    case 'role': if(S.role!==el.dataset.role){S.role=el.dataset.role;S.view=S.role==='staff'?'new':'dash';S.type=null;S.drawer=null;render();window.scrollTo(0,0)} break;
-    case 'nav': S.view=el.dataset.view;S.type=null;S.drawer=null;render();window.scrollTo(0,0);break;
-    case 'pickType': S.type=el.dataset.type;render();window.scrollTo(0,0);break;
-    case 'backTypes': S.type=null;render();break;
-    case 'mineStatus': S.mineStatus=el.dataset.status;render();break;
-    case 'open': S.drawer=id;renderDrawer();break;
-    case 'closeDrawer': S.drawer=null;renderDrawer();break;
-    case 'approve': {const c=document.getElementById('decisionComment');decide(id,'approved',c&&S.drawer===id?c.value.trim():'');break}
-    case 'reject': {const c=document.getElementById('decisionComment');const v=c?c.value.trim():'';if(!v){toast('Please add a comment explaining the rejection',true);c&&c.focus();return}decide(id,'rejected',v);break}
-    case 'quickReject': S.drawer=id;renderDrawer();setTimeout(()=>{const c=document.getElementById('decisionComment');c&&c.focus()},250);break;
-    case 'cancelReq': {const r=getReq(id);if(r&&r.status==='pending'){const at=new Date().toISOString();r.status='cancelled';r.history.push({at,by:ME.name,action:'Cancelled'});save();render();toast(`${r.id} cancelled`)}break}
-    case 'goPending': S.view='all';S.filters={q:'',type:'all',status:'pending'};render();break;
-    case 'expType': {const k=el.dataset.type;S.exp.types.has(k)?S.exp.types.delete(k):S.exp.types.add(k);el.classList.toggle('on');document.getElementById('expPreview').innerHTML=expPreviewHTML();break}
-    case 'expLayout': S.exp.layout=el.dataset.layout;render();break;
-    case 'doExport': doExport();break;
-    case 'reset': if(confirm('Reset all demo requests to the sample data?')){S.reqs=seed();save();S.drawer=null;render();toast('Demo data reset')}break;
-  }
-});
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'&&S.drawer){S.drawer=null;renderDrawer()}
-  if((e.key==='Enter'||e.key===' ')&&e.target.matches('.req-card')){e.preventDefault();e.target.click()}
-});
-document.addEventListener('submit',e=>{if(e.target.id==='reqForm'){e.preventDefault();submitRequest(e.target)}});
-document.addEventListener('input',e=>{
-  const f=e.target.dataset.filter;
-  if(f){S.filters[f]=e.target.value;document.getElementById('results').innerHTML=resultsHTML()}
-});
-document.addEventListener('change',e=>{
-  const x=e.target.dataset.exp;
-  if(x){S.exp[x]=e.target.value;document.getElementById('expPreview').innerHTML=expPreviewHTML()}
-});
-
-/* ---------- Init ---------- */
-document.getElementById('logoIcon').innerHTML=icon('layers',18);
-render();
-</script>
-</body>
-</html>
+<div class="d-foot"><textarea class="input" rows="2" placeholder="Reply to your supervisor (optional)"></textarea>
+<div class="row"><button class="btn ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg> I've read this · Acknowledge</button></div></div></div><nav class="frame-nav"><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>New</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-list"/></svg><span>My Requests</span><span class="badge">1</span></button><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>From WFM</span><span class="badge">2</span></button></nav></div></section>
+<div class="group-head"><h2>WFM / Manager</h2><p>Act on every request, create records about staff, and set the rules.</p></div>
+<section class="screen" id="s11">
+<div class="screen-label"><b>WFM · Dashboard</b><span>Pending work first, leave capacity for the next two weeks, and year-to-date numbers per staff member.</span></div>
+<div class="frame"><div class="frame-body"><div class="page-head"><div style="display:flex;gap:14px;align-items:center"><div><h1>Dashboard</h1><p>Department overview · 2026 year to date</p></div></div><button class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg> Create</button></div><div class="stats">
+<div class="card stat"><span>Needs your decision</span><b style="color:var(--warn)">6</b><small>oldest 2 days</small></div>
+<div class="card stat"><span>Waiting for colleague</span><b style="color:var(--primary)">1</b><small>shift swaps</small></div>
+<div class="card stat"><span>Not yet acknowledged</span><b style="color:var(--ret)">4</b><small>evaluations, tickets, minutes</small></div>
+<div class="card stat"><span>Accepted this month</span><b style="color:var(--ok)">18</b><small>of 23 decided</small></div></div><div class="grid-2"><div class="card card-pad"><h2>Needs your action <span class="muted" style="font-weight:500">· oldest first</span></h2><div class="req-list"><div class="req-card "><span class="bubble sm" style="--c:#0ea5e9"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sun"/></svg></span>
+    <div class="req-main"><div class="req-title">Annual Leave <small>REQ-1031</small></div>
+    <div class="req-sub">22 Nov → 24 Nov · 3 days · resubmitted</div><div class="req-meta">Sara Ahmed · 20m ago</div></div>
+    <div class="req-side"><div class="quick"><button class="btn sm bad" title="Reject"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-x"/></svg></button><button class="btn sm ret" title="Return"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-undo"/></svg></button><button class="btn sm ok" title="Accept"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg><span class="desktop-only">Accept</span></button></div></div></div><div class="req-card "><span class="bubble sm" style="--c:#ec4899"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-target"/></svg></span>
+    <div class="req-main"><div class="req-title">KPI Request <small>REQ-1027</small></div>
+    <div class="req-sub">Adherence · 9 Nov · 1 attachment</div><div class="req-meta">Sara Ahmed · 1d ago</div></div>
+    <div class="req-side"><div class="quick"><button class="btn sm bad" title="Reject"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-x"/></svg></button><button class="btn sm ret" title="Return"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-undo"/></svg></button><button class="btn sm ok" title="Accept"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg><span class="desktop-only">Accept</span></button></div></div></div><div class="req-card "><span class="bubble sm" style="--c:#8b5cf6"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-swap"/></svg></span>
+    <div class="req-main"><div class="req-title">Shift Swap <small>REQ-1024</small></div>
+    <div class="req-sub">18 Nov · Morning ⇄ Evening · colleague accepted</div><div class="req-meta">Yousef Ali ⇄ Fatima Hassan · 1d ago</div></div>
+    <div class="req-side"><div class="quick"><button class="btn sm bad" title="Reject"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-x"/></svg></button><button class="btn sm ret" title="Return"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-undo"/></svg></button><button class="btn sm ok" title="Accept"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg><span class="desktop-only">Accept</span></button></div></div></div><div class="req-card "><span class="bubble sm" style="--c:#10b981"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-cal"/></svg></span>
+    <div class="req-main"><div class="req-title">Schedule Special Request <small>REQ-1022</small></div>
+    <div class="req-sub">December schedule · Avoid mornings</div><div class="req-meta">Noura Saleh · 2d ago</div></div>
+    <div class="req-side"><div class="quick"><button class="btn sm bad" title="Reject"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-x"/></svg></button><button class="btn sm ret" title="Return"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-undo"/></svg></button><button class="btn sm ok" title="Accept"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg><span class="desktop-only">Accept</span></button></div></div></div></div></div>
+<div class="stack"><div class="card card-pad"><h2>Leave capacity · next 14 days</h2><div class="cap-strip"><div class="cap l0"><b>12</b>Thu<br>0/2</div><div class="cap l1"><b>13</b>Fri<br>1/2</div><div class="cap l0"><b>14</b>Sat<br>0/2</div><div class="cap l1"><b>15</b>Sun<br>1/2</div><div class="cap l0"><b>16</b>Mon<br>0/2</div><div class="cap l1"><b>17</b>Tue<br>1/2</div><div class="cap l1"><b>18</b>Wed<br>1/2</div><div class="cap l2"><b>19</b>Thu<br>2/2</div><div class="cap l0"><b>20</b>Fri<br>0/2</div><div class="cap l0"><b>21</b>Sat<br>0/2</div><div class="cap l1"><b>22</b>Sun<br>1/2</div><div class="cap l1"><b>23</b>Mon<br>1/2</div><div class="cap l1"><b>24</b>Tue<br>1/2</div><div class="cap l1"><b>25</b>Wed<br>1/2</div></div>
+<div class="flow-note">Limit: 2 staff per day (managers excluded). Red days are greyed out for staff.</div></div>
+<div class="card card-pad"><h2>By request type <span class="muted" style="font-weight:500">· this month</span></h2><div class="bars"><div class="bar-row"><span>Annual Leave</span><div class="bar-track"><div class="bar-fill" style="width:100%;--c:#0ea5e9"></div></div><b>9</b></div><div class="bar-row"><span>Shift Swap</span><div class="bar-track"><div class="bar-fill" style="width:67%;--c:#8b5cf6"></div></div><b>6</b></div><div class="bar-row"><span>Shift Change</span><div class="bar-track"><div class="bar-fill" style="width:44%;--c:#f59e0b"></div></div><b>4</b></div><div class="bar-row"><span>Schedule Special Request</span><div class="bar-track"><div class="bar-fill" style="width:33%;--c:#10b981"></div></div><b>3</b></div><div class="bar-row"><span>KPI Request</span><div class="bar-track"><div class="bar-fill" style="width:56%;--c:#ec4899"></div></div><b>5</b></div></div></div></div></div>
+<div class="card" style="margin-top:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Year to date by staff</h2></div><div class="table-wrap"><table class="mini-table">
+<thead><tr><th>Staff</th><th class="num-cell">Leave days</th><th class="num-cell">Adherence notes</th><th class="num-cell">Violations</th><th class="num-cell">Avg call score</th><th class="num-cell">KPI requests accepted</th></tr></thead>
+<tbody><tr><td style="white-space:nowrap"><span class="av">SA</span><b style="font-weight:600">Sara Ahmed</b> <span class="muted" style="font-size:12px">· Team A</span></td><td class="num-cell">12</td><td class="num-cell">1</td><td class="num-cell">1</td><td class="num-cell">88%</td><td class="num-cell">2</td></tr><tr><td style="white-space:nowrap"><span class="av">OK</span><b style="font-weight:600">Omar Khalid</b> <span class="muted" style="font-size:12px">· Team A</span></td><td class="num-cell">9</td><td class="num-cell">3</td><td class="num-cell">2</td><td class="num-cell">79%</td><td class="num-cell">1</td></tr><tr><td style="white-space:nowrap"><span class="av">FH</span><b style="font-weight:600">Fatima Hassan</b> <span class="muted" style="font-size:12px">· Team B</span></td><td class="num-cell">15</td><td class="num-cell">0</td><td class="num-cell">0</td><td class="num-cell">92%</td><td class="num-cell">0</td></tr><tr><td style="white-space:nowrap"><span class="av">YA</span><b style="font-weight:600">Yousef Ali</b> <span class="muted" style="font-size:12px">· Team B</span></td><td class="num-cell">6</td><td class="num-cell">2</td><td class="num-cell">1</td><td class="num-cell">84%</td><td class="num-cell">3</td></tr><tr><td style="white-space:nowrap"><span class="av">NS</span><b style="font-weight:600">Noura Saleh</b> <span class="muted" style="font-size:12px">· Team C</span></td><td class="num-cell">11</td><td class="num-cell">1</td><td class="num-cell">0</td><td class="num-cell">90%</td><td class="num-cell">1</td></tr></tbody></table></div></div></div><nav class="frame-nav"><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-grid"/></svg><span>Dashboard</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>Requests</span><span class="badge">6</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>Create</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sliders"/></svg><span>Rules</span></button></nav></div></section><section class="screen" id="s12">
+<div class="screen-label"><b>WFM · Request pool</b><span>Every request from every staff member in one place. Export uses the list's built-in Excel export.</span></div>
+<div class="frame"><div class="frame-body"><div class="page-head"><div style="display:flex;gap:14px;align-items:center"><div><h1>Requests</h1><p>Search, filter and act on every request.</p></div></div><button class="btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-download"/></svg> Export to Excel</button></div><div class="filters"><div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-search"/></svg><input class="input" placeholder="Search name, ID, team…"></div>
+<select class="input"><option>All types</option></select><select class="input"><option>All statuses</option></select><select class="input"><option>All teams</option></select></div>
+<div class="count">8 requests</div>
+<div class="card table-wrap desktop-only"><table><thead><tr><th>Request</th><th>Employee</th><th>Details</th><th>Submitted</th><th>Status</th></tr></thead><tbody><tr><td><div class="cell-type"><span class="bubble sm" style="--c:#0ea5e9"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sun"/></svg></span><div>Annual Leave<div class="muted" style="font-weight:500;font-size:12px">REQ-1031</div></div></div></td>
+<td><b style="font-weight:600">Sara Ahmed</b><div class="muted" style="font-size:12px">Customer Care · Team A</div></td><td class="muted">22 Nov → 24 Nov · 3 days</td><td class="muted" style="white-space:nowrap">20m ago</td><td><span class="pill pending">Pending</span></td></tr><tr><td><div class="cell-type"><span class="bubble sm" style="--c:#ec4899"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-target"/></svg></span><div>KPI Request<div class="muted" style="font-weight:500;font-size:12px">REQ-1027</div></div></div></td>
+<td><b style="font-weight:600">Sara Ahmed</b><div class="muted" style="font-size:12px">Customer Care · Team A</div></td><td class="muted">Adherence · 9 Nov · 1 attachment</td><td class="muted" style="white-space:nowrap">1d ago</td><td><span class="pill pending">Pending</span></td></tr><tr><td><div class="cell-type"><span class="bubble sm" style="--c:#8b5cf6"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-swap"/></svg></span><div>Shift Swap<div class="muted" style="font-weight:500;font-size:12px">REQ-1029</div></div></div></td>
+<td><b style="font-weight:600">Sara Ahmed ⇄ Fatima Hassan</b><div class="muted" style="font-size:12px">Team A ⇄ Team B</div></td><td class="muted">20 Nov · Morning ⇄ Evening</td><td class="muted" style="white-space:nowrap">3h ago</td><td><span class="pill waiting">Waiting for colleague</span></td></tr><tr><td><div class="cell-type"><span class="bubble sm" style="--c:#8b5cf6"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-swap"/></svg></span><div>Shift Swap<div class="muted" style="font-weight:500;font-size:12px">REQ-1024</div></div></div></td>
+<td><b style="font-weight:600">Yousef Ali ⇄ Fatima Hassan</b><div class="muted" style="font-size:12px">Team B</div></td><td class="muted">18 Nov · Morning ⇄ Evening</td><td class="muted" style="white-space:nowrap">1d ago</td><td><span class="pill pending">Pending</span></td></tr><tr><td><div class="cell-type"><span class="bubble sm" style="--c:#10b981"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-cal"/></svg></span><div>Schedule Special Request<div class="muted" style="font-weight:500;font-size:12px">REQ-1022</div></div></div></td>
+<td><b style="font-weight:600">Noura Saleh</b><div class="muted" style="font-size:12px">Sales Support · Team C</div></td><td class="muted">December schedule · Avoid mornings</td><td class="muted" style="white-space:nowrap">2d ago</td><td><span class="pill pending">Pending</span></td></tr><tr><td><div class="cell-type"><span class="bubble sm" style="--c:#f59e0b"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-clock"/></svg></span><div>Shift Change<div class="muted" style="font-weight:500;font-size:12px">REQ-1020</div></div></div></td>
+<td><b style="font-weight:600">Omar Khalid</b><div class="muted" style="font-size:12px">Customer Care · Team A</div></td><td class="muted">26 Nov · Evening → Morning</td><td class="muted" style="white-space:nowrap">2d ago</td><td><span class="pill returned">Returned</span></td></tr><tr><td><div class="cell-type"><span class="bubble sm" style="--c:#f59e0b"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-clock"/></svg></span><div>Shift Change<div class="muted" style="font-weight:500;font-size:12px">REQ-1019</div></div></div></td>
+<td><b style="font-weight:600">Sara Ahmed</b><div class="muted" style="font-size:12px">Customer Care · Team A</div></td><td class="muted">4 Nov · Evening → Morning</td><td class="muted" style="white-space:nowrap">6d ago</td><td><span class="pill approved">Accepted</span></td></tr><tr><td><div class="cell-type"><span class="bubble sm" style="--c:#0ea5e9"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sun"/></svg></span><div>Annual Leave<div class="muted" style="font-weight:500;font-size:12px">REQ-1015</div></div></div></td>
+<td><b style="font-weight:600">Ahmad Faisal</b><div class="muted" style="font-size:12px">Sales Support · Team C</div></td><td class="muted">17 Nov → 19 Nov · 3 days</td><td class="muted" style="white-space:nowrap">1w ago</td><td><span class="pill rejected">Rejected</span></td></tr></tbody></table></div>
+<div class="req-list mobile-only"><div class="req-card "><span class="bubble sm" style="--c:#0ea5e9"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sun"/></svg></span>
+    <div class="req-main"><div class="req-title">Annual Leave <small>REQ-1031</small></div>
+    <div class="req-sub">22 Nov → 24 Nov · 3 days</div><div class="req-meta">Sara Ahmed · 20m ago</div></div>
+    <div class="req-side"><span class="pill pending">Pending</span></div></div><div class="req-card "><span class="bubble sm" style="--c:#ec4899"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-target"/></svg></span>
+    <div class="req-main"><div class="req-title">KPI Request <small>REQ-1027</small></div>
+    <div class="req-sub">Adherence · 9 Nov · 1 attachment</div><div class="req-meta">Sara Ahmed · 1d ago</div></div>
+    <div class="req-side"><span class="pill pending">Pending</span></div></div><div class="req-card "><span class="bubble sm" style="--c:#8b5cf6"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-swap"/></svg></span>
+    <div class="req-main"><div class="req-title">Shift Swap <small>REQ-1029</small></div>
+    <div class="req-sub">20 Nov · Morning ⇄ Evening</div><div class="req-meta">Sara Ahmed ⇄ Fatima Hassan · 3h ago</div></div>
+    <div class="req-side"><span class="pill waiting">Waiting for colleague</span></div></div><div class="req-card "><span class="bubble sm" style="--c:#8b5cf6"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-swap"/></svg></span>
+    <div class="req-main"><div class="req-title">Shift Swap <small>REQ-1024</small></div>
+    <div class="req-sub">18 Nov · Morning ⇄ Evening</div><div class="req-meta">Yousef Ali ⇄ Fatima Hassan · 1d ago</div></div>
+    <div class="req-side"><span class="pill pending">Pending</span></div></div><div class="req-card "><span class="bubble sm" style="--c:#10b981"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-cal"/></svg></span>
+    <div class="req-main"><div class="req-title">Schedule Special Request <small>REQ-1022</small></div>
+    <div class="req-sub">December schedule · Avoid mornings</div><div class="req-meta">Noura Saleh · 2d ago</div></div>
+    <div class="req-side"><span class="pill pending">Pending</span></div></div><div class="req-card "><span class="bubble sm" style="--c:#f59e0b"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-clock"/></svg></span>
+    <div class="req-main"><div class="req-title">Shift Change <small>REQ-1020</small></div>
+    <div class="req-sub">26 Nov · Evening → Morning</div><div class="req-meta">Omar Khalid · 2d ago</div></div>
+    <div class="req-side"><span class="pill returned">Returned</span></div></div><div class="req-card "><span class="bubble sm" style="--c:#f59e0b"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-clock"/></svg></span>
+    <div class="req-main"><div class="req-title">Shift Change <small>REQ-1019</small></div>
+    <div class="req-sub">4 Nov · Evening → Morning</div><div class="req-meta">Sara Ahmed · 6d ago</div></div>
+    <div class="req-side"><span class="pill approved">Accepted</span></div></div><div class="req-card "><span class="bubble sm" style="--c:#0ea5e9"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sun"/></svg></span>
+    <div class="req-main"><div class="req-title">Annual Leave <small>REQ-1015</small></div>
+    <div class="req-sub">17 Nov → 19 Nov · 3 days</div><div class="req-meta">Ahmad Faisal · 1w ago</div></div>
+    <div class="req-side"><span class="pill rejected">Rejected</span></div></div></div></div><nav class="frame-nav"><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-grid"/></svg><span>Dashboard</span></button><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>Requests</span><span class="badge">6</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>Create</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sliders"/></svg><span>Rules</span></button></nav></div></section><section class="screen" id="s13">
+<div class="screen-label"><b>WFM · Request details</b><span>Three decisions: Accept, Return with comments, Reject. A comment is required to return or reject.</span></div>
+<div class="frame"><div class="drawer-static"><div class="d-head"><span class="bubble sm" style="--c:#0ea5e9"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sun"/></svg></span><div><h3>Annual Leave</h3><small>REQ-1031</small></div></div>
+<div class="d-body">
+<div class="d-section" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="pill pending">Pending</span><span class="muted" style="font-size:12.5px">Resubmitted 11 Nov 2026, 10:55</span></div>
+<div class="callout ok"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg><div><b>Within the leave limit</b>22, 23 and 24 Nov each have 1 of 2 slots used.</div></div>
+<div class="d-section"><h4>Employee</h4><div class="kv"><div><span>Name</span><b>Sara Ahmed</b></div><div><span>Employee ID</span><b>E1042</b></div>
+<div style="grid-column:1/-1"><span>Team</span><b>Customer Care · Team A</b></div></div></div>
+<div class="d-section"><h4>Request details</h4><div class="kv"><div><span>Start date</span><b>22 Nov 2026</b></div><div><span>End date</span><b>24 Nov 2026</b></div>
+<div><span>Duration</span><b>3 days</b></div><div><span>Cover arranged with</span><b>Omar Khalid</b></div></div></div>
+<div class="d-section"><h4>Attachments</h4><div class="file"><span class="fi">PDF</span><div><b style="font-weight:600">flight-booking.pdf</b><small>214 KB</small></div><span class="x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-x"/></svg></span></div></div>
+<div class="d-section"><h4>History</h4><div class="timeline">
+<div class="t-item"><b>Submitted</b><span>Sara Ahmed · 10 Nov 2026, 09:05 · 19–21 Nov</span></div>
+<div class="t-item returned"><b>Returned for changes</b><span>Khaled Nasser · 10 Nov 2026, 14:20</span><em>Please attach your travel booking and confirm who is covering you.</em></div>
+<div class="t-item"><b>Resubmitted</b><span>Sara Ahmed · 11 Nov 2026, 10:55 · dates changed to 22–24 Nov, booking attached</span></div>
+</div></div></div>
+<div class="d-foot"><textarea class="input" rows="2" placeholder="Comment (required to return or reject)"></textarea>
+<div class="row"><button class="btn bad"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-x"/></svg> Reject</button><button class="btn ret"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-undo"/></svg> Return</button><button class="btn ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg> Accept</button></div></div></div><nav class="frame-nav"><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-grid"/></svg><span>Dashboard</span></button><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>Requests</span><span class="badge">6</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>Create</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sliders"/></svg><span>Rules</span></button></nav></div></section><section class="screen" id="s14">
+<div class="screen-label"><b>WFM · Create</b><span>Records WFM or managers create about staff. They feed the dashboards and end-of-cycle scores.</span></div>
+<div class="frame"><div class="frame-body"><div class="page-head"><div style="display:flex;gap:14px;align-items:center"><div><h1>Create</h1><p>What would you like to create?</p></div></div></div><div class="type-grid"><button class="type-card" style="--c:#64748b"><span class="bubble" style="--c:#64748b"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-clipboard"/></svg></span><div><b>Adherence Note</b><br><span>Record that affects adherence data</span></div></button><button class="type-card" style="--c:#ef4444"><span class="bubble" style="--c:#ef4444"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-alert"/></svg></span><div><b>Violation Ticket</b><br><span>Log a violation for a staff member</span></div></button><button class="type-card" style="--c:#6366f1"><span class="bubble" style="--c:#6366f1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-headset"/></svg></span><div><b>Call Evaluation</b><br><span>Score a monitored call and give feedback</span></div></button><button class="type-card" style="--c:#0891b2"><span class="bubble" style="--c:#0891b2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-file"/></svg></span><div><b>Minutes of Meeting</b><br><span>Send minutes to a person or a group</span></div></button></div><div class="flow-note" style="margin-top:16px">Adherence notes stay internal. Violation tickets, call evaluations and minutes are sent to the staff member’s “From WFM” inbox.</div></div><nav class="frame-nav"><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-grid"/></svg><span>Dashboard</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>Requests</span><span class="badge">6</span></button><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>Create</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sliders"/></svg><span>Rules</span></button></nav></div></section><section class="screen" id="s15">
+<div class="screen-label"><b>WFM · Call evaluation</b><span>Score a monitored call per criterion. The total is calculated automatically. Criteria list to be confirmed by the team.</span></div>
+<div class="frame"><div class="frame-body"><button class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-back"/></svg> Create</button><div class="page-head"><div style="display:flex;gap:14px;align-items:center"><span class="bubble" style="--c:#6366f1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-headset"/></svg></span><div><h1>Call Evaluation</h1><p>Score a monitored call and give feedback</p></div></div></div><div class="grid-2"><div class="card card-pad"><div class="form-grid"><div class="field"><label>Staff member <span class="req">*</span></label><select><option>Sara Ahmed · Team A</option><option>Omar Khalid · Team A</option></select></div><div class="field"><label>Call date &amp; time <span class="req">*</span></label><input type="datetime-local" value="2026-11-09T13:42" placeholder=""></div><div class="field full"><label>Call ID</label><input type="text" value="CL-77219034" placeholder=""></div></div><h2 style="margin:20px 0 12px">Scores</h2><div class="crit-grid"><span>Greeting &amp; opening</span><div class="rating"><i class="on">1</i><i class="on">2</i><i class="on">3</i><i class="on">4</i><i class="on">5</i></div><b style="text-align:right">100%</b><span>Customer verification</span><div class="rating"><i class="on">1</i><i class="on">2</i><i class="on">3</i><i class="on">4</i><i class="on">5</i></div><b style="text-align:right">100%</b><span>Understanding the need</span><div class="rating"><i class="on">1</i><i class="on">2</i><i class="on">3</i><i class="on">4</i><i class="">5</i></div><b style="text-align:right">80%</b><span>Solution accuracy</span><div class="rating"><i class="on">1</i><i class="on">2</i><i class="on">3</i><i class="on">4</i><i class="">5</i></div><b style="text-align:right">80%</b><span>Tone &amp; empathy</span><div class="rating"><i class="on">1</i><i class="on">2</i><i class="on">3</i><i class="on">4</i><i class="">5</i></div><b style="text-align:right">80%</b><span>Closing</span><div class="rating"><i class="on">1</i><i class="on">2</i><i class="on">3</i><i class="on">4</i><i class="">5</i></div><b style="text-align:right">80%</b></div><div class="form-grid" style="margin-top:18px"><div class="field full"><label>Feedback <span class="req">*</span></label><textarea placeholder="">Great verification and a warm opening. Try to summarise the solution before closing and offer further help.</textarea></div><div class="field full"><label>Attachment</label><div class="drop"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-upload"/></svg> <span>Drag a file here or <b>browse</b></span></div><span class="hint">e.g. evaluation form or call notes</span></div></div><div class="form-actions"><button type="button" class="btn">Cancel</button><button type="button" class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg> Send to staff</button></div></div><div class="stack"><div class="card card-pad"><div class="score-box" style="margin:0"><div class="score-num">87%</div><div><b>Total score</b><span style="display:block">Average of 6 criteria</span></div></div></div><div class="card card-pad"><h2>Options</h2><div class="switch-row"><div><b>Require acknowledgement</b><span>Staff must tap “I’ve read this”</span></div><span class="switch"></span></div><div class="switch-row"><div><b>Count in end-of-cycle score</b><span>Included in the staff member’s average</span></div><span class="switch"></span></div></div></div></div></div><nav class="frame-nav"><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-grid"/></svg><span>Dashboard</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>Requests</span><span class="badge">6</span></button><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>Create</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sliders"/></svg><span>Rules</span></button></nav></div></section><section class="screen" id="s16">
+<div class="screen-label"><b>WFM · Violation ticket & Adherence note</b><span>Violation types are placeholders until the team sends the list. Adherence notes adjust adherence data and aren’t sent to staff.</span></div>
+<div class="frame"><div class="frame-body"><div class="grid-2" style="grid-template-columns:1fr 1fr"><div class="card card-pad"><div style="display:flex;gap:12px;align-items:center;margin-bottom:16px"><span class="bubble" style="--c:#ef4444"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-alert"/></svg></span><div><b style="font-size:15px">Violation Ticket</b><div class="muted" style="font-size:13px">Sent to the staff member to acknowledge</div></div></div><div class="form-grid" style="grid-template-columns:1fr"><div class="field"><label>Staff member <span class="req">*</span></label><select><option>Omar Khalid · Team A</option></select></div><div class="field"><label>Violation type <span class="req">*</span></label><select><option>Late login</option><option>Type 2 (to be confirmed)</option><option>Type 3 (to be confirmed)</option></select></div><div class="field"><label>Date of violation <span class="req">*</span></label><input type="date" value="2026-11-10" placeholder=""></div><div class="field"><label>Details</label><textarea placeholder="">Logged in at 07:24 for a 07:00 shift.</textarea></div><div class="field"><label>Attachment</label><div class="drop"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-upload"/></svg> <span>Drag a file here or <b>browse</b></span></div><span class="hint">Optional</span></div></div><div class="form-actions"><button type="button" class="btn">Cancel</button><button type="button" class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg> Send ticket</button></div></div><div class="card card-pad"><div style="display:flex;gap:12px;align-items:center;margin-bottom:16px"><span class="bubble" style="--c:#64748b"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-clipboard"/></svg></span><div><b style="font-size:15px">Adherence Note</b><div class="muted" style="font-size:13px">Internal · adjusts adherence data</div></div></div><div class="form-grid" style="grid-template-columns:1fr"><div class="field"><label>Staff member <span class="req">*</span></label><select><option>Yousef Ali · Team B</option></select></div><div class="field"><label>Reason <span class="req">*</span></label><select><option>Sick leave</option><option>Emergency leave</option><option>System issue</option><option>Other</option></select></div><div class="form-grid" style="gap:12px"><div class="field"><label>From <span class="req">*</span></label><input type="date" value="2026-11-08" placeholder=""></div><div class="field"><label>To <span class="req">*</span></label><input type="date" value="2026-11-08" placeholder=""></div></div><div class="field"><label>Note</label><textarea placeholder="">Called in sick. Certificate received by email.</textarea></div><div class="field"><label>Attachment</label><div class="files"><div class="file"><span class="fi img">JPG</span><div><b style="font-weight:600">sick-certificate.jpg</b><small>1.2 MB</small></div><span class="x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-x"/></svg></span></div></div></div></div><div class="form-actions"><button type="button" class="btn">Cancel</button><button type="button" class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg> Save note</button></div></div></div></div><nav class="frame-nav"><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-grid"/></svg><span>Dashboard</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>Requests</span><span class="badge">6</span></button><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>Create</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sliders"/></svg><span>Rules</span></button></nav></div></section><section class="screen" id="s17">
+<div class="screen-label"><b>WFM · Minutes of meeting</b><span>Send to one person, a team, or the whole department. Each recipient gets it in their inbox and acknowledges it.</span></div>
+<div class="frame"><div class="frame-body"><button class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-back"/></svg> Create</button><div class="page-head"><div style="display:flex;gap:14px;align-items:center"><span class="bubble" style="--c:#0891b2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-file"/></svg></span><div><h1>Minutes of Meeting</h1><p>Send minutes to a person or a group</p></div></div></div><div class="grid-2"><div class="card card-pad"><div class="form-grid"><div class="field full"><label>Send to <span class="req">*</span></label><div class="seg"><button>One person</button><button class="on">Team(s)</button><button>Whole department</button></div></div><div class="field full"><label>Teams</label><div class="opt-chips"><span class="chip on">Team A · 8</span><span class="chip">Team B · 7</span><span class="chip">Team C · 6</span></div></div><div class="field"><label>Title <span class="req">*</span></label><input type="text" value="Team A weekly huddle" placeholder=""></div><div class="field"><label>Meeting date <span class="req">*</span></label><input type="date" value="2026-11-10" placeholder=""></div><div class="field full"><label>Summary <span class="req">*</span></label><textarea placeholder="">1. New greeting script from 15 Nov.
+2. Adherence target stays at 92%.
+3. Holiday leave requests close 20 Nov.</textarea></div><div class="field full"><label>Action items</label><textarea placeholder="Optional">Everyone: read the new script before 15 Nov.</textarea></div><div class="field full"><label>Attachments</label><div class="files"><div class="file"><span class="fi">PDF</span><div><b style="font-weight:600">greeting-script-v3.pdf</b><small>340 KB</small></div><span class="x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-x"/></svg></span></div><div class="file"><span class="fi">PDF</span><div><b style="font-weight:600">huddle-slides.pdf</b><small>1.8 MB</small></div><span class="x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-x"/></svg></span></div></div></div></div><div class="form-actions"><button type="button" class="btn">Cancel</button><button type="button" class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg> Send minutes</button></div></div><div class="stack"><div class="card card-pad"><h2>Options</h2><div class="switch-row"><div><b>Require acknowledgement</b><span>Track who has read it</span></div><span class="switch"></span></div><div class="switch-row"><div><b>Email a copy</b><span>Official record in Outlook · planned</span></div><span class="switch off"></span></div></div><div class="card card-pad"><h2>Recipients</h2><div class="exp-summary" style="margin:0"><span style="color:var(--primary)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-users"/></svg></span><div><b>8</b> <span>staff in Team A will receive this</span></div></div></div></div></div></div><nav class="frame-nav"><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-grid"/></svg><span>Dashboard</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>Requests</span><span class="badge">6</span></button><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>Create</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sliders"/></svg><span>Rules</span></button></nav></div></section><section class="screen" id="s18">
+<div class="screen-label"><b>WFM · Rules</b><span>The daily leave limit greys out full days for staff. Blocks stop a person (or everyone) from submitting a request type for a set period.</span></div>
+<div class="frame"><div class="frame-body"><div class="page-head"><div style="display:flex;gap:14px;align-items:center"><div><h1>Rules</h1><p>Limits and blocks that apply to staff requests.</p></div></div></div><div class="grid-2" style="grid-template-columns:1fr 1.4fr"><div class="stack"><div class="card card-pad"><h2>Daily leave limit</h2><div style="display:flex;align-items:center;gap:14px;margin-bottom:6px"><div class="num"><button>−</button><b>2</b><button>+</button></div><span class="muted">staff on annual leave per day</span></div><div class="switch-row" style="margin-top:10px"><div><b>Applies to</b><span>Whole department · managers excluded</span></div></div><div class="switch-row"><div><b>Count pending requests</b><span>Pending leave takes a slot until decided</span></div><span class="switch"></span></div><div class="form-actions" style="margin-top:12px"><button class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg> Save</button></div></div></div><div class="stack"><div class="card"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Active blocks</h2></div><div class="table-wrap"><table class="mini-table"><thead><tr><th>Who</th><th>Request type</th><th>Period</th><th>Reason</th><th></th></tr></thead><tbody><tr><td><b style="font-weight:600">Sara Ahmed</b></td><td>Shift Change</td><td class="muted" style="white-space:nowrap">1 Nov → 30 Nov</td><td class="muted">Too many changes this month</td><td style="text-align:right"><button class="btn sm icon" title="Remove"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-trash"/></svg></button></td></tr><tr><td><b style="font-weight:600">All staff</b></td><td>Schedule Special Request</td><td class="muted" style="white-space:nowrap">21 Nov → 31 Dec</td><td class="muted">December schedule already released</td><td style="text-align:right"><button class="btn sm icon" title="Remove"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-trash"/></svg></button></td></tr><tr><td><b style="font-weight:600">Omar Khalid</b></td><td>Annual Leave</td><td class="muted" style="white-space:nowrap">15 Dec → 31 Dec</td><td class="muted">Year-end peak — already approved for Oct</td><td style="text-align:right"><button class="btn sm icon" title="Remove"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-trash"/></svg></button></td></tr></tbody></table></div></div><div class="card card-pad"><h2>Add a block</h2><div class="form-grid"><div class="field"><label>Who</label><select><option>One staff member</option><option>A team</option><option>All staff</option></select></div><div class="field"><label>Staff member</label><select><option>Yousef Ali · Team B</option></select></div><div class="field"><label>Request type</label><select><option>Shift Swap</option><option>Annual Leave</option><option>Shift Change</option><option>Schedule Special Request</option><option>KPI Request</option></select></div><div class="form-grid" style="gap:12px"><div class="field"><label>From</label><input type="date" value="2026-11-12" placeholder=""></div><div class="field"><label>To</label><input type="date" value="2026-11-30" placeholder=""></div></div><div class="field full"><label>Reason (shown to staff)</label><input type="text" value="Swap limit reached for November" placeholder=""></div></div><div class="form-actions"><button class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-lock"/></svg> Add block</button></div></div></div></div></div><nav class="frame-nav"><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-grid"/></svg><span>Dashboard</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-inbox"/></svg><span>Requests</span><span class="badge">6</span></button><button class=""><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-plus"/></svg><span>Create</span></button><button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sliders"/></svg><span>Rules</span></button></nav></div></section>
+<div style="height:40px"></div>
+</body></html>
