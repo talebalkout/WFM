@@ -514,7 +514,6 @@ const VTYPES=['Late login','Early logout','Unscheduled break','Other (types to b
 const ADH_REASONS=['Sick leave','Emergency leave','System issue','Other'];
 const CRITERIA=['Greeting & opening','Customer verification','Understanding the need','Solution accuracy','Tone & empathy','Closing'];
 const CALL_TYPES=['Inquiry','Complaint','Sales','Technical support'];
-const FEEDBACK=['Good structure overall. Keep summarising the solution before closing.','Verification steps were missed — please follow the checklist every time.','Warm tone and clear explanation. Offer further help before ending the call.','Long hold without updating the customer. Check in every 60 seconds.','Excellent call — accurate solution and great empathy.','Rushed closing. Confirm the customer is satisfied before ending.'];
 const PREFS=['Avoid mornings','Avoid evenings','Avoid nights','Specific days off','Other'];
 const USERS=[
   {id:'u1',name:'Sara Ahmed',emp:'E1042',role:'staff',team:0},
@@ -562,56 +561,6 @@ const nextMonths=()=>{const t=today();return [1,2].map(k=>{const d=new Date(t.ge
 let S; // persisted
 const ui={q:{days:90,team:'all'},view:null,form:null,drawer:null,filters:{q:'',type:'all',status:'all',team:'all'},mineFilter:'all',inboxFilter:'all',createKind:null,blockForm:{scope:'user',target:'u1',type:'swap',from:'',to:'',reason:''},rulesDraft:null};
 
-function seed(){
-  const T=today(),d=n=>iso(addDays(T,n)),ts=(daysAgo,h=9,m=0)=>{const x=addDays(T,-daysAgo);x.setHours(h,m);return x.getTime()};
-  const hoursAgo=h=>Date.now()-h*3600000;
-  const H=(at,by,action,comment)=>({at,by,action,comment:comment||''});
-  const nm=nextMonths()[0];
-  const endOfMonth=iso(new Date(T.getFullYear(),T.getMonth()+1,0));
-  const reqs=[
-    {id:'REQ-1001',type:'leave',userId:'u3',status:'approved',createdAt:ts(95),data:{start:d(-90),end:d(-81),cover:'Yousef Ali',notes:''},files:[],history:[H(ts(95),'u3','Submitted'),H(ts(94,11),'w1','Accepted')]},
-    {id:'REQ-1002',type:'leave',userId:'u1',status:'approved',createdAt:ts(66),data:{start:d(-60),end:d(-56),cover:'Omar Khalid',notes:''},files:[],history:[H(ts(66),'u1','Submitted'),H(ts(65,10),'w1','Accepted')]},
-    {id:'REQ-1003',type:'leave',userId:'u6',status:'rejected',createdAt:ts(20),data:{start:d(-12),end:d(-10),cover:'',notes:''},files:[],history:[H(ts(20),'u6','Submitted'),H(ts(19,13),'w1','Rejected','Peak week — no leave possible.')]},
-    {id:'REQ-1004',type:'change',userId:'u1',status:'approved',createdAt:ts(9),data:{date:d(-7),current:SHIFTS[2],requested:SHIFTS[0],reason:'Family appointment in the evening'},files:[],history:[H(ts(9),'u1','Submitted'),H(ts(8,12),'w1','Accepted')]},
-    {id:'REQ-1005',type:'leave',userId:'u3',status:'approved',createdAt:ts(6),data:{start:d(8),end:d(9),cover:'Yousef Ali',notes:'Wedding'},files:[],history:[H(ts(6),'u3','Submitted'),H(ts(5,10),'w1','Accepted')]},
-    {id:'REQ-1006',type:'leave',userId:'u6',status:'approved',createdAt:ts(5),data:{start:d(8),end:d(8),cover:'',notes:''},files:[],history:[H(ts(5),'u6','Submitted'),H(ts(4,9),'w2','Accepted')]},
-    {id:'REQ-1007',type:'leave',userId:'u5',status:'approved',createdAt:ts(5,11),data:{start:d(15),end:d(16),cover:'',notes:''},files:[],history:[H(ts(5,11),'u5','Submitted'),H(ts(4,12),'w1','Accepted')]},
-    {id:'REQ-1008',type:'leave',userId:'u2',status:'approved',createdAt:ts(4),data:{start:d(15),end:d(16),cover:'Sara Ahmed',notes:''},files:[],history:[H(ts(4),'u2','Submitted'),H(ts(3,9),'w1','Accepted')]},
-    {id:'REQ-1009',type:'leave',userId:'u4',status:'approved',createdAt:ts(4,14),data:{start:d(7),end:d(7),cover:'',notes:''},files:[],history:[H(ts(4,14),'u4','Submitted'),H(ts(3,10),'w1','Accepted')]},
-    {id:'REQ-1010',type:'special',userId:'u5',status:'pending',createdAt:ts(2,10),data:{schedule:nm,period:'Whole schedule',prefs:['Avoid mornings'],details:'Dropping my child at school until end of term.'},files:[],history:[H(ts(2,10),'u5','Submitted')]},
-    {id:'REQ-1011',type:'change',userId:'u2',status:'returned',createdAt:ts(2,15),data:{date:d(5),current:SHIFTS[2],requested:SHIFTS[0],reason:'Personal'},files:[],history:[H(ts(2,15),'u2','Submitted'),H(ts(1,11),'w1','Returned','Please give a bit more detail on the reason.')]},
-    {id:'REQ-1012',type:'swap',userId:'u4',partnerId:'u3',status:'pending',createdAt:ts(1,9),data:{date:d(6),myShift:SHIFTS[0],theirShift:SHIFTS[2],reason:'Medical appointment in the morning'},files:[],history:[H(ts(1,9),'u4','Submitted'),H(ts(1,12),'u3','Colleague accepted')]},
-    {id:'REQ-1013',type:'kpi',userId:'u1',status:'pending',createdAt:ts(1,10),data:{kpi:'Adherence',date:d(-2),justification:'System outage from 10:00 to 11:30 — I was logged in but couldn’t take calls. IT ticket attached.'},files:[{name:'IT-ticket-INC48213.pdf',size:186000}],history:[H(ts(1,10),'u1','Submitted')]},
-    {id:'REQ-1014',type:'leave',userId:'u1',status:'returned',createdAt:ts(1,9,5),data:{start:d(8),end:d(10),cover:'',notes:'Family trip'},files:[],history:[H(ts(1,9,5),'u1','Submitted'),H(ts(1,14,20),'w1','Returned',`${fmt(d(8))} is now full. Please pick other dates and attach your travel booking.`)]},
-    {id:'REQ-1015',type:'swap',userId:'u1',partnerId:'u3',status:'waiting',createdAt:hoursAgo(3),data:{date:d(9),myShift:shiftFor('u1',d(9)),theirShift:shiftFor('u3',d(9)),reason:''},files:[],history:[H(hoursAgo(3),'u1','Submitted')]},
-    {id:'REQ-1016',type:'swap',userId:'u2',partnerId:'u1',status:'waiting',createdAt:hoursAgo(1),data:{date:d(16),myShift:SHIFTS[0],theirShift:SHIFTS[2],reason:'Family event in the morning'},files:[],history:[H(hoursAgo(1),'u2','Submitted')]}
-  ];
-  const teamA=staffUsers().filter(u=>u.team===0).map(u=>u.id), all=staffUsers().map(u=>u.id);
-  const recs=[
-    {id:'MOM-1001',kind:'mom',createdBy:'w1',createdAt:ts(14,13),recipients:all,requireAck:true,acks:{u1:{at:ts(14,15)},u2:{at:ts(13,9)},u3:{at:ts(14,16)},u5:{at:ts(13,8)},u6:{at:ts(12,10)}},reads:{},data:{title:'Holiday schedule briefing',date:d(-14),summary:'Holiday schedule will be published two weeks before the holiday.\nLeave requests for the holiday period close one week before.',actions:'',sendTo:'all'},files:[]},
-    {id:'VT-1001',kind:'vio',createdBy:'w1',createdAt:ts(6,11),recipients:['u1'],requireAck:true,acks:{u1:{at:ts(5,9),reply:'Noted, traffic accident on the road. Won’t happen again.'}},reads:{},data:{vtype:'Late login',date:d(-7),details:'Logged in at 07:24 for a 07:00 shift.'},files:[]},
-    {id:'AN-1001',kind:'adh',createdBy:'w1',createdAt:ts(3,10),recipients:['u4'],requireAck:false,acks:{},reads:{},data:{reason:'Sick leave',from:d(-3),to:d(-3),note:'Called in sick. Certificate received by email.'},files:[{name:'sick-certificate.jpg',size:1240000}]},
-    {id:'EV-1001',kind:'eval',createdBy:'w2',createdAt:ts(3,15),recipients:['u2'],requireAck:true,acks:{u2:{at:ts(2,9)}},reads:{},data:{date:d(-4),time:'10:12',callId:'CL-77201544',callType:'Complaint',ratings:[4,4,3,3,4,3],feedback:'Good tone. Verification took too long and the solution needed a second hold — review the billing guide.',countInScore:true},files:[]},
-    {id:'MOM-1002',kind:'mom',createdBy:'w1',createdAt:ts(1,13),recipients:teamA,requireAck:true,acks:{u2:{at:ts(1,15)}},reads:{},data:{title:'Team A weekly huddle',date:d(-1),summary:'1. New greeting script starts next week.\n2. Adherence target stays at 92%.\n3. Leave requests for next month close on the 20th.',actions:'Everyone: read the new script before Sunday.',sendTo:'teams',teams:[0]},files:[{name:'greeting-script-v3.pdf',size:348000}]},
-    {id:'EV-1002',kind:'eval',createdBy:'w2',createdAt:hoursAgo(2),recipients:['u1'],requireAck:true,acks:{},reads:{},data:{date:d(-2),time:'13:42',callId:'CL-77219034',callType:'Inquiry',ratings:[5,5,4,4,4,4],feedback:'Great verification and a warm opening. Try to summarise the solution before closing and offer further help.',countInScore:true},files:[{name:'evaluation-form.pdf',size:98000}]}
-  ];
-  const hist=[
-    ['u1',[[110,[4,4,3,3,4,3]],[90,[4,4,3,4,4,3]],[70,[5,4,4,4,4,3]],[50,[5,5,4,4,4,4]],[30,[5,5,4,4,5,4]]]],
-    ['u2',[[100,[5,4,4,4,4,4]],[80,[4,4,4,4,4,4]],[60,[4,4,4,3,4,3]],[40,[4,3,3,4,4,3]],[20,[4,4,3,3,3,2]]]],
-    ['u3',[[105,[5,5,5,4,5,5]],[75,[5,5,4,5,5,4]],[45,[5,5,5,5,4,5]],[15,[5,4,5,5,5,5]]]],
-    ['u4',[[95,[4,3,4,4,4,4]],[65,[4,3,4,4,4,4]],[35,[4,2,4,4,5,4]],[10,[4,3,4,5,4,4]]]],
-    ['u5',[[100,[4,5,4,4,5,4]],[70,[5,4,4,4,4,5]],[40,[4,4,5,4,5,4]],[12,[5,4,4,5,4,4]]]],
-    ['u6',[[80,[4,4,4,3,4,4]]]]
-  ];
-  let n=1002,k=0;
-  hist.forEach(([uid,list])=>list.forEach(([ago,rt])=>{n++;k++;const at=ts(ago-1,11,(k*7)%60),ev=k%3===0?'w1':'w2';
-    recs.push({id:'EV-'+n,kind:'eval',createdBy:ev,createdAt:at,recipients:[uid],requireAck:true,acks:ago>14||k%2?{[uid]:{at:at+86400000}}:{},reads:{},
-      data:{date:d(-ago),time:`${pad(9+k%8)}:${pad((k*13)%60)}`,callId:'CL-77'+(100000+k*7919%900000),callType:CALL_TYPES[k%4],ratings:rt,feedback:FEEDBACK[k%FEEDBACK.length],countInScore:true},files:[]})}));
-  return {v:1,current:null,seq:{REQ:1016,AN:1001,VT:1001,EV:1002,MOM:1002,BL:2},requests:reqs,records:recs,
-    rules:{leaveLimit:2,countPending:true,blocks:[
-      {id:'BL-1',scope:'user',target:'u1',type:'change',from:d(-10),to:endOfMonth,reason:'Too many shift changes this month'},
-      {id:'BL-2',scope:'all',target:null,type:'special',from:d(10),to:d(45),reason:'Next schedule already released'}]}};
-}
 /* ---- Server (Supabase) ---- */
 async function api(path,{method='GET',body,prefer}={}){
   const h={apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'};
@@ -635,12 +584,6 @@ async function fetchAll(){
   S.requests=rq.map(reqFromDb);S.records=rc.map(recFromDb);
   S.rules={leaveLimit:r0.leave_limit,countPending:r0.count_pending,qualityTarget:r0.quality_target||85,blocks:bl.map(blockFromDb)};
   const sig=JSON.stringify([rq,rc,ru,bl]),changed=sig!==lastSig;lastSig=sig;return changed;
-}
-async function seedServer(){
-  const d=seed();
-  await api('requests',{method:'POST',body:d.requests.map(r=>({id:r.id,...reqToDb(r),created_at:r.createdAt}))});
-  await api('records',{method:'POST',body:d.records.map(r=>({id:r.id,...recToDb(r),created_at:r.createdAt,acks:r.acks,reads:r.reads}))});
-  await api('blocks',{method:'POST',body:d.rules.blocks.map(b=>({scope:b.scope,target:b.target,type:b.type,from_date:b.from,to_date:b.to,reason:b.reason}))});
 }
 async function patchReq(r,expected){
   const rows=await api(`requests?id=eq.${encodeURIComponent(r.id)}&status=eq.${expected}`,{method:'PATCH',prefer:'return=representation',
@@ -745,7 +688,7 @@ function render(){
   <button class="user-btn" data-action="switchUser" title="Switch user">${avatar(u)}<div class="me-text"><b>${esc(u.name)}</b><span>${esc(teamOf(u))}</span></div>${ic('users',16)}</button></header>
   <div class="shell"><aside class="sidebar"><div class="side-label">${isWfm()?'WFM / Manager':'Staff'}</div>
   ${items.map(([k,i,l,b])=>`<button class="nav-item${k===act?' on':''}" data-action="nav" data-view="${k}">${ic(i,18)}<span>${l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`).join('')}
-  <div class="side-foot">Shared test data · everyone with the link sees the same requests.<button data-action="resetDemo">${ic('undo',14)} Reset demo data</button></div></aside>
+  <div class="side-foot">Shared test data · everyone with the link sees the same requests.<button data-action="resetDemo">${ic('trash',14)} Clear all data</button></div></aside>
   <main id="main">${renderView()}</main></div>
   <nav class="bottom-nav">${items.map(([k,i,l,b])=>`<button class="${k===act?'on':''}" data-action="nav" data-view="${k}">${ic(i,22)}<span>${({'New request':'New','My requests':'My Requests'})[l]||l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`).join('')}</nav>`;
   if(ui.drawer)renderDrawer();
@@ -754,7 +697,7 @@ function renderSignin(){
   const row=u=>`<button data-action="login" data-id="${u.id}">${avatar(u)}<div><b>${esc(u.name)}</b><small>${esc(teamOf(u))} · ${u.emp}</small></div><span class="role-tag">${u.role==='wfm'?'WFM':'Staff'}</span></button>`;
   return `<div class="signin-page"><div class="card"><div class="logo">${ic('layers',24)}</div><h1>WFM Requests</h1><p>Real version: you’re signed in with your Microsoft work account.<br>Demo: pick who you want to test as.</p>
   <div class="user-pick"><div class="pick-label">WFM / Manager</div>${USERS.filter(u=>u.role==='wfm').map(row).join('')}<div class="pick-label">Staff</div>${staffUsers().map(row).join('')}</div>
-  <div class="side-foot" style="border:0;margin-top:14px;text-align:center">Shared test data · use dummy information only.<br><button data-action="resetDemo" style="margin:8px auto 0">${ic('undo',14)} Reset demo data</button></div></div></div>`;
+  <div class="side-foot" style="border:0;margin-top:14px;text-align:center">Shared test data · use dummy information only.<br><button data-action="resetDemo" style="margin:8px auto 0">${ic('trash',14)} Clear all data</button></div></div></div>`;
 }
 function renderView(){
   const v=ui.view;
@@ -1325,7 +1268,7 @@ document.addEventListener('click',ev=>{
   switch(a){
     case 'login':S.current=id;ui.view=user(id).role==='wfm'?'dash':'new';ui.form=null;ui.rulesDraft=null;save();render();window.scrollTo(0,0);toast(`Signed in as ${user(id).name}`);break;
     case 'switchUser':S.current=null;ui.drawer=null;closeDrawer(true);save();render();break;
-    case 'resetDemo':if(confirm('Reset the shared demo data for EVERYONE testing? Everything created so far will be removed.')){busy(async()=>{await rpc('reset_demo');await seedServer();await fetchAll();ui.form=null;ui.rulesDraft=null;closeDrawer(true);if(S.current)ui.view=isWfm()?'dash':'new';render();toast('Demo data reset')})}break;
+    case 'resetDemo':if(confirm('Delete ALL requests, records and blocks for EVERYONE testing? Users are kept. This can’t be undone.')){busy(async()=>{await rpc('reset_demo');await fetchAll();ui.form=null;ui.rulesDraft=null;closeDrawer(true);if(S.current)ui.view=isWfm()?'dash':'new';render();toast('All data cleared')})}break;
     case 'nav':go(el.dataset.view);break;
     case 'pickType':ui.form=newForm(el.dataset.type);go('form');break;
     case 'blockedType':toast(`Blocked until ${fmt(el.dataset.to)} · ${el.dataset.reason}`,true);break;
@@ -1401,7 +1344,6 @@ async function boot(){
   $('#app').innerHTML=`<div class="signin-page"><div class="card"><div class="logo">${ic('layers',24)}</div><h1>WFM Requests</h1><p>Loading shared data…</p></div></div>`;
   try{
     await fetchAll();
-    if(!S.requests.length&&!S.records.length){try{await seedServer()}catch(e){}await fetchAll()}
   }catch(e){
     $('#app').innerHTML=`<div class="signin-page"><div class="card"><div class="logo">${ic('layers',24)}</div><h1>Can’t reach the database</h1><p>${esc(e.message)}. Check your internet connection — some office networks block it.</p><button class="btn primary" onclick="boot()">Try again</button></div></div>`;return;
   }
