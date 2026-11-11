@@ -448,7 +448,43 @@ main{min-width:0}
 .field.invalid input,.field.invalid select,.field.invalid textarea,.field.invalid .drop{border-color:var(--bad)}
 .section-title{font-size:15px;margin:26px 0 12px}
 .empty-mini{color:var(--muted);font-size:13px;padding:14px 0}
-@media (max-width:820px){.user-btn .me-text{display:none}.user-btn{padding:4px}}
+.trend{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.trend.up{background:var(--ok-soft);color:var(--ok)}
+.trend.down{background:var(--bad-soft);color:var(--bad)}
+.trend.flat{background:var(--neutral-soft);color:var(--neutral)}
+.trend.new{background:var(--primary-soft);color:var(--primary)}
+.flag{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;padding:2px 7px;border-radius:6px;white-space:nowrap;margin:2px 4px 2px 0}
+.flag.coach{background:var(--bad-soft);color:var(--bad)}
+.flag.repeat{background:var(--warn-soft);color:var(--warn)}
+.flag.star{background:var(--ok-soft);color:var(--ok)}
+.spark{display:block}
+.score-cell{font-weight:700;font-variant-numeric:tabular-nums}
+.below{color:var(--bad)}
+.heat td,.heat th{padding:8px 6px;text-align:center}
+.heat th:first-child,.heat td:first-child{text-align:left;padding-left:14px}
+.heat .hc{display:block;border-radius:6px;padding:7px 4px;font-weight:600;font-size:12.5px;font-variant-numeric:tabular-nums;min-width:44px}
+.heat tbody tr{cursor:pointer}
+.heat tfoot td{border-top:1px solid var(--border);font-weight:700}
+.heat-legend{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:10px 14px 14px}
+.heat-legend i{width:120px;height:8px;border-radius:4px;background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 8%,var(--surface)),var(--primary))}
+.q-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.q-filters select{width:auto;min-width:160px}
+.delta{font-size:12px;font-weight:600}
+.delta.up{color:var(--ok)}.delta.down{color:var(--bad)}
+.chart-wrap svg{width:100%;height:auto;display:block}
+.chart-wrap .gl{stroke:var(--border);stroke-width:1}
+.chart-wrap .tl{stroke:var(--faint);stroke-width:1.5;stroke-dasharray:4 4}
+.chart-wrap text{fill:var(--faint);font-size:10.5px;font-family:inherit}
+.chart-wrap .ln{fill:none;stroke:var(--primary);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.chart-wrap .pt{fill:var(--primary);stroke:var(--surface);stroke-width:2;cursor:pointer}
+.chart-wrap .pt:hover{r:6}
+.ins{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ins div{background:var(--surface-2);border-radius:10px;padding:10px 12px}
+.ins span{display:block;font-size:11.5px;color:var(--muted)}
+.ins b{font-size:13.5px}
+.small-names{font-size:12px;color:var(--muted);margin-top:2px}
+@media (max-width:1000px){.grid-2[style]{grid-template-columns:1fr !important}}
+@media (max-width:820px){.user-btn .me-text{display:none}.user-btn{padding:4px}.q-filters select{flex:1;min-width:0}}
 </style></head><body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol><symbol id="i-swap" viewBox="0 0 24 24"><path d="M16 3l4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16"/></symbol><symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol><symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol><symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol><symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></symbol><symbol id="i-headset" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol><symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M16 13H8M16 17H8M10 9H8"/></symbol><symbol id="i-clip" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></symbol><symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol><symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol><symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol><symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol><symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol><symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol><symbol id="i-next" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol><symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol><symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol><symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol><symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol><symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol><symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol><symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2 10 5-10 5L2 7l10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></symbol><symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol><symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol></svg>
 <div id="app"></div>
@@ -477,6 +513,8 @@ const KPIS=['Adherence','AHT (Average handle time)','Quality score','Attendance'
 const VTYPES=['Late login','Early logout','Unscheduled break','Other (types to be confirmed)'];
 const ADH_REASONS=['Sick leave','Emergency leave','System issue','Other'];
 const CRITERIA=['Greeting & opening','Customer verification','Understanding the need','Solution accuracy','Tone & empathy','Closing'];
+const CALL_TYPES=['Inquiry','Complaint','Sales','Technical support'];
+const FEEDBACK=['Good structure overall. Keep summarising the solution before closing.','Verification steps were missed — please follow the checklist every time.','Warm tone and clear explanation. Offer further help before ending the call.','Long hold without updating the customer. Check in every 60 seconds.','Excellent call — accurate solution and great empathy.','Rushed closing. Confirm the customer is satisfied before ending.'];
 const PREFS=['Avoid mornings','Avoid evenings','Avoid nights','Specific days off','Other'];
 const USERS=[
   {id:'u1',name:'Sara Ahmed',emp:'E1042',role:'staff',team:0},
@@ -522,7 +560,7 @@ const nextMonths=()=>{const t=today();return [1,2].map(k=>{const d=new Date(t.ge
 
 /* ================= State ================= */
 let S; // persisted
-const ui={view:null,form:null,drawer:null,filters:{q:'',type:'all',status:'all',team:'all'},mineFilter:'all',inboxFilter:'all',createKind:null,blockForm:{scope:'user',target:'u1',type:'swap',from:'',to:'',reason:''},rulesDraft:null};
+const ui={q:{days:90,team:'all'},view:null,form:null,drawer:null,filters:{q:'',type:'all',status:'all',team:'all'},mineFilter:'all',inboxFilter:'all',createKind:null,blockForm:{scope:'user',target:'u1',type:'swap',from:'',to:'',reason:''},rulesDraft:null};
 
 function seed(){
   const T=today(),d=n=>iso(addDays(T,n)),ts=(daysAgo,h=9,m=0)=>{const x=addDays(T,-daysAgo);x.setHours(h,m);return x.getTime()};
@@ -553,10 +591,22 @@ function seed(){
     {id:'MOM-1001',kind:'mom',createdBy:'w1',createdAt:ts(14,13),recipients:all,requireAck:true,acks:{u1:{at:ts(14,15)},u2:{at:ts(13,9)},u3:{at:ts(14,16)},u5:{at:ts(13,8)},u6:{at:ts(12,10)}},reads:{},data:{title:'Holiday schedule briefing',date:d(-14),summary:'Holiday schedule will be published two weeks before the holiday.\nLeave requests for the holiday period close one week before.',actions:'',sendTo:'all'},files:[]},
     {id:'VT-1001',kind:'vio',createdBy:'w1',createdAt:ts(6,11),recipients:['u1'],requireAck:true,acks:{u1:{at:ts(5,9),reply:'Noted, traffic accident on the road. Won’t happen again.'}},reads:{},data:{vtype:'Late login',date:d(-7),details:'Logged in at 07:24 for a 07:00 shift.'},files:[]},
     {id:'AN-1001',kind:'adh',createdBy:'w1',createdAt:ts(3,10),recipients:['u4'],requireAck:false,acks:{},reads:{},data:{reason:'Sick leave',from:d(-3),to:d(-3),note:'Called in sick. Certificate received by email.'},files:[{name:'sick-certificate.jpg',size:1240000}]},
-    {id:'EV-1001',kind:'eval',createdBy:'w2',createdAt:ts(3,15),recipients:['u2'],requireAck:true,acks:{u2:{at:ts(2,9)}},reads:{},data:{date:d(-4),time:'10:12',callId:'CL-77201544',ratings:[4,4,3,3,4,3],feedback:'Good tone. Verification took too long and the solution needed a second hold — review the billing guide.',countInScore:true},files:[]},
+    {id:'EV-1001',kind:'eval',createdBy:'w2',createdAt:ts(3,15),recipients:['u2'],requireAck:true,acks:{u2:{at:ts(2,9)}},reads:{},data:{date:d(-4),time:'10:12',callId:'CL-77201544',callType:'Complaint',ratings:[4,4,3,3,4,3],feedback:'Good tone. Verification took too long and the solution needed a second hold — review the billing guide.',countInScore:true},files:[]},
     {id:'MOM-1002',kind:'mom',createdBy:'w1',createdAt:ts(1,13),recipients:teamA,requireAck:true,acks:{u2:{at:ts(1,15)}},reads:{},data:{title:'Team A weekly huddle',date:d(-1),summary:'1. New greeting script starts next week.\n2. Adherence target stays at 92%.\n3. Leave requests for next month close on the 20th.',actions:'Everyone: read the new script before Sunday.',sendTo:'teams',teams:[0]},files:[{name:'greeting-script-v3.pdf',size:348000}]},
-    {id:'EV-1002',kind:'eval',createdBy:'w2',createdAt:hoursAgo(2),recipients:['u1'],requireAck:true,acks:{},reads:{},data:{date:d(-2),time:'13:42',callId:'CL-77219034',ratings:[5,5,4,4,4,4],feedback:'Great verification and a warm opening. Try to summarise the solution before closing and offer further help.',countInScore:true},files:[{name:'evaluation-form.pdf',size:98000}]}
+    {id:'EV-1002',kind:'eval',createdBy:'w2',createdAt:hoursAgo(2),recipients:['u1'],requireAck:true,acks:{},reads:{},data:{date:d(-2),time:'13:42',callId:'CL-77219034',callType:'Inquiry',ratings:[5,5,4,4,4,4],feedback:'Great verification and a warm opening. Try to summarise the solution before closing and offer further help.',countInScore:true},files:[{name:'evaluation-form.pdf',size:98000}]}
   ];
+  const hist=[
+    ['u1',[[110,[4,4,3,3,4,3]],[90,[4,4,3,4,4,3]],[70,[5,4,4,4,4,3]],[50,[5,5,4,4,4,4]],[30,[5,5,4,4,5,4]]]],
+    ['u2',[[100,[5,4,4,4,4,4]],[80,[4,4,4,4,4,4]],[60,[4,4,4,3,4,3]],[40,[4,3,3,4,4,3]],[20,[4,4,3,3,3,2]]]],
+    ['u3',[[105,[5,5,5,4,5,5]],[75,[5,5,4,5,5,4]],[45,[5,5,5,5,4,5]],[15,[5,4,5,5,5,5]]]],
+    ['u4',[[95,[4,3,4,4,4,4]],[65,[4,3,4,4,4,4]],[35,[4,2,4,4,5,4]],[10,[4,3,4,5,4,4]]]],
+    ['u5',[[100,[4,5,4,4,5,4]],[70,[5,4,4,4,4,5]],[40,[4,4,5,4,5,4]],[12,[5,4,4,5,4,4]]]],
+    ['u6',[[80,[4,4,4,3,4,4]]]]
+  ];
+  let n=1002,k=0;
+  hist.forEach(([uid,list])=>list.forEach(([ago,rt])=>{n++;k++;const at=ts(ago-1,11,(k*7)%60),ev=k%3===0?'w1':'w2';
+    recs.push({id:'EV-'+n,kind:'eval',createdBy:ev,createdAt:at,recipients:[uid],requireAck:true,acks:ago>14||k%2?{[uid]:{at:at+86400000}}:{},reads:{},
+      data:{date:d(-ago),time:`${pad(9+k%8)}:${pad((k*13)%60)}`,callId:'CL-77'+(100000+k*7919%900000),callType:CALL_TYPES[k%4],ratings:rt,feedback:FEEDBACK[k%FEEDBACK.length],countInScore:true},files:[]})}));
   return {v:1,current:null,seq:{REQ:1016,AN:1001,VT:1001,EV:1002,MOM:1002,BL:2},requests:reqs,records:recs,
     rules:{leaveLimit:2,countPending:true,blocks:[
       {id:'BL-1',scope:'user',target:'u1',type:'change',from:d(-10),to:endOfMonth,reason:'Too many shift changes this month'},
@@ -583,7 +633,7 @@ async function fetchAll(){
   const [rq,rc,ru,bl]=await Promise.all([api('requests?select=*&order=created_at.desc'),api('records?select=*&order=created_at.desc'),api('rules?select=*'),api('blocks?select=*')]);
   const r0=ru[0]||{leave_limit:2,count_pending:true};
   S.requests=rq.map(reqFromDb);S.records=rc.map(recFromDb);
-  S.rules={leaveLimit:r0.leave_limit,countPending:r0.count_pending,blocks:bl.map(blockFromDb)};
+  S.rules={leaveLimit:r0.leave_limit,countPending:r0.count_pending,qualityTarget:r0.quality_target||85,blocks:bl.map(blockFromDb)};
   const sig=JSON.stringify([rq,rc,ru,bl]),changed=sig!==lastSig;lastSig=sig;return changed;
 }
 async function seedServer(){
@@ -677,7 +727,7 @@ function quick(id){return `<div class="quick"><button class="btn sm bad" data-ac
 function navItems(){
   if(isWfm()){
     const p=S.requests.filter(r=>r.status==='pending').length;
-    return [['dash','grid','Dashboard'],['all','inbox','Requests',p],['create','plus','Create'],['rules','sliders','Rules']];
+    return [['dash','grid','Dashboard'],['all','inbox','Requests',p],['quality','headset','Quality'],['create','plus','Create'],['rules','sliders','Rules']];
   }
   const uid=S.current,m=S.requests.filter(r=>r.userId===uid&&r.status==='returned').length+incomingSwaps(uid).length;
   const u=myInbox(uid).filter(r=>isUnread(r,uid)).length;
@@ -708,7 +758,7 @@ function renderSignin(){
 }
 function renderView(){
   const v=ui.view;
-  if(isWfm()){return v==='all'?viewAll():v==='create'?viewCreate():v==='createForm'?viewCreateForm():v==='rules'?viewRules():viewDash()}
+  if(isWfm()){return v==='quality'?viewQuality():v==='all'?viewAll():v==='create'?viewCreate():v==='createForm'?viewCreateForm():v==='rules'?viewRules():viewDash()}
   return v==='form'?viewForm():v==='mine'?viewMine():v==='inbox'?viewInbox():viewNew();
 }
 
@@ -913,7 +963,7 @@ function newRecForm(kind){
   const f={kind,vals:{staff:staffUsers()[0].id,requireAck:kind!=='adh',countInScore:true},files:[],errors:{},ratings:CRITERIA.map(()=>0),teams:[0],sendTo:'teams'};
   if(kind==='vio'){f.vals.vtype=VTYPES[0];f.vals.date=iso(T)}
   if(kind==='adh'){f.vals.reason=ADH_REASONS[0];f.vals.from=iso(T);f.vals.to=iso(T)}
-  if(kind==='eval'){f.vals.date=iso(T)}
+  if(kind==='eval'){f.vals.date=iso(T);f.vals.callType=CALL_TYPES[0]}
   if(kind==='mom'){f.vals.date=iso(T)}
   return f;
 }
@@ -927,7 +977,7 @@ function viewCreateForm(){
   let main='',side='';
   if(k==='eval'){
     const sc=f.ratings.every(x=>x)?scoreOf(f.ratings):null;
-    main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Call date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}${field('Call time',inp('time','time'))}${field('Call ID',inp('callId','text','e.g. CL-77219034'))}</div>
+    main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Call date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}${field('Call time',inp('time','time'))}${field('Call ID',inp('callId','text','e.g. CL-77219034'))}${field('Call type',`<select name="callType">${CALL_TYPES.map(c=>opt(c,c,c===v.callType)).join('')}</select>`,{req:1})}</div>
     <h2 style="margin:20px 0 12px">Scores ${e.ratings?`<span class="err-text" style="font-weight:500">· ${e.ratings}</span>`:''}</h2><div class="crit-grid">${CRITERIA.map((c,i)=>`<span>${c}</span><div class="rating">${[1,2,3,4,5].map(n=>`<i class="${n<=f.ratings[i]?'on':''}" data-action="rate" data-c="${i}" data-n="${n}">${n}</i>`).join('')}</div><b style="text-align:right">${f.ratings[i]?f.ratings[i]*20+'%':'—'}</b>`).join('')}</div>
     <div class="form-grid" style="margin-top:18px">${field('Feedback',ta('feedback','What went well, and what to improve'),{full:1,req:1,invalid:e.feedback,hint:e.feedback})}${files('e.g. evaluation form or call notes')}</div>`;
     side=`<div class="card card-pad"><div class="score-box" style="margin:0"><div class="score-num" style="${sc===null?'color:var(--faint)':''}">${sc===null?'—':sc+'%'}</div><div><b>Total score</b><span style="display:block">Average of ${CRITERIA.length} criteria</span></div></div></div>
@@ -957,19 +1007,20 @@ function momRecipients(f){
   return [f.vals.staff];
 }
 function viewRules(){
-  const R=ui.rulesDraft||(ui.rulesDraft={leaveLimit:S.rules.leaveLimit,countPending:S.rules.countPending});
+  const R=ui.rulesDraft||(ui.rulesDraft={leaveLimit:S.rules.leaveLimit,countPending:S.rules.countPending,qualityTarget:S.rules.qualityTarget});
   const b=ui.blockForm,t=iso(today());
   const who=x=>x.scope==='all'?'All staff':x.scope==='team'?TEAMS[x.target]:user(x.target).name;
   const rows=S.rules.blocks.slice().sort((a,b)=>a.from.localeCompare(b.from)).map(x=>{const active=x.from<=t&&t<=x.to,past=x.to<t;
     return `<tr><td><b style="font-weight:600">${esc(who(x))}</b></td><td>${TYPES[x.type].name}</td><td class="muted" style="white-space:nowrap">${fmt(x.from)} → ${fmt(x.to)}<div style="font-size:11.5px;font-weight:600;color:${active?'var(--bad)':past?'var(--faint)':'var(--warn)'}">${active?'Active':past?'Ended':'Upcoming'}</div></td><td class="muted">${esc(x.reason)}</td><td style="text-align:right"><button class="btn sm icon" data-action="rmBlock" data-id="${x.id}" title="Remove">${ic('trash',15)}</button></td></tr>`}).join('');
   const targetSel=b.scope==='user'?`<select data-bf="target">${staffUsers().map(u=>opt(u.id,`${u.name} · ${TEAMS[u.team].split(' · ')[1]}`,u.id===b.target)).join('')}</select>`:
     b.scope==='team'?`<select data-bf="target">${TEAMS.map((tm,i)=>opt(String(i),tm,String(i)===String(b.target))).join('')}</select>`:'<input value="Everyone except managers" disabled>';
-  const changed=R.leaveLimit!==S.rules.leaveLimit||R.countPending!==S.rules.countPending;
+  const changed=R.leaveLimit!==S.rules.leaveLimit||R.countPending!==S.rules.countPending||R.qualityTarget!==S.rules.qualityTarget;
   return head('Rules','Limits and blocks that apply to staff requests.')+
   `<div class="grid-2" style="grid-template-columns:1fr 1.4fr"><div class="stack"><div class="card card-pad"><h2>Daily leave limit</h2>
   <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px"><div class="num"><button type="button" data-action="limit" data-d="-1">−</button><b>${R.leaveLimit}</b><button type="button" data-action="limit" data-d="1">+</button></div><span class="muted">staff on annual leave per day</span></div>
   <div class="switch-row" style="margin-top:10px"><div><b>Applies to</b><span>Whole department · managers excluded</span></div></div>
   <div class="switch-row"><div><b>Count pending requests</b><span>Pending leave takes a slot until decided</span></div><button type="button" class="switch${R.countPending?'':' off'}" data-action="toggleCountPending" aria-label="Count pending requests"></button></div>
+  <div class="switch-row"><div><b>Call quality target</b><span>Below this, calls count as under target</span></div><div class="num"><button type="button" data-action="qTarget" data-d="-5">−</button><b>${R.qualityTarget}%</b><button type="button" data-action="qTarget" data-d="5">+</button></div></div>
   <div class="form-actions" style="margin-top:12px"><button class="btn primary" data-action="saveRules" ${changed?'':'disabled style="opacity:.5"'}>${ic('check',16)} Save</button></div></div></div>
   <div class="stack"><div class="card"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Blocks</h2></div>${rows?`<div class="table-wrap"><table class="mini-table"><thead><tr><th>Who</th><th>Request type</th><th>Period</th><th>Reason</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="card-pad empty-mini">No blocks.</div>'}</div>
   <div class="card card-pad"><h2>Add a block</h2><div class="form-grid">
@@ -981,6 +1032,133 @@ function viewRules(){
   </div><div class="form-actions"><button class="btn primary" data-action="addBlock">${ic('lock',16)} Add block</button></div></div></div></div>`;
 }
 
+
+/* ================= Quality analytics ================= */
+const SHORT_CRIT=['Greeting','Verification','Understanding','Solution','Tone','Closing'];
+const evalTime=r=>parse(r.data.date).getTime();
+const avgOf=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
+const evalsOf=uid=>S.records.filter(r=>r.kind==='eval'&&r.recipients[0]===uid&&r.data.countInScore!==false).sort((a,b)=>evalTime(a)-evalTime(b));
+function staffQuality(uid){
+  const all=evalsOf(uid),sc=all.map(r=>scoreOf(r.data.ratings)),tgt=S.rules.qualityTarget;
+  let trend='new',delta=0;
+  if(sc.length>=4){const last=sc.slice(-3),prev=sc.slice(-6,-3);delta=avgOf(last)-avgOf(prev);trend=delta>3?'up':delta<-3?'down':'flat'}
+  const coaching=sc.length>=2&&sc.slice(-2).every(x=>x<tgt);
+  const repeat=all.length>=3?CRITERIA.map((c,i)=>i).filter(i=>all.slice(-3).every(r=>r.data.ratings[i]<=3)).map(i=>SHORT_CRIT[i]):[];
+  const crit=CRITERIA.map((c,i)=>avgOf(all.map(r=>r.data.ratings[i]*20)));
+  let strong=null,weak=null;if(all.length){const ix=crit.map((v,i)=>i);strong=ix.reduce((a,b)=>crit[b]>crit[a]?b:a,0);weak=ix.reduce((a,b)=>crit[b]<crit[a]?b:a,0)}
+  return {all,sc,trend,delta,coaching,repeat,crit,strong,weak,recent:avgOf(sc.slice(-6))};
+}
+function mostImproved(uids){let best=null;uids.forEach(u=>{const q=staffQuality(u);if(q.trend==='up'&&q.delta>5&&(!best||q.delta>best.d))best={u,d:q.delta}});return best&&best.u}
+const trendBadge=t=>({up:`<span class="trend up">${ic('arrow',12).replace('<svg','<svg style="transform:rotate(-45deg)"')} Improving</span>`,down:`<span class="trend down">${ic('arrow',12).replace('<svg','<svg style="transform:rotate(45deg)"')} Slipping</span>`,flat:`<span class="trend flat">${ic('arrow',12)} Steady</span>`,new:`<span class="trend new">${ic('info',12)} Too few calls</span>`})[t];
+function flagsHtml(q,uid,star){
+  let h='';
+  if(q.coaching)h+=`<span class="flag coach">${ic('alert',12)} Needs coaching</span>`;
+  q.repeat.forEach(c=>h+=`<span class="flag repeat">${ic('undo',12)} Repeat issue: ${c}</span>`);
+  if(star===uid)h+=`<span class="flag star">${ic('check',12)} Most improved</span>`;
+  return h;
+}
+function sparkline(sc){
+  const pts=sc.slice(-6);if(!pts.length)return '<span class="muted">—</span>';
+  const W=84,H=26,y=v=>H-3-(Math.max(40,Math.min(100,v))-40)/60*(H-6),x=i=>pts.length===1?W/2:3+i*(W-6)/(pts.length-1);
+  const tg=y(S.rules.qualityTarget);
+  return `<svg class="spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-label="Last ${pts.length} scores: ${pts.join(', ')}%"><line x1="0" x2="${W}" y1="${tg}" y2="${tg}" stroke="var(--border)" stroke-dasharray="3 3"/><polyline fill="none" stroke="var(--primary)" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" points="${pts.map((v,i)=>x(i)+','+y(v)).join(' ')}"/><circle cx="${x(pts.length-1)}" cy="${y(pts.at(-1))}" r="3" fill="var(--primary)"/></svg>`;
+}
+function lineChart(all){
+  const sc=all.map(r=>scoreOf(r.data.ratings));if(!sc.length)return '<div class="empty-mini">No evaluations yet.</div>';
+  const W=420,H=170,L=34,R=12,Tp=12,B=26,lo=40,hi=100,tgt=S.rules.qualityTarget;
+  const y=v=>Tp+(hi-v)/(hi-lo)*(H-Tp-B),x=i=>sc.length===1?(L+W-R)/2:L+i*(W-L-R)/(sc.length-1);
+  let g='';[50,60,70,80,90,100].forEach(v=>{g+=`<line class="gl" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L-6}" y="${y(v)+3.5}" text-anchor="end">${v}</text>`});
+  g+=`<line class="tl" x1="${L}" x2="${W-R}" y1="${y(tgt)}" y2="${y(tgt)}"/><text x="${W-R}" y="${y(tgt)-5}" text-anchor="end">Target ${tgt}%</text>`;
+  g+=`<polyline class="ln" points="${sc.map((v,i)=>x(i)+','+y(v)).join(' ')}"/>`;
+  g+=all.map((r,i)=>`<circle class="pt" cx="${x(i)}" cy="${y(sc[i])}" r="4.5" data-action="openRec" data-id="${r.id}"><title>${fmt(r.data.date)} · ${sc[i]}% · ${esc(r.data.callType||'')} · by ${esc(user(r.createdBy).name)}</title></circle>`).join('');
+  g+=`<text x="${x(0)}" y="${H-6}" text-anchor="${sc.length===1?'middle':'start'}">${fmt(all[0].data.date)}</text>`;
+  if(sc.length>1)g+=`<text x="${x(sc.length-1)}" y="${H-6}" text-anchor="end">${fmt(all.at(-1).data.date)}</text>`;
+  return `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Call scores over time">${g}</svg></div>`;
+}
+const heatBg=v=>{if(v==null)return 'var(--surface-2)';const p=Math.round(8+Math.max(0,Math.min(1,(v-50)/50))*82);return `color-mix(in srgb,var(--primary) ${p}%,var(--surface))`};
+const heatInk=v=>v!=null&&(8+Math.max(0,(v-50)/50)*82)>52?'var(--primary-ink)':'var(--text)';
+function qScope(){
+  const days=ui.q.days,T=today().getTime(),from=T-days*86400000,pfrom=T-2*days*86400000;
+  const staff=staffUsers().filter(u=>ui.q.team==='all'||String(u.team)===ui.q.team);
+  const ids=staff.map(u=>u.id);
+  const evs=S.records.filter(r=>r.kind==='eval'&&ids.includes(r.recipients[0])&&r.data.countInScore!==false);
+  return {days,from,staff,ids,cur:evs.filter(r=>evalTime(r)>=from),prev:evs.filter(r=>evalTime(r)>=pfrom&&evalTime(r)<from)};
+}
+function viewQuality(){
+  const Q=qScope(),tgt=S.rules.qualityTarget,star=mostImproved(Q.ids);
+  const curAvg=avgOf(Q.cur.map(r=>scoreOf(r.data.ratings))),prevAvg=avgOf(Q.prev.map(r=>scoreOf(r.data.ratings)));
+  const diff=curAvg!=null&&prevAvg!=null?curAvg-prevAvg:null;
+  const notEval=Q.staff.filter(u=>!Q.cur.some(r=>r.recipients[0]===u.id));
+  const reqAck=Q.cur.filter(r=>r.requireAck),acked=reqAck.filter(r=>r.acks[r.recipients[0]]);
+  const qs=Object.fromEntries(Q.staff.map(u=>[u.id,staffQuality(u.id)]));
+  const attention=Q.staff.filter(u=>qs[u.id].coaching||qs[u.id].repeat.length);
+  const per=u=>{const e=Q.cur.filter(r=>r.recipients[0]===u.id);return {n:e.length,avg:avgOf(e.map(r=>scoreOf(r.data.ratings))),last:e.length?e.reduce((a,b)=>evalTime(b)>evalTime(a)?b:a):null,crit:CRITERIA.map((c,i)=>avgOf(e.map(r=>r.data.ratings[i]*20)))}};
+  const P=Object.fromEntries(Q.staff.map(u=>[u.id,per(u)]));
+  const order=[...Q.staff].sort((a,b)=>(P[b.id].avg??-1)-(P[a.id].avg??-1));
+  const lb=order.map(u=>{const p=P[u.id],q=qs[u.id];return `<tr data-action="openStaff" data-id="${u.id}">
+    <td style="white-space:nowrap"><span class="av">${initials(u.name)}</span><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:12px;margin-left:36px">${TEAMS[u.team].split(' · ')[1]}</div></td>
+    <td class="num-cell"><span class="score-cell${p.avg!=null&&p.avg<tgt?' below':''}">${p.avg!=null?p.avg+'%':'—'}</span>${p.avg!=null&&p.avg<tgt?`<div style="font-size:11px;color:var(--bad);font-weight:600">${ic('alert',11)} below target</div>`:''}</td>
+    <td>${sparkline(q.sc)}</td><td class="num-cell">${p.n}</td><td>${trendBadge(q.trend)}</td><td style="min-width:160px">${flagsHtml(q,u.id,star)||'<span class="muted">—</span>'}</td>
+    <td class="muted" style="white-space:nowrap">${p.last?fmt(p.last.data.date):'Not in period'}</td></tr>`}).join('');
+  const teamCrit=CRITERIA.map((c,i)=>avgOf(Q.cur.map(r=>r.data.ratings[i]*20)));
+  const weakI=teamCrit.every(v=>v==null)?null:teamCrit.reduce((a,v,i)=>v!=null&&(teamCrit[a]==null||v<teamCrit[a])?i:a,0);
+  const cell=(v,tip)=>`<td><span class="hc" style="background:${heatBg(v)};color:${heatInk(v)}" title="${tip}">${v!=null?v:'—'}</span></td>`;
+  const heat=order.map(u=>`<tr data-action="openStaff" data-id="${u.id}"><td style="white-space:nowrap;font-weight:600">${esc(u.name)}</td>${P[u.id].crit.map((v,i)=>cell(v,`${esc(u.name)} · ${CRITERIA[i]}: ${v??'no data'}%`)).join('')}</tr>`).join('');
+  const types=CALL_TYPES.map(t=>{const e=Q.cur.filter(r=>r.data.callType===t);return [t,avgOf(e.map(r=>scoreOf(r.data.ratings))),e.length]});
+  const evaluators=USERS.filter(u=>u.role==='wfm').map(u=>{const e=Q.cur.filter(r=>r.createdBy===u.id);return [u,avgOf(e.map(r=>scoreOf(r.data.ratings))),e.length]}).filter(x=>x[2]);
+  const label={30:'last 30 days',90:'last 90 days',365:'last 12 months'}[Q.days];
+  return head('Call quality',`Evaluation results · ${label}`,`<button class="btn" data-action="exportCycle">${ic('download',16)} Cycle summary</button>`)+
+  `<div class="q-filters"><select class="input" data-q="days">${[[30,'Last 30 days'],[90,'Last 90 days'],[365,'Last 12 months']].map(([v,l])=>opt(v,l,Q.days===v)).join('')}</select>
+   <select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAMS.map((t,i)=>opt(String(i),t,ui.q.team===String(i))).join('')}</select></div>
+  <div class="stats">
+   <div class="card stat"><span>Team average</span><b${curAvg!=null&&curAvg<tgt?' style="color:var(--bad)"':''}>${curAvg!=null?curAvg+'%':'—'}</b><small>${diff==null?`target ${tgt}%`:`<span class="delta ${diff>=0?'up':'down'}">${diff>=0?'▲':'▼'} ${Math.abs(diff)} pts</span> vs previous period`}</small></div>
+   <div class="card stat"><span>Evaluations</span><b>${Q.cur.length}</b><small>${Q.prev.length} in previous period</small></div>
+   <div class="card stat"><span>Not evaluated</span><b style="color:${notEval.length?'var(--warn)':'var(--ok)'}">${notEval.length}</b><small>${notEval.length?esc(notEval.map(u=>u.name.split(' ')[0]).join(', ')):'everyone covered'}</small></div>
+   <div class="card stat"><span>Feedback acknowledged</span><b>${reqAck.length?Math.round(acked.length/reqAck.length*100)+'%':'—'}</b><small>${acked.length} of ${reqAck.length} evaluations</small></div>
+  </div>
+  ${attention.length?callout('warn','alert',`${attention.length} staff need attention`,attention.map(u=>`${esc(u.name)}: ${[qs[u.id].coaching?'below target twice in a row':'',...qs[u.id].repeat.map(c=>'low '+c+' 3 times')].filter(Boolean).join(', ')}`).join(' · ')):''}
+  <div class="card" style="margin-bottom:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Leaderboard <span class="muted" style="font-weight:500">· tap a name for the full profile</span></h2></div>
+   <div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Average</th><th>Last 6 calls</th><th class="num-cell">Calls</th><th>Trend</th><th>Flags</th><th>Last evaluated</th></tr></thead><tbody>${lb}</tbody></table></div></div>
+  <div class="card" style="margin-bottom:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Criteria heatmap ${weakI!=null?`<span class="muted" style="font-weight:500">· team’s weakest: ${CRITERIA[weakI]} (${teamCrit[weakI]}%)</span>`:''}</h2></div>
+   <div class="table-wrap"><table class="heat"><thead><tr><th>Staff</th>${SHORT_CRIT.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${heat}</tbody>
+   <tfoot><tr><td>Team</td>${teamCrit.map((v,i)=>cell(v,`Team · ${CRITERIA[i]}: ${v??'no data'}%`)).join('')}</tr></tfoot></table></div>
+   <div class="heat-legend">50%<i></i>100% · average score per criterion</div></div>
+  <div class="grid-2" style="grid-template-columns:1fr 1fr">
+   <div class="card card-pad"><h2>By call type</h2><div class="bars">${types.map(([t,a,n])=>`<div class="bar-row" style="grid-template-columns:130px 1fr 72px"><span>${t}</span><div class="bar-track"><div class="bar-fill" style="width:${a||0}%;--c:var(--primary)"></div></div><b>${a!=null?a+'%':'—'} <span class="muted" style="font-weight:500">· ${n}</span></b></div>`).join('')}</div><div class="flow-note">Average score · number of calls</div></div>
+   <div class="card card-pad"><h2>Evaluator calibration</h2>${evaluators.length?`<div class="bars">${evaluators.map(([u,a,n])=>{const d=curAvg!=null?a-curAvg:0;return `<div class="bar-row" style="grid-template-columns:130px 1fr 72px"><span>${esc(u.name)}</span><div class="bar-track"><div class="bar-fill" style="width:${a}%;--c:var(--primary)"></div></div><b>${a}% <span class="muted" style="font-weight:500">· ${n}</span></b></div><div class="flow-note" style="margin:-6px 0 4px">${Math.abs(d)<=3?'In line with the team average':d<0?`Scores ${-d} pts lower than average — stricter`:`Scores ${d} pts higher than average — more lenient`}</div>`}).join('')}</div>`:'<div class="empty-mini">No evaluations in this period.</div>'}</div>
+  </div>`;
+}
+function staffDrawer(uid){
+  const u=user(uid),q=staffQuality(uid),tgt=S.rules.qualityTarget,star=mostImproved(staffUsers().map(x=>x.id));
+  const vio=S.records.filter(r=>r.kind==='vio'&&r.recipients.includes(uid)).length,adh=S.records.filter(r=>r.kind==='adh'&&r.recipients.includes(uid)).length;
+  const kpi=S.requests.filter(r=>r.type==='kpi'&&r.userId===uid&&r.status==='approved').length;
+  const y=today().getFullYear(),leave=S.requests.filter(r=>r.type==='leave'&&r.userId===uid&&r.status==='approved'&&r.data.start.slice(0,4)==String(y)).reduce((a,r)=>a+daysBetween(r.data.start,r.data.end),0);
+  const list=[...q.all].reverse().map(r=>{const sc=scoreOf(r.data.ratings);return `<div class="req-card" data-action="openRec" data-id="${r.id}" role="button" tabindex="0"><div class="req-main"><div class="req-title"><span class="score-cell${sc<tgt?' below':''}">${sc}%</span> <small>${fmt(r.data.date)} · ${esc(r.data.callType||'—')} · by ${esc(user(r.createdBy).name)}</small></div><div class="req-sub" style="white-space:normal">${esc(r.data.feedback)}</div></div><div class="req-side">${r.requireAck?ackPill(!!r.acks[uid]):''}</div></div>`}).join('');
+  const fl=flagsHtml(q,uid,star);
+  return `<div class="sheet-handle"></div><div class="d-head">${avatar(u)}<div><h3>${esc(u.name)}</h3><small>${u.emp} · ${esc(TEAMS[u.team])}</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div>
+  <div class="d-body">
+   <div class="score-box"><div class="score-num" style="color:${q.recent==null?'var(--faint)':q.recent>=tgt?'var(--ok)':'var(--bad)'}">${q.recent!=null?q.recent+'%':'—'}</div><div><b>Average of last ${Math.min(6,q.sc.length)} calls</b><span style="display:block">Target ${tgt}% · ${q.sc.length} evaluation(s) in total</span><div style="margin-top:6px">${trendBadge(q.trend)}</div></div></div>
+   ${fl?`<div class="d-section">${fl}</div>`:''}
+   <div class="d-section"><h4>Score over time</h4>${lineChart(q.all)}</div>
+   ${q.all.length?`<div class="d-section"><h4>Strengths &amp; focus</h4><div class="ins"><div><span>Strongest</span><b>${CRITERIA[q.strong]} · ${q.crit[q.strong]}%</b></div><div><span>Focus area</span><b>${CRITERIA[q.weak]} · ${q.crit[q.weak]}%</b></div></div></div>`:''}
+   <div class="d-section"><h4>Other records · ${y}</h4><div class="ins"><div><span>Violations</span><b>${vio}</b></div><div><span>Adherence notes</span><b>${adh}</b></div><div><span>KPI requests accepted</span><b>${kpi}</b></div><div><span>Leave days taken</span><b>${leave}</b></div></div></div>
+   <div class="d-section"><h4>Feedback history</h4>${list?`<div class="req-list">${list}</div>`:'<div class="empty-mini">No evaluations yet.</div>'}</div>
+  </div><div class="d-foot"><button class="btn primary" data-action="newEvalFor" data-id="${uid}">${ic('plus',16)} New call evaluation</button></div>`;
+}
+function exportCycle(){
+  const Q=qScope(),from=Q.from,star=mostImproved(Q.ids),trendTxt={up:'Improving',down:'Slipping',flat:'Steady',new:'Too few calls'};
+  const cols=['Employee','Employee ID','Team','Evaluations','Avg call score %','Trend','Flags','KPI requests accepted','Violations','Adherence notes'];
+  const rows=Q.staff.map(u=>{const e=Q.cur.filter(r=>r.recipients[0]===u.id),q=staffQuality(u.id);
+    const fl=[q.coaching?'Needs coaching':'',...q.repeat.map(c=>'Repeat issue: '+c),star===u.id?'Most improved':''].filter(Boolean).join('; ');
+    return [u.name,u.emp,TEAMS[u.team],e.length,avgOf(e.map(r=>scoreOf(r.data.ratings)))??'',trendTxt[q.trend],fl,
+      S.requests.filter(r=>r.type==='kpi'&&r.userId===u.id&&r.status==='approved'&&r.createdAt>=from).length,
+      S.records.filter(r=>r.kind==='vio'&&r.recipients.includes(u.id)&&r.createdAt>=from).length,
+      S.records.filter(r=>r.kind==='adh'&&r.recipients.includes(u.id)&&r.createdAt>=from).length]});
+  const csv='﻿'+[cols,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=`cycle-summary-${iso(today())}.csv`;document.body.appendChild(a);a.click();a.remove();
+  toast(`Cycle summary exported · ${rows.length} staff`);
+}
+
 /* ================= Drawer ================= */
 function openDrawer(kind,id){ui.drawer={kind,id};
   if(kind==='rec'&&!isWfm()){const r=S.records.find(x=>x.id===id);if(r&&r.recipients.includes(S.current)&&!r.reads[S.current]){r.reads[S.current]=Date.now();rpc('mark_read',{p_id:id,p_uid:S.current}).catch(()=>{})}}
@@ -988,6 +1166,7 @@ function openDrawer(kind,id){ui.drawer={kind,id};
 function closeDrawer(silent){ui.drawer=null;$('#overlay').classList.remove('open');$('#drawer').classList.remove('open');$('#drawer').setAttribute('aria-hidden','true');if(!silent)render()}
 function renderDrawer(){
   const d=ui.drawer,el=$('#drawer');
+  if(d.kind==='staff'){el.innerHTML=staffDrawer(d.id);return}
   if(d.kind==='req'){const r=S.requests.find(x=>x.id===d.id);if(!r)return closeDrawer();el.innerHTML=reqDrawer(r)}
   else{const r=S.records.find(x=>x.id===d.id);if(!r)return closeDrawer();el.innerHTML=recDrawer(r)}
 }
@@ -1036,7 +1215,7 @@ function recDrawer(r){
   if(r.kind==='eval'){
     const sc=scoreOf(x.ratings);
     body=`<div class="score-box"><div class="score-num" style="color:${sc>=85?'var(--ok)':sc>=70?'var(--warn)':'var(--bad)'}">${sc}%</div><div><b>${sc>=85?'Good call':sc>=70?'Room to improve':'Needs attention'}</b><span style="display:block">Evaluated by ${esc(user(r.createdBy).name)} · ${fmtL(iso(new Date(r.createdAt)))}</span></div></div>
-    <div class="d-section"><h4>Call</h4><div class="kv">${kv('Call date',`${fmtL(x.date)}${x.time?', '+esc(x.time):''}`)+kv('Call ID',esc(x.callId||'—'))}</div></div>
+    <div class="d-section"><h4>Call</h4><div class="kv">${kv('Call date',`${fmtL(x.date)}${x.time?', '+esc(x.time):''}`)+kv('Call ID',esc(x.callId||'—'))+kv('Call type',esc(x.callType||'—'))+kv('Evaluator',esc(user(r.createdBy).name))}</div></div>
     <div class="d-section"><h4>Scores</h4><div class="bars">${CRITERIA.map((c,i)=>{const v=x.ratings[i]*20;return `<div class="bar-row" style="grid-template-columns:150px 1fr 40px"><span>${c}</span><div class="bar-track"><div class="bar-fill" style="width:${v}%;--c:${v>=90?'var(--ok)':v>=80?'var(--primary)':'var(--warn)'}"></div></div><b>${v}%</b></div>`}).join('')}</div></div>
     <div class="d-section"><h4>Feedback</h4><div class="note-box">${esc(x.feedback)}</div></div>`;
   }else if(r.kind==='mom'){
@@ -1101,7 +1280,7 @@ function submitRequest(){
 }
 function submitRecord(){
   const f=ui.form,v=f.vals,e={};let data={},recipients=[v.staff];
-  if(f.kind==='eval'){if(!v.date)e.date='Pick the date';if(!f.ratings.every(x=>x))e.ratings='Score every criterion';if(!(v.feedback||'').trim())e.feedback='Feedback is required';data={date:v.date,time:v.time||'',callId:v.callId||'',ratings:[...f.ratings],feedback:v.feedback||'',countInScore:!!v.countInScore}}
+  if(f.kind==='eval'){if(!v.date)e.date='Pick the date';if(!f.ratings.every(x=>x))e.ratings='Score every criterion';if(!(v.feedback||'').trim())e.feedback='Feedback is required';data={date:v.date,time:v.time||'',callId:v.callId||'',callType:v.callType||CALL_TYPES[0],ratings:[...f.ratings],feedback:v.feedback||'',countInScore:!!v.countInScore}}
   if(f.kind==='vio'){if(!v.date)e.date='Pick the date';if(!(v.details||'').trim())e.details='Details are required';data={vtype:v.vtype,date:v.date,details:v.details||''}}
   if(f.kind==='adh'){if(!v.from)e.from='Required';if(!v.to)e.to='Required';if(v.from&&v.to&&v.to<v.from)e.to='Must be after “From”';data={reason:v.reason,from:v.from,to:v.to,note:v.note||''}}
   if(f.kind==='mom'){recipients=momRecipients(f);if(f.sendTo==='teams'&&!f.teams.length)e.teams='Pick at least one team';if(!(v.title||'').trim())e.title='Title is required';if(!v.date)e.date='Pick the date';if(!(v.summary||'').trim())e.summary='Summary is required';data={title:v.title,date:v.date,summary:v.summary||'',actions:v.actions||'',sendTo:f.sendTo,teams:[...f.teams]}}
@@ -1160,6 +1339,9 @@ document.addEventListener('click',ev=>{
     case 'inboxFilter':ui.inboxFilter=el.dataset.f;render();break;
     case 'openReq':openDrawer('req',id);break;
     case 'openRec':openDrawer('rec',id);break;
+    case 'openStaff':openDrawer('staff',id);break;
+    case 'newEvalFor':ui.form=newRecForm('eval');ui.form.vals.staff=id;go('createForm');break;
+    case 'exportCycle':exportCycle();break;
     case 'closeDrawer':closeDrawer();break;
     case 'decide':decide(id,el.dataset.d,(($('#decisionComment')||{}).value||'').trim());break;
     case 'quickDecide':openDrawer('req',id);setTimeout(()=>{const c=$('#decisionComment');if(c){c.focus();c.placeholder=`Comment required to ${el.dataset.d}`}},260);toast(`Add a comment, then tap ${el.dataset.d==='return'?'Return':'Reject'}`);break;
@@ -1176,8 +1358,9 @@ document.addEventListener('click',ev=>{
     case 'momTo':ui.form.sendTo=el.dataset.s;render();break;
     case 'momTeam':{const t=+el.dataset.t,arr=ui.form.teams,i=arr.indexOf(t);i>=0?arr.splice(i,1):arr.push(t);render();break}
     case 'limit':ui.rulesDraft.leaveLimit=Math.max(1,Math.min(20,ui.rulesDraft.leaveLimit+(+el.dataset.d)));render();break;
+    case 'qTarget':ui.rulesDraft.qualityTarget=Math.max(50,Math.min(100,ui.rulesDraft.qualityTarget+(+el.dataset.d)));render();break;
     case 'toggleCountPending':ui.rulesDraft.countPending=!ui.rulesDraft.countPending;render();break;
-    case 'saveRules':{const R=ui.rulesDraft;busy(async()=>{await api('rules?id=eq.1',{method:'PATCH',body:{leave_limit:R.leaveLimit,count_pending:R.countPending}});await fetchAll();ui.rulesDraft=null;render();toast('Rules saved')});break}
+    case 'saveRules':{const R=ui.rulesDraft;busy(async()=>{await api('rules?id=eq.1',{method:'PATCH',body:{leave_limit:R.leaveLimit,count_pending:R.countPending,quality_target:R.qualityTarget}});await fetchAll();ui.rulesDraft=null;render();toast('Rules saved')});break}
     case 'rmBlock':busy(async()=>{await api(`blocks?id=eq.${encodeURIComponent(id)}`,{method:'DELETE'});await fetchAll();render();toast('Block removed')});break;
     case 'addBlock':{const b=ui.blockForm;
       if(!b.from||!b.to){toast('Set both dates',true);break}if(b.to<b.from){toast('“To” must be after “From”',true);break}if(!b.reason.trim()){toast('Add a reason staff will see',true);break}
@@ -1201,6 +1384,7 @@ document.addEventListener('change',ev=>{
   if(t.matches('[data-file]')){readFiles(t.files);t.value='';return}
   if(t.dataset.bf==='scope'){ui.blockForm.scope=t.value;ui.blockForm.target=t.value==='user'?staffUsers()[0].id:t.value==='team'?'0':null;render();return}
   if(t.dataset.filter){ui.filters[t.dataset.filter]=t.value;const res=$('#results');if(res)res.innerHTML=resultsHtml();return}
+  if(t.dataset.q){ui.q[t.dataset.q]=t.dataset.q==='days'?+t.value:t.value;render();return}
   if(ui.form&&t.name&&t.closest('#reqForm,#recForm')){ui.form.vals[t.name]=t.value;
     if(['date','partnerId','period','staff'].includes(t.name))render();}
 });
@@ -1209,7 +1393,7 @@ document.addEventListener('dragover',ev=>{if(ev.target.closest('.drop'))ev.preve
 document.addEventListener('drop',ev=>{const d=ev.target.closest('.drop');if(d){ev.preventDefault();readFiles(ev.dataTransfer.files)}});
 
 /* ================= Boot ================= */
-S={current:null,requests:[],records:[],rules:{leaveLimit:2,countPending:true,blocks:[]}};
+S={current:null,requests:[],records:[],rules:{leaveLimit:2,countPending:true,qualityTarget:85,blocks:[]}};
 try{S.current=localStorage.getItem(KEY)}catch(e){}
 if(S.current&&!USERS.some(u=>u.id===S.current))S.current=null;
 (function(){const T=today();ui.blockForm.from=iso(T);ui.blockForm.to=iso(addDays(T,14))})();
