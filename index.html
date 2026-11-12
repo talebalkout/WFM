@@ -504,6 +504,13 @@ main{min-width:0}
 .req-card.inactive{opacity:.6}
 .req-card.editing{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
 .req-card .avatar{flex:none}
+.signin-wrap{display:flex;gap:20px;align-items:flex-start;justify-content:center;flex-wrap:wrap;width:100%;max-width:1000px}
+.signin-wrap>.card:first-child{max-width:400px;flex:1 1 320px}
+.signin-page .test-card{max-width:560px;flex:1 1 360px;padding:20px;text-align:left}
+.test-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.test-head b{font-size:15px}
+.test-table td,.test-table th{padding:8px 8px}
+.test-table code{font-size:12.5px;background:var(--surface-2);padding:2px 6px;border-radius:5px}
 .login-form{display:flex;flex-direction:column;gap:14px;text-align:left}
 .login-form .btn{width:100%;padding:11px}
 .mini-h{font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin:16px 0 8px}
@@ -658,6 +665,20 @@ async function poll(){
   if(document.hidden||working||!S.current)return;
   try{const ch=await fetchAll();if(!ch)return;if(!sessionValid()){signOut('You were signed out — your account changed. Please sign in again.');return}const a=document.activeElement;if(a&&a.matches('input,textarea,select'))return;render()}catch(e){}
 }
+/* ---- TEST ONLY: remembers passwords on this device so testers can switch users quickly. Remove before real use. ---- */
+const TPW='wfm-test-passwords';
+const testPw=()=>{try{return JSON.parse(localStorage.getItem(TPW))||{}}catch(e){return {}}};
+const rememberPw=(emp,pw)=>{try{const m=testPw();m[String(emp).toLowerCase()]=pw;localStorage.setItem(TPW,JSON.stringify(m))}catch(e){}};
+function testUsersCard(){
+  const known=testPw(),list=[...USERS].filter(u=>u.active).sort((a,b)=>(a.role===b.role?0:a.role==='wfm'?-1:1)||a.name.localeCompare(b.name));
+  const pwOf=u=>known[u.emp.toLowerCase()]||(u.mustChange?'Wfm@2026':null);
+  return `<div class="card test-card"><div class="test-head"><b>Test users</b><span class="pill need">Testing only</span></div>
+  <div class="flow-note" style="margin:0 0 10px">Tap <b>Use</b> to sign in. Passwords you set on this device are remembered here.</div>
+  <div class="table-wrap"><table class="mini-table test-table"><thead><tr><th>Name</th><th>Employee ID</th><th>Password</th><th></th></tr></thead><tbody>
+  ${list.map(u=>{const pw=pwOf(u);return `<tr><td><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:11.5px">${u.role==='wfm'?'WFM / Manager':esc(teamName(u.team))}</div></td>
+   <td style="font-variant-numeric:tabular-nums">${esc(u.emp)}</td><td>${pw?`<code>${esc(pw)}</code>`:'<span class="muted" style="font-size:12px">Changed elsewhere</span>'}</td>
+   <td style="text-align:right"><button class="btn sm${pw?' primary':''}" data-action="useTest" data-emp="${esc(u.emp)}" data-pw="${esc(pw||'')}">Use</button></td></tr>`}).join('')}</tbody></table></div></div>`;
+}
 function signIn(id){S.current=id;if(!ui.blockForm.target)ui.blockForm.target=(staffUsers()[0]||{}).id;ui.pending=null;ui.view=user(id).role==='wfm'?'dash':'new';ui.form=null;ui.rulesDraft=null;ui.listDraft=null;save();closeDrawer(true);render();window.scrollTo(0,0);toast(`Welcome, ${user(id).name.split(' ')[0]}`)}
 function signOut(msg){S.current=null;ui.pending=null;ui.drawer=null;save();closeDrawer(true);render();if(msg)toast(msg,true)}
 const sessionValid=()=>{const u=USERS.find(x=>x.id===S.current);return !!(u&&u.active&&!u.mustChange)};
@@ -768,10 +789,10 @@ function renderSignin(){
   if(ui.pending)return `<div class="signin-page"><div class="card"><div class="logo">${ic('lock',24)}</div><h1>Choose a new password</h1><p>Hi ${esc(user(ui.pending.id).name.split(' ')[0])} — please replace your temporary password before you continue.</p>
    <form id="newPwForm" class="login-form" novalidate>${field('New password','<input type="password" name="new1" autocomplete="new-password" autofocus>',{hint:'At least 6 characters'})}${field('Repeat new password','<input type="password" name="new2" autocomplete="new-password">')}
    <button type="submit" class="btn primary">${ic('check',16)} Save and continue</button><button type="button" class="btn" data-action="cancelPending">Back to sign in</button></form></div></div>`;
-  return `<div class="signin-page"><div class="card"><div class="logo">${ic('layers',24)}</div><h1>WFM Requests</h1><p>Sign in with your employee ID.</p>
+  return `<div class="signin-page"><div class="signin-wrap"><div class="card"><div class="logo">${ic('layers',24)}</div><h1>WFM Requests</h1><p>Sign in with your employee ID.</p>
    <form id="loginForm" class="login-form" novalidate>${field('Employee ID',`<input name="emp" value="${esc(ui.lastEmp||'')}" autocomplete="username" autocapitalize="characters" placeholder="e.g. E1042">`)}${field('Password','<input type="password" name="pw" autocomplete="current-password">')}
    <button type="submit" class="btn primary">${ic('next',16)} Sign in</button></form>
-   <div class="side-foot" style="border:0;margin-top:10px;text-align:center">Forgot your password? Ask WFM to reset it.<br>Test version · use dummy information only.</div></div></div>`;
+   <div class="side-foot" style="border:0;margin-top:10px;text-align:center">Forgot your password? Ask WFM to reset it.<br>Test version · use dummy information only.</div></div>${testUsersCard()}</div></div>`;
 }
 function renderView(){
   const v=ui.view;
@@ -1580,6 +1601,7 @@ document.addEventListener('click',ev=>{
   if(el.tagName==='BUTTON'&&el.closest('.req-card')&&a!=='openReq')ev.stopPropagation();
   switch(a){
     case 'account':openDrawer('account');break;
+    case 'useTest':{const lf=$('#loginForm');if(!lf)break;lf.emp.value=el.dataset.emp;lf.pw.value=el.dataset.pw;if(el.dataset.pw)lf.requestSubmit();else{lf.pw.focus();toast('Type this user’s password',true)}break}
     case 'signOut':signOut();break;
     case 'cancelPending':ui.pending=null;render();break;
     case 'adminTab':ui.adminTab=el.dataset.t;render();break;
@@ -1592,11 +1614,11 @@ document.addEventListener('click',ev=>{
       if(e.length){toast('Please add '+e.join(', '),true);break}
       if(USERS.some(u=>u.emp.toLowerCase()===f.emp.trim().toLowerCase()&&u.id!==f.id)){toast('That employee ID is already used',true);break}
       busy(async()=>{await rpc('admin_save_user',{p_id:f.id||null,p_emp:f.emp,p_name:f.name,p_role:f.role,p_title:f.role==='wfm'?(f.title||null):null,p_team:f.role==='staff'?+f.team:null,p_active:f.active,p_pw:f.id?null:f.pw});
-        await fetchAll();closeDrawer();toast(f.id?'User updated':`${f.name.trim()} created · temporary password: ${f.pw}`)});break}
+        if(!f.id)rememberPw(f.emp.trim(),f.pw);await fetchAll();closeDrawer();toast(f.id?'User updated':`${f.name.trim()} created · temporary password: ${f.pw}`)});break}
     case 'userPw':ui.tmpPw=genPw();openDrawer('pw',id);break;
     case 'genPw':ui.tmpPw=genPw();const tp=$('#tmpPw');if(tp)tp.value=ui.tmpPw;break;
     case 'pwReset':{const pw=(($('#tmpPw')||{}).value||'').trim();if(pw.length<6){toast('Use at least 6 characters',true);break}
-      busy(async()=>{await rpc('admin_reset_password',{p_id:id,p_pw:pw});await fetchAll();closeDrawer();toast(`Password reset · share it with ${user(id).name}: ${pw}`);if(id===S.current)signOut('Your password was reset. Sign in with the new one.')});break}
+      busy(async()=>{await rpc('admin_reset_password',{p_id:id,p_pw:pw});rememberPw(user(id).emp,pw);await fetchAll();closeDrawer();toast(`Password reset · share it with ${user(id).name}: ${pw}`);if(id===S.current)signOut('Your password was reset. Sign in with the new one.')});break}
     case 'saveTeam':{const inp=document.querySelector(`[data-team="${id}"]`),name=(inp&&inp.value||'').trim();if(!name){toast('Team name can’t be empty',true);break}
       busy(async()=>{await api(`teams?id=eq.${id}`,{method:'PATCH',body:{name}});await fetchAll();render();toast('Team renamed')});break}
     case 'addTeam':{const name=(($('#newTeam')||{}).value||'').trim();if(!name){toast('Type a team name first',true);break}
@@ -1693,13 +1715,13 @@ document.addEventListener('change',ev=>{
 document.addEventListener('submit',ev=>{ev.preventDefault();const f=ev.target;
   if(f.id==='reqForm')submitRequest();if(f.id==='recForm')submitRecord();
   if(f.id==='loginForm'){const emp=f.emp.value.trim(),pw=f.pw.value;ui.lastEmp=emp;if(!emp||!pw){toast('Enter your employee ID and password',true);return}
-    busy(async()=>{const r=await rpc('login',{p_emp:emp,p_pw:pw});if(!r){toast('Wrong employee ID or password',true);return}await fetchAll();
+    busy(async()=>{const r=await rpc('login',{p_emp:emp,p_pw:pw});if(!r){toast('Wrong employee ID or password',true);return}rememberPw(emp,pw);await fetchAll();
       if(r.must_change){ui.pending={id:r.id,old:pw};render();return}signIn(r.id)})}
   if(f.id==='newPwForm'){const a=f.new1.value,b=f.new2.value;if(a.length<6){toast('Use at least 6 characters',true);return}if(a!==b){toast('The two passwords don’t match',true);return}
     if(a===ui.pending.old){toast('Choose a password different from the temporary one',true);return}
-    busy(async()=>{await rpc('change_password',{p_id:ui.pending.id,p_old:ui.pending.old,p_new:a});await fetchAll();signIn(ui.pending.id)})}
+    busy(async()=>{await rpc('change_password',{p_id:ui.pending.id,p_old:ui.pending.old,p_new:a});rememberPw(user(ui.pending.id).emp,a);await fetchAll();signIn(ui.pending.id)})}
   if(f.id==='acctPwForm'){const o=f.old.value,a=f.new1.value,b=f.new2.value;if(!o){toast('Enter your current password',true);return}if(a.length<6){toast('Use at least 6 characters',true);return}if(a!==b){toast('The two new passwords don’t match',true);return}
-    busy(async()=>{await rpc('change_password',{p_id:S.current,p_old:o,p_new:a});f.reset();toast('Password updated')})}
+    busy(async()=>{await rpc('change_password',{p_id:S.current,p_old:o,p_new:a});rememberPw(me().emp,a);f.reset();toast('Password updated')})}
 });
 document.addEventListener('dragover',ev=>{if(ev.target.closest('.drop'))ev.preventDefault()});
 document.addEventListener('drop',ev=>{const d=ev.target.closest('.drop');if(d){ev.preventDefault();readFiles(ev.dataTransfer.files)}});
