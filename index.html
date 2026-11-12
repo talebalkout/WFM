@@ -521,6 +521,32 @@ main{min-width:0}
 .ans button.on.below,.ans button.on.no{background:var(--bad-soft);color:var(--bad)}
 .ans button.on.na{background:var(--neutral-soft);color:var(--neutral)}
 .ev-score{position:sticky;top:78px}
+.drawer.modal{top:50%;left:50%;right:auto;bottom:auto;width:min(1000px,94vw);height:min(90vh,940px);max-height:none;border-radius:18px;transform:translate(-50%,-47%);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;box-shadow:0 24px 60px rgba(0,0,0,.25)}
+.drawer.modal.open{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}
+.drawer.modal .sheet-handle{display:none}
+.drawer.modal .d-body{padding:22px 24px}
+.evm-top{display:grid;grid-template-columns:1fr 1.3fr 1.2fr;gap:14px;margin-bottom:16px}
+.evm-card{border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.evm-score{display:flex;flex-direction:column}
+.evm-score .score-num{font-size:40px;margin-bottom:4px}
+.evm-score>span{color:var(--muted);font-size:12.5px}
+.evm-feedback{margin-bottom:16px}
+.evm-feedback b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);margin-bottom:6px}
+.evm-sec{border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden}
+.evm-sec-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 14px;background:var(--surface-2);font-size:14px}
+.evm-sec-head span{font-size:13px;color:var(--muted)}
+.evm-table{width:100%;border-collapse:collapse;font-size:13px}
+.evm-table th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);text-align:left;padding:8px 14px;border-bottom:1px solid var(--border)}
+.evm-table th.ar-h{text-align:right;text-transform:none;letter-spacing:0;font-size:12px}
+.evm-table td{padding:9px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.evm-table tr:last-child td{border-bottom:0}
+.evm-table tbody tr:hover td{background:inherit}
+.evm-table td.en{font-weight:500;width:38%}
+.evm-table td.ar{color:var(--muted);text-align:right;width:36%}
+.evm-table td.res{width:1%;white-space:nowrap}
+.evm-table td.pts,.evm-table th.pts{width:1%;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.evm-table tr.avg td{background:color-mix(in srgb,var(--warn-soft) 60%,transparent)}
+.evm-table tr.below td{background:color-mix(in srgb,var(--bad-soft) 60%,transparent)}
 .ev-mscore{position:sticky;top:62px;z-index:5;display:flex;justify-content:space-between;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 12px;margin-bottom:12px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
 .ev-mscore b{font-size:15px}
 .ev-break{display:flex;flex-direction:column;gap:6px;font-size:13px}
@@ -589,6 +615,21 @@ body:has(.li-row.dragging){user-select:none}
 .btn.bad.icon{color:var(--bad)}
 @media (max-width:1000px){.grid-2[style],.even-rules,.perf-grid{grid-template-columns:1fr !important}}
 @media (max-width:820px){
+  .drawer.modal{top:0;left:0;width:100%;height:100%;border-radius:0;transform:translateY(3%)}
+  .drawer.modal.open{transform:none}
+  .drawer.modal .d-body{padding:16px}
+  .evm-top{grid-template-columns:1fr}
+  .evm-table thead{display:none}
+  .evm-table tr{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:9px 12px;border-bottom:1px solid var(--border)}
+  .evm-table tr:last-child{border-bottom:0}
+  .evm-table td{padding:0;border:0;width:auto!important}
+  .evm-table td{background:none!important}
+  .evm-table tr.avg{background:color-mix(in srgb,var(--warn-soft) 60%,transparent)}
+  .evm-table tr.below{background:color-mix(in srgb,var(--bad-soft) 60%,transparent)}
+  .evm-table td.en{grid-column:1}
+  .evm-table td.ar{grid-column:1;grid-row:2;text-align:right}
+  .evm-table td.res{grid-column:2;grid-row:1;text-align:right}
+  .evm-table td.pts{grid-column:2;grid-row:2}
   .ev-row{grid-template-columns:1fr;gap:6px}
   .ev-score{position:static}
   .ans{width:100%}.ans button{flex:1;min-width:0}
@@ -1726,6 +1767,8 @@ async function handlePerfFile(file){
 /* ================= Drawer ================= */
 function openDrawer(kind,id){ui.drawer={kind,id};
   if(kind==='rec'&&!isWfm()){const r=S.records.find(x=>x.id===id);if(r&&r.recipients.includes(S.current)&&!r.reads[S.current]){r.reads[S.current]=Date.now();rpc('mark_read',{p_id:id,p_uid:S.current}).catch(()=>{})}}
+  const isModal=kind==='rec'&&(()=>{const r=S.records.find(x=>x.id===id);return !!(r&&r.kind==='eval'&&r.data.result)})();
+  $('#drawer').classList.toggle('modal',isModal);
   render();$('#overlay').classList.add('open');$('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false')}
 function closeDrawer(silent){ui.drawer=null;$('#overlay').classList.remove('open');$('#drawer').classList.remove('open');$('#drawer').setAttribute('aria-hidden','true');if(!silent)render()}
 function renderDrawer(){
@@ -1782,6 +1825,24 @@ function reqDrawer(r){
   ${r.files.length?`<div class="d-section"><h4>Attachments</h4>${fileList(r.files)}</div>`:''}
   <div class="d-section"><h4>History</h4>${timeline(r)}</div></div>${foot}`;
 }
+function evalModalBody(r){
+  const x=r.data,R=x.result,form=x.form||EVAL_FORM,tgt=S.rules.qualityTarget,u=user(r.recipients[0]),ans=x.ans||{items:{},bonus:{},tags:{}};
+  const pct=v=>Math.max(0,Math.min(100,v));
+  const secCards=form.sections.map((sec,si)=>{const sr=R.sec[si]||{earned:0,max:0,pct:0};
+    const rows=sec.items.map((it,ii)=>{const a=(ans.items||{})[si+'_'+ii]||'good',pts=a==='good'||a==='na'?it.good:a==='avg'?it.avg:0;
+      return `<tr class="${a}"><td class="en">${esc(it.name)}</td><td class="ar" dir="rtl">${esc(it.ar||'')}</td><td class="res"><span class="achip ${a}">${ANS[a]}</span></td><td class="pts">${a==='na'?'—':pts} <span class="muted">/ ${it.good}</span></td></tr>`}).join('');
+    return `<div class="evm-sec"><div class="evm-sec-head"><b>${esc(sec.name)}</b><span><b>${sr.earned}</b> / ${sr.max} · ${sr.pct??0}%</span></div><table class="evm-table"><thead><tr><th>Factor</th><th class="ar-h">العامل</th><th>Result</th><th class="pts">Points</th></tr></thead><tbody>${rows}</tbody></table></div>`}).join('');
+  const bonus=(form.bonus||[]).length?`<div class="evm-sec"><div class="evm-sec-head"><b>Bonus</b><span><b>+${R.bonus}</b></span></div><table class="evm-table"><tbody>${form.bonus.map((b2,i)=>{const y=(ans.bonus||{})[i]==='yes';return `<tr class="${y?'good':''}"><td class="en">${esc(b2.name)}</td><td class="ar" dir="rtl">${esc(b2.ar||'')}</td><td class="res"><span class="achip ${y?'good':'na'}">${y?'Yes':'No'}</span></td><td class="pts">${y?'+'+b2.value:'0'}</td></tr>`}).join('')}</tbody></table></div>`:'';
+  const tags=R.tags.length?`<div class="evm-sec"><div class="evm-sec-head"><b>Quality tags</b><span class="${R.pen?'neg':''}"><b>${R.pen?'−'+R.pen:'0'}</b> · ${R.tags.filter(t=>t.a!=='no').length}/${R.tags.length} achieved</span></div><table class="evm-table"><tbody>${(form.tags||[]).map((g,i)=>{const t=R.tags[i]||{a:'yes'},no=t.a==='no';return `<tr class="${no?'below':''}"><td class="en">${esc(g.name)}</td><td class="ar" dir="rtl">${esc(g.ar||'')}</td><td class="res"><span class="achip ${no?'below':'good'}">${no?'Not achieved':'Achieved'}</span></td><td class="pts">${no?'−'+g.penalty:'0'}</td></tr>`}).join('')}</tbody></table></div>`:'';
+  return `<div class="evm-top">
+    <div class="evm-card evm-score"><div class="score-num" style="color:${R.overall>=tgt?'var(--ok)':'var(--bad)'}">${R.overall}%</div><b>Overall score</b><span>Target ${tgt}% · ${R.overall>=tgt?'on target':'below target'}</span>
+      <div class="ev-break" style="margin-top:12px"><div><span>Monitor score</span><b>${R.monitor}%</b></div><div><span>Bonus</span><b>+${R.bonus}</b></div><div><span>Tag deductions</span><b class="${R.pen?'neg':''}">${R.pen?'−'+R.pen:'0'}</b></div></div></div>
+    <div class="evm-card"><h4 class="mini-h" style="margin-top:0">Sections</h4><div class="bars">${R.sec.map(s2=>`<div class="bar-row" style="grid-template-columns:1fr 90px 64px"><span>${esc(s2.name)}</span><div class="bar-track"><div class="bar-fill" style="width:${pct(s2.pct||0)}%;--c:var(--primary)"></div></div><b>${s2.earned}/${s2.max}</b></div>`).join('')}</div></div>
+    <div class="evm-card"><h4 class="mini-h" style="margin-top:0">Call</h4><div class="kv">${kv('Staff',esc(u.name))+kv('Call date',`${fmtL(x.date)}${x.time?', '+esc(x.time):''}`)+kv('Call ID',esc(x.callId||'—'))+kv('Call type',esc(x.callType||'—'))+kv('Evaluator',esc(user(r.createdBy).name),1)}</div></div>
+  </div>
+  ${x.feedback?`<div class="evm-feedback"><b>Feedback</b><div class="note-box">${esc(x.feedback)}</div></div>`:''}
+  ${secCards}${bonus}${tags}`;
+}
 function evalBreakdownHtml(x){
   const R=x.result,form=x.form||EVAL_FORM;
   return `<div class="d-section"><h4>Score</h4><div class="ev-break">${R.sec.map(s2=>`<div><span>${esc(s2.name)}</span><b>${s2.earned} / ${s2.max}</b></div>`).join('')}<div><span>Bonus</span><b>+${R.bonus}</b></div><div class="tot"><span>Monitor score</span><b>${R.monitor}%</b></div><div><span>Quality tag deductions</span><b class="${R.pen?'neg':''}">${R.pen?'−'+R.pen:'0'}</b></div><div class="tot"><span>Overall score</span><b>${R.overall}%</b></div></div></div>
@@ -1791,7 +1852,9 @@ function evalBreakdownHtml(x){
 }
 function recDrawer(r){
   const x=r.data,uid=S.current,wfm=isWfm();let body='';
-  if(r.kind==='eval'){
+  if(r.kind==='eval'&&x.result){
+    body=evalModalBody(r);
+  }else if(r.kind==='eval'){
     const sc=evScore(r);
     body=`<div class="score-box"><div class="score-num" style="color:${sc>=85?'var(--ok)':sc>=70?'var(--warn)':'var(--bad)'}">${sc}%</div><div><b>${sc>=85?'Good call':sc>=70?'Room to improve':'Needs attention'}</b><span style="display:block">Evaluated by ${esc(user(r.createdBy).name)} · ${fmtL(iso(new Date(r.createdAt)))}</span></div></div>
     <div class="d-section"><h4>Call</h4><div class="kv">${kv('Call date',`${fmtL(x.date)}${x.time?', '+esc(x.time):''}`)+kv('Call ID',esc(x.callId||'—'))+kv('Call type',esc(x.callType||'—'))+kv('Evaluator',esc(user(r.createdBy).name),1)}</div></div>
