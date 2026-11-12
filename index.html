@@ -504,6 +504,49 @@ main{min-width:0}
 .req-card.inactive{opacity:.6}
 .req-card.editing{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
 .req-card .avatar{flex:none}
+.ev-sec{border:1px solid var(--border);border-radius:12px;padding:4px 14px 6px;margin-bottom:14px}
+.ev-sec-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;flex-wrap:wrap}
+.ev-sec-head>span{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.ev-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--border)}
+.ev-row:last-child{border-bottom:0}
+.ev-name{display:block;font-size:13.5px;font-weight:500}
+.ev-row .ar{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.ev-row.avg .ev-name{color:var(--warn)}.ev-row.below .ev-name{color:var(--bad)}
+.ans{display:inline-flex;border:1px solid var(--border);border-radius:9px;overflow:hidden;flex:none}
+.ans button{border:0;background:var(--surface);padding:6px 10px;font-size:12.5px;font-weight:600;color:var(--muted);min-width:50px;display:flex;flex-direction:column;align-items:center;line-height:1.15}
+.ans button small{font-size:10px;font-weight:600;opacity:.75}
+.ans button+button{border-left:1px solid var(--border)}
+.ans button.on.good,.ans button.on.yes{background:var(--ok-soft);color:var(--ok)}
+.ans button.on.avg{background:var(--warn-soft);color:var(--warn)}
+.ans button.on.below,.ans button.on.no{background:var(--bad-soft);color:var(--bad)}
+.ans button.on.na{background:var(--neutral-soft);color:var(--neutral)}
+.ev-score{position:sticky;top:78px}
+.ev-mscore{position:sticky;top:62px;z-index:5;display:flex;justify-content:space-between;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 12px;margin-bottom:12px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.ev-mscore b{font-size:15px}
+.ev-break{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.ev-break div{display:flex;justify-content:space-between;gap:10px}
+.ev-break span{color:var(--muted)}
+.ev-break .tot{border-top:1px solid var(--border);padding-top:6px;font-weight:700}
+.ev-break .tot span{color:var(--text)}
+.neg{color:var(--bad)}
+.ev-list{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.ev-list div{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:3px 0}
+.achip{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:6px;white-space:nowrap}
+.achip.good{background:var(--ok-soft);color:var(--ok)}.achip.avg{background:var(--warn-soft);color:var(--warn)}.achip.below{background:var(--bad-soft);color:var(--bad)}.achip.na{background:var(--neutral-soft);color:var(--neutral)}
+.ef-top{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.ef-card{margin-bottom:16px}
+.ef-head{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.ef-title{font-weight:700;font-size:15px;flex:1}
+.ef-cols,.ef-row{display:grid;grid-template-columns:28px 1.3fr 1.1fr 64px 64px 40px 34px;gap:6px;align-items:center}
+.ef-cols{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);padding:0 0 4px}
+.ef-row{padding:3px 0}
+.ef-row.small{grid-template-columns:28px 1.2fr 1fr 58px 34px}
+.ef-row .input{padding:7px 9px;min-width:0}
+.ef-num{text-align:center}
+.ef-na{display:grid;place-items:center}
+.ef-na input{width:18px;height:18px;accent-color:var(--primary)}
+.ef-row.dragging{opacity:.9;background:var(--surface);box-shadow:0 6px 18px rgba(0,0,0,.15);border-radius:10px;position:relative;z-index:2}
+body:has(.ef-row.dragging){user-select:none}
 .tab-badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--primary);color:#fff;font-size:11px;margin-left:4px}
 .req-card.overdue{border-color:color-mix(in srgb,var(--bad) 45%,var(--border))}
 .who-off{display:flex;gap:10px;align-items:flex-start;margin-top:10px;padding:11px 13px;border-radius:10px;background:var(--surface-2);font-size:13px}
@@ -546,6 +589,16 @@ body:has(.li-row.dragging){user-select:none}
 .btn.bad.icon{color:var(--bad)}
 @media (max-width:1000px){.grid-2[style],.even-rules,.perf-grid{grid-template-columns:1fr !important}}
 @media (max-width:820px){
+  .ev-row{grid-template-columns:1fr;gap:6px}
+  .ev-score{position:static}
+  .ans{width:100%}.ans button{flex:1;min-width:0}
+  .ef-cols{display:none}
+  .ef-row{grid-template-columns:28px 1fr 64px 34px;row-gap:4px;padding:8px 0;border-bottom:1px dashed var(--border)}
+  .ef-row>input[dir=rtl]{grid-column:2/3;grid-row:2}
+  .ef-row>input[data-ef$=".avg"]{grid-column:3;grid-row:2}
+  .ef-row>.ef-na{grid-column:4;grid-row:2}
+  .ef-row.small{grid-template-columns:28px 1fr 58px 34px}
+  .ef-row.small>input[dir=rtl]{grid-column:2/4;grid-row:2}
   input,select,textarea,.input{font-size:16px}
   .q-filters select,.q-filters input{flex:1 1 45%;min-width:0}
   .dispute-fix{grid-template-columns:1fr}
@@ -614,7 +667,6 @@ const LIST_META={
   vtypes:{name:'Violation types',hint:'Used on violation tickets'},
   adh_reasons:{name:'Adherence note reasons',hint:'Used on adherence notes'},
   kpis:{name:'KPI types',hint:'Shown to staff on KPI requests'},
-  criteria:{name:'Call evaluation criteria',hint:'Scored 1–5 each. Changes apply to new evaluations; past ones keep their own criteria.'},
   call_types:{name:'Call types',hint:'Used on call evaluations'},
   prefs:{name:'Schedule preferences',hint:'Shown to staff on schedule special requests'},
   shifts:{name:'Shifts',hint:'Used on shift swap and shift change requests'}
@@ -622,6 +674,19 @@ const LIST_META={
 let LISTS=JSON.parse(JSON.stringify(DEFAULT_LISTS));
 let TEAMS={},TEAM_LIST=[],USERS=[];
 const DEFAULT_CRIT=DEFAULT_LISTS.criteria;
+const DEFAULT_FORM={"sections": [{"name": "Opening & Soft Skills", "items": [{"name": "Ready for the call", "ar": "الاستعداد لاستلام المكالمة", "good": 3, "avg": 1, "na": false}, {"name": "Greeting", "ar": "التحية", "good": 3, "avg": 1, "na": false}, {"name": "Mention Warba bank", "ar": "ذكر اسم البنك", "good": 3, "avg": 1, "na": false}, {"name": "Mention your name", "ar": "ذكر اسمك (الموظف) بشكل واضح", "good": 3, "avg": 1, "na": false}, {"name": "Tone of voice (Welcoming, active, warm)", "ar": "نبرة الصوت ترحيبية ,متفاعلة ,دافئة", "good": 3, "avg": 1, "na": false}, {"name": "Volume of voice (balanced \"Not loud or Low\")", "ar": "مستوى الصوت يكون (ليس عالي ولا منخفض)", "good": 3, "avg": 1, "na": false}, {"name": "Use appropriate pace", "ar": "استخدام الرتم(السرعة) المناسب", "good": 3, "avg": 1, "na": false}, {"name": "Voice Quality (Staff & Headset)", "ar": "جودة الصوت سواء من قبل الموظف أو السماعة", "good": 3, "avg": 1, "na": false}, {"name": "Use customer name & title (Beginning, During, End)", "ar": "استخدام اسم العميل مع اللقب في بداية ووسط ونهاية المكالمة", "good": 3, "avg": 1, "na": false}, {"name": "Friendliness & Attitude", "ar": "حسن التصرف والودية", "good": 4, "avg": 2, "na": false}, {"name": "Caring & Patient", "ar": "الاهتمام بالعميل وان تكون صبور", "good": 3, "avg": 1, "na": false}, {"name": "Follow hold protocol (Permission, Duration 45 Sec & Mute 20 Sec)", "ar": "اتباع بروتكول الانتظار والصامت", "good": 4, "avg": 2, "na": true}, {"name": "Avoid interrupting customer", "ar": "تجنب مقاطعة العميل", "good": 4, "avg": 2, "na": false}, {"name": "Ask security questions", "ar": "سؤال العميل الأسئلة الأمنية", "good": 3, "avg": 1, "na": false}, {"name": "Use professional terms", "ar": "استخدام مصطلحات احترافيه - استخدام مصطلحات بنكية / بنكية تقليدية (قرض / فوائد)", "good": 3, "avg": 1, "na": false}, {"name": "Avoid using slang terms", "ar": "تجنب استخدام المصطلحات العاميه", "good": 3, "avg": 1, "na": false}]}, {"name": "Selling Skills & Product Knowledge", "items": [{"name": "Probing further into customer request", "ar": "فهم طلب العميل ( الأسئلة المناسبة )", "good": 5, "avg": 3, "na": false}, {"name": "Listen actively (don't ask the customer to repeat himself)", "ar": "الأستماع الفعال و التركيز مع العميل", "good": 4, "avg": 2, "na": false}, {"name": "Provide accurate information", "ar": "توفير معلومات دقيقة وصحيحه", "good": 5, "avg": 3, "na": false}, {"name": "Explain product/service benefit related to the inquiry (Benefits)", "ar": "شرح كامل لأستفسار العميل / (المميزات)", "good": 6, "avg": 3, "na": false}, {"name": "Mention a direct channel (App, Social Media, Branches, WhatsApp)", "ar": "ذكر القنوات المباشرة", "good": 5, "avg": 3, "na": true}, {"name": "Mention current promotion and/ or cross sell other product", "ar": "ذكر العروض الحالية /او عرض منتج او خدمة", "good": 5, "avg": 3, "na": false}, {"name": "Mentioning documents (when needed)", "ar": "ذكر المستندات المطلوبة", "good": 4, "avg": 2, "na": true}, {"name": "Issue or Problem handled properly (if applicable)", "ar": "معالجة المشكلة او المسألة / توجيه الطلب للجهة المعنية", "good": 4, "avg": 2, "na": true}]}, {"name": "Closure", "items": [{"name": "Call Summary (if applicable)", "ar": "تلخيص المكالمه", "good": 4, "avg": 2, "na": true}, {"name": "Offer additional assistance", "ar": "سؤال العميل عن اي خدمة أخرى", "good": 4, "avg": 2, "na": false}, {"name": "Thank customer and goodbye", "ar": "شكر العميل وتوديعه", "good": 3, "avg": 1, "na": false}]}], "bonus": [{"name": "Mention the notice (Lets be aware)", "ar": "ذكر التنويه ( لنكن على دراية )", "value": 1}], "tags": [{"name": "Voice Quality", "ar": "مستوى الصوت - النشاط - الرتم - التنفس", "penalty": 3}, {"name": "Step Explaining", "ar": "سبب السؤال - توضيح ما سيتم", "penalty": 3}, {"name": "Info Timing", "ar": "اختيار الوقت المناسب", "penalty": 3}, {"name": "Language & Clarity", "ar": "ماسك الحسابات vs مسؤول عن الحسابات", "penalty": 3}, {"name": "Personal Remarks", "ar": "ابداء رأي بخصوص ارصدة العملاء", "penalty": 3}, {"name": "Hold Protocol", "ar": "المدة - السبب - المتابعة", "penalty": 3}, {"name": "Explain Requirements", "ar": "شرح المطلوب حسب حاجة العميل وليس بشكل عام", "penalty": 3}, {"name": "Offer an Action", "ar": "طلب أو تصحيح", "penalty": 3}, {"name": "Engagement", "ar": "التواصل المستمر خلالتنفيذ الطلب", "penalty": 3}, {"name": "Probing Questions", "ar": "أسئلة إضافية للتأكد من طلب العميل", "penalty": 3}]};
+let EVAL_FORM=JSON.parse(JSON.stringify(DEFAULT_FORM));
+const ANS={good:'Good',avg:'Avg',below:'Below',na:'N/A'};
+function calcEval(form,ans){
+  const items=[],sec=form.sections.map((s,si)=>{let e=0,m=0;s.items.forEach((it,ii)=>{const a=(ans.items||{})[si+'_'+ii]||'good';const pts=a==='good'||a==='na'?it.good:a==='avg'?it.avg:0;e+=pts;m+=it.good;items.push({s:s.name,name:it.name,a,pts,max:it.good})});return {name:s.name,earned:e,max:m,pct:m?Math.round(e/m*100):null}});
+  const bonus=(form.bonus||[]).reduce((t,b,i)=>t+((ans.bonus||{})[i]==='yes'?+b.value:0),0);
+  const tags=(form.tags||[]).map((g,i)=>({name:g.name,a:(ans.tags||{})[i]||'yes',penalty:+g.penalty}));
+  const pen=tags.reduce((t,g)=>t+(g.a==='no'?g.penalty:0),0);
+  const base=sec.reduce((t,x)=>t+x.earned,0),r1=v=>Math.round(v*10)/10;
+  return {sec,items,tags,tagPct:tags.length?Math.round(tags.filter(g=>g.a!=='no').length/tags.length*100):null,base:r1(base),bonus:r1(bonus),monitor:r1(base+bonus),pen:r1(pen),overall:r1(base+bonus-pen),max:sec.reduce((t,x)=>t+x.max,0)};
+}
+const evScore=r=>r.data.result?r.data.result.overall:(r.data.ratings?scoreOf(r.data.ratings):0);
+const formTotal=f=>f.sections.reduce((t,s)=>t+s.items.reduce((a,i)=>a+(+i.good||0),0),0);
 const STATUS={pending:'Pending',approved:'Accepted',rejected:'Rejected',cancelled:'Cancelled',returned:'Returned',waiting:'Waiting for colleague',declined:'Declined by colleague'};
 const KEY='wfm-requests-user';
 const SB_URL='https://gtwibzupaaxcrqqfnajl.supabase.co';
@@ -682,6 +747,7 @@ async function fetchAll(){
   USERS=us.map(u=>({id:u.id,emp:u.emp,name:u.name,role:u.role,title:u.title,team:u.team,active:u.active&&!u.deleted,deleted:!!u.deleted,mustChange:u.must_change}));
   TEAM_LIST=tm.map(t=>({id:t.id,name:t.name,sort:t.sort}));TEAMS=Object.fromEntries(TEAM_LIST.map(t=>[t.id,t.name]));
   LISTS=JSON.parse(JSON.stringify(DEFAULT_LISTS));st.forEach(x=>{if(Array.isArray(x.value)&&x.value.length)LISTS[x.key]=x.value});
+  {const ef=st.find(x=>x.key==='eval_form');EVAL_FORM=ef&&ef.value&&Array.isArray(ef.value.sections)&&ef.value.sections.length?ef.value:JSON.parse(JSON.stringify(DEFAULT_FORM))}
   S.perf=pf.map(x=>({userId:x.user_id,date:x.date,score:+x.score,at:+x.uploaded_at}));
   const r0=ru[0]||{leave_limit:2,count_pending:true};
   S.requests=rq.map(reqFromDb);S.records=rc.map(recFromDb);
@@ -767,7 +833,7 @@ function summary(r){
 function recSummary(r){
   const x=r.data;
   switch(r.kind){
-    case 'eval':return `Score ${scoreOf(x.ratings)}% · Call on ${fmt(x.date)} · by ${user(r.createdBy).name}`;
+    case 'eval':return `Score ${evScore(r)}% · Call on ${fmt(x.date)} · by ${user(r.createdBy).name}`;
     case 'mom':return `${x.title}${r.files.length?` · ${r.files.length} attachment(s)`:''}`;
     case 'task':return `${x.title}${x.due?` · due ${fmt(x.due)}`:''}`;
     case 'vio':return `${x.vtype} · ${fmt(x.date)}`;
@@ -1007,7 +1073,7 @@ function viewDash(){
     const adh=S.records.filter(r=>r.kind==='adh'&&r.recipients.includes(u.id)).length;
     const vio=S.records.filter(r=>r.kind==='vio'&&r.recipients.includes(u.id)).length;
     const ev=S.records.filter(r=>r.kind==='eval'&&r.recipients.includes(u.id)&&r.data.countInScore);
-    const avg=ev.length?Math.round(ev.reduce((a,r)=>a+scoreOf(r.data.ratings),0)/ev.length)+'%':'—';
+    const avg=ev.length?Math.round(ev.reduce((a,r)=>a+evScore(r),0)/ev.length)+'%':'—';
     const kpi=S.requests.filter(r=>r.type==='kpi'&&r.userId===u.id&&r.status==='approved').length;
     return `<tr><td style="white-space:nowrap"><span class="av">${initials(u.name)}</span><b style="font-weight:600">${esc(u.name)}</b> <span class="muted" style="font-size:12px">· ${teamName(u.team)}</span></td><td class="num-cell">${leave}</td><td class="num-cell">${adh}</td><td class="num-cell">${vio}</td><td class="num-cell">${avg}</td><td class="num-cell">${kpi}</td></tr>`;
   }).join('');
@@ -1078,7 +1144,7 @@ function viewCreate(){
 }
 function newRecForm(kind){
   const T=today();
-  const f={kind,vals:{staff:(staffUsers()[0]||{}).id,requireAck:kind!=='adh',countInScore:true},files:[],errors:{},ratings:LISTS.criteria.map(()=>0),teams:TEAM_LIST.length?[TEAM_LIST[0].id]:[],sendTo:'teams'};
+  const f={kind,vals:{staff:(staffUsers()[0]||{}).id,requireAck:kind!=='adh',countInScore:true},files:[],errors:{},ans:{items:{},bonus:{},tags:{}},teams:TEAM_LIST.length?[TEAM_LIST[0].id]:[],sendTo:'teams'};
   if(kind==='vio'){f.vals.vtype=LISTS.vtypes[0];f.vals.date=iso(T)}
   if(kind==='adh'){f.vals.reason=LISTS.adh_reasons[0];f.vals.date=iso(T)}
   if(kind==='eval'){f.vals.date=iso(T);f.vals.callType=LISTS.call_types[0]}
@@ -1095,11 +1161,17 @@ function viewCreateForm(){
   const sw=(name,title,sub,disabled)=>`<div class="switch-row"><div><b>${title}</b><span>${sub}</span></div><button type="button" class="switch${v[name]?'':' off'}" ${disabled?'disabled style="opacity:.5;cursor:not-allowed"':`data-action="toggleVal" data-name="${name}"`} aria-label="${title}"></button></div>`;
   let main='',side='';
   if(k==='eval'){
-    const sc=f.ratings.every(x=>x)?scoreOf(f.ratings):null;
+    const R=calcEval(EVAL_FORM,f.ans),tgt=S.rules.qualityTarget;
+    const seg=(key,val,opts)=>`<div class="ans">${opts.map(([v2,l,pts])=>`<button type="button" class="${v2}${val===v2?' on':''}" data-action="evAns" data-k="${key}" data-v="${v2}">${l}${pts!=null?`<small>${pts}</small>`:''}</button>`).join('')}</div>`;
+    const secHtml=EVAL_FORM.sections.map((sec,si)=>{const sr=R.sec[si];return `<div class="ev-sec"><div class="ev-sec-head"><b>${esc(sec.name)}</b><span><b>${sr.earned}</b> / ${sr.max}% <button type="button" class="btn sm" data-action="evAllGood" data-s="${si}" title="Set every item in this section to Good">All good</button></span></div>
+      ${sec.items.map((it,ii)=>{const key=`items.${si}_${ii}`,val=f.ans.items[si+'_'+ii]||'good';return `<div class="ev-row ${val}"><div><span class="ev-name">${esc(it.name)}</span>${it.ar?`<span class="ar" dir="rtl">${esc(it.ar)}</span>`:''}</div>${seg(key,val,[['good','Good',it.good],['avg','Avg',it.avg],['below','Below',0],...(it.na?[['na','N/A',null]]:[])])}</div>`}).join('')}</div>`}).join('');
+    const bonusHtml=(EVAL_FORM.bonus||[]).length?`<div class="ev-sec"><div class="ev-sec-head"><b>Bonus</b><span>+${R.bonus}%</span></div>${EVAL_FORM.bonus.map((b2,i)=>{const val=f.ans.bonus[i]||'no';return `<div class="ev-row ${val==='yes'?'good':''}"><div><span class="ev-name">${esc(b2.name)}</span>${b2.ar?`<span class="ar" dir="rtl">${esc(b2.ar)}</span>`:''}</div>${seg(`bonus.${i}`,val,[['yes',`Yes +${b2.value}%`,null],['no','No',null]])}</div>`}).join('')}</div>`:'';
+    const tagsHtml=(EVAL_FORM.tags||[]).length?`<div class="ev-sec"><div class="ev-sec-head"><b>Quality tags <span class="muted" style="font-weight:500">· achieved?</span></b><span class="${R.pen?'neg':''}">${R.pen?'−'+R.pen+'%':'no deductions'}</span></div>${EVAL_FORM.tags.map((g,i)=>{const val=f.ans.tags[i]||'yes';return `<div class="ev-row ${val==='no'?'below':''}"><div><span class="ev-name">${esc(g.name)}</span>${g.ar?`<span class="ar" dir="rtl">${esc(g.ar)}</span>`:''}</div>${seg(`tags.${i}`,val,[['yes','Yes',null],['no',`No −${g.penalty}%`,null]])}</div>`}).join('')}</div>`:'';
     main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Call date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}${field('Call time',inp('time','time'))}${field('Call ID',inp('callId','text','e.g. CL-77219034'))}${field('Call type',`<select name="callType">${LISTS.call_types.map(c=>opt(c,c,c===v.callType)).join('')}</select>`,{req:1})}</div>
-    <h2 style="margin:20px 0 12px">Scores ${e.ratings?`<span class="err-text" style="font-weight:500">· ${e.ratings}</span>`:''}</h2><div class="crit-grid">${LISTS.criteria.map((c,i)=>`<span>${c}</span><div class="rating">${[1,2,3,4,5].map(n=>`<i class="${n<=f.ratings[i]?'on':''}" data-action="rate" data-c="${i}" data-n="${n}">${n}</i>`).join('')}</div><b style="text-align:right">${f.ratings[i]?f.ratings[i]*20+'%':'—'}</b>`).join('')}</div>
+    <div class="flow-note" style="margin:18px 0 6px">Every item starts at <b>Good</b> — just change the ones that weren’t.</div><div class="ev-mscore mobile-only"><span>Overall <b style="color:${R.overall>=tgt?'var(--ok)':'var(--bad)'}">${R.overall}%</b></span><span>Monitor ${R.monitor}%</span><span>Tags ${R.pen?'−'+R.pen:'0'}</span></div>${secHtml}${bonusHtml}${tagsHtml}
     <div class="form-grid" style="margin-top:18px">${field('Feedback',ta('feedback','What went well, and what to improve'),{full:1,req:1,invalid:e.feedback,hint:e.feedback})}${files('e.g. evaluation form or call notes')}</div>`;
-    side=`<div class="card card-pad"><div class="score-box" style="margin:0"><div class="score-num" style="${sc===null?'color:var(--faint)':''}">${sc===null?'—':sc+'%'}</div><div><b>Total score</b><span style="display:block">Average of ${LISTS.criteria.length} criteria</span></div></div></div>
+    side=`<div class="card card-pad ev-score"><div class="score-box" style="margin:0 0 12px"><div class="score-num" style="color:${R.overall>=tgt?'var(--ok)':'var(--bad)'}">${R.overall}%</div><div><b>Overall score</b><span style="display:block">Target ${tgt}%</span></div></div>
+      <div class="ev-break">${R.sec.map(x=>`<div><span>${esc(x.name)}</span><b>${x.earned} / ${x.max}</b></div>`).join('')}<div><span>Bonus</span><b>+${R.bonus}</b></div><div class="tot"><span>Monitor score</span><b>${R.monitor}%</b></div><div><span>Quality tag deductions</span><b class="${R.pen?'neg':''}">${R.pen?'−'+R.pen:'0'}</b></div><div class="tot"><span>Overall score</span><b>${R.overall}%</b></div></div></div>
     <div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Staff must tap “I’ve read this”')}${sw('countInScore','Count in end-of-cycle score','Included in the staff member’s average')}</div>`;
   }else if(k==='vio'){
     main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Violation type',`<select name="vtype">${LISTS.vtypes.map(s=>opt(s,s,s===v.vtype)).join('')}</select>`,{req:1})}${field('Date of violation',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}<div></div>${field('Details',ta('details','What happened'),{full:1,req:1,invalid:e.details,hint:e.details})}${files('Optional')}</div>`;
@@ -1160,9 +1232,9 @@ function viewRules(){
   </div><div class="form-actions">${b.id?`<button class="btn" data-action="cancelBlockEdit">Cancel</button>`:''}<button class="btn primary" data-action="addBlock">${ic(b.id?'check':'lock',16)} ${b.id?'Save changes':'Add block'}</button></div></div></div></div>`;
 }
 function viewAdmin(){
-  const tabs=[['users','Users'],['teams','Teams'],['lists','Lists'],['rules','Rules & blocks']];
+  const tabs=[['users','Users'],['teams','Teams'],['lists','Lists'],['form','Evaluation form'],['rules','Rules & blocks']];
   const tab=ui.adminTab||'users';
-  const body=tab==='teams'?adminTeams():tab==='lists'?adminLists():tab==='rules'?viewRules():adminUsers();
+  const body=tab==='teams'?adminTeams():tab==='lists'?adminLists():tab==='form'?adminForm():tab==='rules'?viewRules():adminUsers();
   return head('Admin','Users, teams, lists and rules.',tab==='users'?`<button class="btn primary" data-action="userNew">${ic('plus',16)} Add user</button>`:'')+
     `<div class="tabs">${tabs.map(([k,l])=>`<button class="${k===tab?'on':''}" data-action="adminTab" data-t="${k}">${l}</button>`).join('')}</div>${body}`;
 }
@@ -1185,12 +1257,30 @@ function adminTeams(){
     ${USERS.some(u=>u.role==='staff'&&u.active&&(u.team==null||TEAMS[u.team]==null))?`<div class="callout warn" style="margin-top:14px">${ic('alert',18)}<div><b>Staff without a team</b>${USERS.filter(u=>u.role==='staff'&&u.active&&(u.team==null||TEAMS[u.team]==null)).map(u=>esc(u.name)).join(', ')}</div></div>`:''}
     <div class="flow-note">Tap <b>Members</b> to add or move several people at once. Renaming a team updates it everywhere.</div></div>`;
 }
+function adminForm(){
+  const d=ui.formDraft||(ui.formDraft=JSON.parse(JSON.stringify(EVAL_FORM))),dirty=JSON.stringify(d)!==JSON.stringify(EVAL_FORM),tot=formTotal(d);
+  const grip=`<span class="grip" title="Drag to reorder" aria-label="Drag to reorder"><i></i><i></i><i></i></span>`;
+  const num=(path,v,w)=>`<input class="input ef-num" type="number" min="0" step="1" data-ef="${path}" value="${v}" style="width:${w||64}px">`;
+  return `<div class="ef-top card card-pad"><div><b>Total for a perfect call: <span style="color:${tot===100?'var(--ok)':'var(--bad)'}">${tot}%</span></b><div class="flow-note" style="margin:2px 0 0">${tot===100?'Sections add up to 100%.':'Sections should add up to 100% — adjust the Good points.'} Bonus can take a call above 100%; each quality tag not achieved is deducted. Changes apply to new evaluations only.</div></div>
+   <div class="form-actions" style="margin:0">${dirty?`<span class="pill need">Unsaved</span><button class="btn" data-action="efReset">Undo changes</button>`:''}<button class="btn primary" data-action="efSave" ${dirty?'':'disabled style="opacity:.5"'}>${ic('check',16)} Save form</button></div></div>
+  ${d.sections.map((sec,si)=>`<div class="card card-pad ef-card"><div class="ef-head"><input class="input ef-title" data-ef="sections.${si}.name" value="${esc(sec.name)}" aria-label="Section name"><span class="muted">${sec.items.reduce((a,i)=>a+(+i.good||0),0)}%</span><button class="btn sm icon bad" data-action="efDelSec" data-s="${si}" ${d.sections.length>1?'':'disabled style="opacity:.35"'} title="Delete section">${ic('trash',14)}</button></div>
+   <div class="ef-cols"><span></span><span>Item</span><span>Arabic</span><span>Good</span><span>Avg</span><span>N/A</span><span></span></div>
+   <div data-drag="sections.${si}.items">${sec.items.map((it,ii)=>`<div class="ef-row" data-idx="${ii}">${grip}<input class="input" data-ef="sections.${si}.items.${ii}.name" value="${esc(it.name)}" placeholder="Item"><input class="input" dir="rtl" data-ef="sections.${si}.items.${ii}.ar" value="${esc(it.ar||'')}" placeholder="Arabic (optional)">${num(`sections.${si}.items.${ii}.good`,it.good)}${num(`sections.${si}.items.${ii}.avg`,it.avg)}<label class="ef-na" title="N/A allowed (counts as full points)"><input type="checkbox" data-ef="sections.${si}.items.${ii}.na" ${it.na?'checked':''}></label><button class="btn sm icon bad" data-action="efDelItem" data-s="${si}" data-i="${ii}" ${sec.items.length>1?'':'disabled style="opacity:.35"'} title="Remove item">${ic('trash',14)}</button></div>`).join('')}</div>
+   <button class="btn sm" data-action="efAddItem" data-s="${si}" style="margin-top:8px">${ic('plus',14)} Add item</button></div>`).join('')}
+  <button class="btn" data-action="efAddSec" style="margin-bottom:18px">${ic('plus',16)} Add section</button>
+  <div class="grid-2 even-rules" style="grid-template-columns:1fr 1fr">
+   <div class="card card-pad ef-card"><h2>Bonus <span class="muted" style="font-weight:500">· added when “Yes”</span></h2><div data-drag="bonus">${(d.bonus||[]).map((b2,i)=>`<div class="ef-row small" data-idx="${i}">${grip}<input class="input" data-ef="bonus.${i}.name" value="${esc(b2.name)}"><input class="input" dir="rtl" data-ef="bonus.${i}.ar" value="${esc(b2.ar||'')}" placeholder="Arabic">${num(`bonus.${i}.value`,b2.value,58)}<button class="btn sm icon bad" data-action="efDel" data-g="bonus" data-i="${i}" title="Remove">${ic('trash',14)}</button></div>`).join('')}</div><button class="btn sm" data-action="efAdd" data-g="bonus" style="margin-top:8px">${ic('plus',14)} Add bonus</button></div>
+   <div class="card card-pad ef-card"><h2>Quality tags <span class="muted" style="font-weight:500">· deducted when not achieved</span></h2><div data-drag="tags">${(d.tags||[]).map((g,i)=>`<div class="ef-row small" data-idx="${i}">${grip}<input class="input" data-ef="tags.${i}.name" value="${esc(g.name)}"><input class="input" dir="rtl" data-ef="tags.${i}.ar" value="${esc(g.ar||'')}" placeholder="Description">${num(`tags.${i}.penalty`,g.penalty,58)}<button class="btn sm icon bad" data-action="efDel" data-g="tags" data-i="${i}" title="Remove">${ic('trash',14)}</button></div>`).join('')}</div><button class="btn sm" data-action="efAdd" data-g="tags" style="margin-top:8px">${ic('plus',14)} Add tag</button></div>
+  </div>`;
+}
+const getPath=(o,path)=>path.split('.').reduce((a,k)=>a==null?a:a[k],o);
+function setPath(o,path,v){const ks=path.split('.'),last=ks.pop();const t=ks.reduce((a,k)=>a[k],o);t[last]=v}
 function adminLists(){
   ui.listDraft=ui.listDraft||{};
   return `<div class="list-grid">${Object.entries(LIST_META).map(([k,m])=>{
     const d=ui.listDraft[k]||(ui.listDraft[k]=[...LISTS[k]]),dirty=JSON.stringify(d)!==JSON.stringify(LISTS[k]);
     return `<div class="card card-pad"><h2>${m.name}${dirty?' <span class="pill need">Unsaved</span>':''}</h2><div class="flow-note" style="margin:-8px 0 12px">${m.hint}</div>
-    <div class="li-rows" data-lk="${k}">${d.map((v,i)=>`<div class="li-row"><span class="grip" data-k="${k}" title="Drag to reorder" aria-label="Drag to reorder"><i></i><i></i><i></i></span><input class="input" data-li="${k}" data-i="${i}" value="${esc(v)}" aria-label="${m.name} item ${i+1}">
+    <div class="li-rows" data-lk="${k}" data-drag="list:${k}">${d.map((v,i)=>`<div class="li-row" data-idx="${i}"><span class="grip" data-k="${k}" title="Drag to reorder" aria-label="Drag to reorder"><i></i><i></i><i></i></span><input class="input" data-li="${k}" data-i="${i}" value="${esc(v)}" aria-label="${m.name} item ${i+1}">
       <button class="btn sm icon bad" data-action="liDel" data-k="${k}" data-i="${i}" ${d.length>1?'':'disabled style="opacity:.35"'} title="Remove">${ic('trash',14)}</button></div>`).join('')}</div>
     <div class="li-row add"><input class="input" data-lnew="${k}" placeholder="Add new item"><button class="btn sm" data-action="liAdd" data-k="${k}">${ic('plus',14)} Add</button></div>
     <div class="form-actions" style="margin-top:12px">${dirty?`<button class="btn" data-action="liReset" data-k="${k}">Undo changes</button>`:''}<button class="btn primary" data-action="liSave" data-k="${k}" ${dirty?'':'disabled style="opacity:.5"'}>${ic('check',16)} Save</button></div></div>`}).join('')}</div>`;
@@ -1237,18 +1327,24 @@ function accountDrawer(){
 
 /* ================= Quality analytics ================= */
 const critOf=r=>r.data.criteria||DEFAULT_CRIT;
-const ratingFor=(r,name)=>{const i=critOf(r).indexOf(name);return i<0?null:r.data.ratings[i]};
-const critAvg=(evs,name)=>avgOf(evs.map(r=>ratingFor(r,name)).filter(v=>v!=null).map(v=>v*20));
+const ratingFor=(r,name)=>{if(!r.data.ratings)return null;const i=critOf(r).indexOf(name);return i<0?null:r.data.ratings[i]};
+const TAGS_LABEL='Quality tags';
+const critNames=()=>[...EVAL_FORM.sections.map(s=>s.name),...((EVAL_FORM.tags||[]).length?[TAGS_LABEL]:[])];
+const critPct=(r,name)=>{const res=r.data.result;if(res){if(name===TAGS_LABEL)return res.tagPct;const x=res.sec.find(z=>z.name===name);return x?x.pct:null}const v=ratingFor(r,name);return v==null?null:v*20};
+const critAvg=(evs,name)=>avgOf(evs.map(r=>critPct(r,name)).filter(v=>v!=null));
+const ansFor=(r,name)=>{const res=r.data.result;if(!res)return null;const it=res.items.find(x=>x.name===name);if(it)return it.a;const t=res.tags.find(x=>x.name===name);return t?(t.a==='no'?'below':'good'):null};
+function missedItems(evs){const m={};evs.forEach(r=>{const res=r.data.result;if(!res)return;res.items.forEach(it=>{if(it.a==='avg'||it.a==='below'){const k=it.name;m[k]=m[k]||{name:k,avg:0,below:0,lost:0};m[k][it.a]++;m[k].lost+=it.max-it.pts}});res.tags.forEach(t=>{if(t.a==='no'){const k='Tag: '+t.name;m[k]=m[k]||{name:k,avg:0,below:0,lost:0};m[k].below++;m[k].lost+=t.penalty}})});return Object.values(m).sort((a,b)=>b.lost-a.lost)}
 const evalTime=r=>parse(r.data.date).getTime();
 const avgOf=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
 const evalsOf=uid=>S.records.filter(r=>r.kind==='eval'&&r.recipients[0]===uid&&r.data.countInScore!==false).sort((a,b)=>evalTime(a)-evalTime(b));
 function staffQuality(uid){
-  const all=evalsOf(uid),sc=all.map(r=>scoreOf(r.data.ratings)),tgt=S.rules.qualityTarget;
+  const all=evalsOf(uid),sc=all.map(r=>evScore(r)),tgt=S.rules.qualityTarget;
   let trend='new',delta=0;
   if(sc.length>=4){const last=sc.slice(-3),prev=sc.slice(-6,-3);delta=avgOf(last)-avgOf(prev);trend=delta>3?'up':delta<-3?'down':'flat'}
   const coaching=sc.length>=2&&sc.slice(-2).every(x=>x<tgt);
-  const repeat=all.length>=3?LISTS.criteria.filter(n=>all.slice(-3).every(r=>{const v=ratingFor(r,n);return v!=null&&v<=3})):[];
-  const crit=LISTS.criteria.map(n=>critAvg(all,n));
+  const l3=all.slice(-3),names=[...EVAL_FORM.sections.flatMap(s=>s.items.map(i=>i.name)),...(EVAL_FORM.tags||[]).map(t=>t.name)];
+  const repeat=all.length>=3?names.filter(n=>l3.every(r=>ansFor(r,n)==='below')):[];
+  const crit=critNames().map(n=>critAvg(all,n));
   let strong=null,weak=null;const ix=crit.map((v,i)=>i).filter(i=>crit[i]!=null);
   if(ix.length){strong=ix.reduce((a,b)=>crit[b]>crit[a]?b:a);weak=ix.reduce((a,b)=>crit[b]<crit[a]?b:a);if(crit[strong]===crit[weak]){strong=null;weak=null}}
   return {all,sc,trend,delta,coaching,repeat,crit,strong,weak,recent:avgOf(sc.slice(-6))};
@@ -1269,7 +1365,7 @@ function sparkline(sc){
   return `<svg class="spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-label="Last ${pts.length} scores: ${pts.join(', ')}%"><line x1="0" x2="${W}" y1="${tg}" y2="${tg}" stroke="var(--border)" stroke-dasharray="3 3"/><polyline fill="none" stroke="var(--primary)" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" points="${pts.map((v,i)=>x(i)+','+y(v)).join(' ')}"/><circle cx="${x(pts.length-1)}" cy="${y(pts.at(-1))}" r="3" fill="var(--primary)"/></svg>`;
 }
 function lineChart(all){
-  const sc=all.map(r=>scoreOf(r.data.ratings));if(!sc.length)return '<div class="empty-mini">No evaluations yet.</div>';
+  const sc=all.map(r=>evScore(r));if(!sc.length)return '<div class="empty-mini">No evaluations yet.</div>';
   const W=420,H=170,L=34,R=12,Tp=12,B=26,lo=40,hi=100,tgt=S.rules.qualityTarget;
   const y=v=>Tp+(hi-v)/(hi-lo)*(H-Tp-B),x=i=>sc.length===1?(L+W-R)/2:L+i*(W-L-R)/(sc.length-1);
   let g='';[50,60,70,80,90,100].forEach(v=>{g+=`<line class="gl" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L-6}" y="${y(v)+3.5}" text-anchor="end">${v}</text>`});
@@ -1312,13 +1408,13 @@ function qTabs(){const t=ui.qTab||'calls';return `<div class="tabs">${[['calls',
 function viewQuality(){return (ui.qTab||'calls')==='perf'?head('Quality','Daily performance scores uploaded by WFM.',`<button class="btn" data-action="exportCycle">${ic('download',16)} Cycle summary</button>`)+qTabs()+viewPerfAdmin():viewCallQuality()}
 function viewCallQuality(){
   const Q=qScope(),tgt=S.rules.qualityTarget,star=mostImproved(Q.ids);
-  const curAvg=avgOf(Q.cur.map(r=>scoreOf(r.data.ratings))),prevAvg=avgOf(Q.prev.map(r=>scoreOf(r.data.ratings)));
+  const curAvg=avgOf(Q.cur.map(r=>evScore(r))),prevAvg=avgOf(Q.prev.map(r=>evScore(r)));
   const diff=curAvg!=null&&prevAvg!=null?curAvg-prevAvg:null;
   const notEval=Q.staff.filter(u=>!Q.cur.some(r=>r.recipients[0]===u.id));
   const reqAck=Q.cur.filter(r=>r.requireAck),acked=reqAck.filter(r=>r.acks[r.recipients[0]]);
   const qs=Object.fromEntries(Q.staff.map(u=>[u.id,staffQuality(u.id)]));
   const attention=Q.staff.filter(u=>qs[u.id].coaching||qs[u.id].repeat.length);
-  const per=u=>{const e=Q.cur.filter(r=>r.recipients[0]===u.id);return {n:e.length,avg:avgOf(e.map(r=>scoreOf(r.data.ratings))),last:e.length?e.reduce((a,b)=>evalTime(b)>evalTime(a)?b:a):null,crit:LISTS.criteria.map(n=>critAvg(e,n))}};
+  const per=u=>{const e=Q.cur.filter(r=>r.recipients[0]===u.id);return {n:e.length,avg:avgOf(e.map(r=>evScore(r))),last:e.length?e.reduce((a,b)=>evalTime(b)>evalTime(a)?b:a):null,crit:critNames().map(n=>critAvg(e,n))}};
   const P=Object.fromEntries(Q.staff.map(u=>[u.id,per(u)]));
   const order=[...Q.staff].sort((a,b)=>(P[b.id].avg??-1)-(P[a.id].avg??-1));
   const lb=order.map(u=>{const p=P[u.id],q=qs[u.id];return `<tr data-action="openStaff" data-id="${u.id}">
@@ -1326,15 +1422,15 @@ function viewCallQuality(){
     <td class="num-cell"><span class="score-cell${p.avg!=null&&p.avg<tgt?' below':''}">${p.avg!=null?p.avg+'%':'—'}</span>${p.avg!=null&&p.avg<tgt?`<div style="font-size:11px;color:var(--bad);font-weight:600">${ic('alert',11)} below target</div>`:''}</td>
     <td>${sparkline(q.sc)}</td><td class="num-cell">${p.n}</td><td>${trendBadge(q.trend)}</td><td style="min-width:160px">${flagsHtml(q,u.id,star)||'<span class="muted">—</span>'}</td>
     <td class="muted" style="white-space:nowrap">${p.last?fmt(p.last.data.date):'Not in period'}</td></tr>`}).join('');
-  const teamCrit=LISTS.criteria.map(n=>critAvg(Q.cur,n));
+  const teamCrit=critNames().map(n=>critAvg(Q.cur,n));
   const weakI=teamCrit.every(v=>v==null)?null:teamCrit.reduce((a,v,i)=>v!=null&&(teamCrit[a]==null||v<teamCrit[a])?i:a,0);
   const cell=(v,tip)=>`<td><span class="hc" style="background:${heatBg(v)};color:${heatInk(v)}" title="${tip}">${v!=null?v:'—'}</span></td>`;
-  const heat=order.map(u=>`<tr data-action="openStaff" data-id="${u.id}"><td style="white-space:nowrap;font-weight:600">${esc(u.name)}</td>${P[u.id].crit.map((v,i)=>cell(v,`${esc(u.name)} · ${LISTS.criteria[i]}: ${v??'no data'}%`)).join('')}</tr>`).join('');
-  const types=LISTS.call_types.map(t=>{const e=Q.cur.filter(r=>r.data.callType===t);return [t,avgOf(e.map(r=>scoreOf(r.data.ratings))),e.length]});
-  const evaluators=USERS.filter(u=>u.role==='wfm').map(u=>{const e=Q.cur.filter(r=>r.createdBy===u.id);return [u,avgOf(e.map(r=>scoreOf(r.data.ratings))),e.length]}).filter(x=>x[2]);
+  const heat=order.map(u=>`<tr data-action="openStaff" data-id="${u.id}"><td style="white-space:nowrap;font-weight:600">${esc(u.name)}</td>${P[u.id].crit.map((v,i)=>cell(v,`${esc(u.name)} · ${critNames()[i]}: ${v??'no data'}%`)).join('')}</tr>`).join('');
+  const types=LISTS.call_types.map(t=>{const e=Q.cur.filter(r=>r.data.callType===t);return [t,avgOf(e.map(r=>evScore(r))),e.length]});
+  const evaluators=USERS.filter(u=>u.role==='wfm').map(u=>{const e=Q.cur.filter(r=>r.createdBy===u.id);return [u,avgOf(e.map(r=>evScore(r))),e.length]}).filter(x=>x[2]);
   const label=`${fmtL(iso(Q.a))} – ${fmtL(iso(Q.b))}`,qv=k=>ui.q[k]||'all';
   const active=['staff','type','evaluator'].filter(k=>qv(k)!=='all').length+(ui.q.team!=='all'?1:0);
-  const weeks={};Q.cur.forEach(r=>{const d=parse(r.data.date);const ws=iso(addDays(d,-d.getDay()));(weeks[ws]=weeks[ws]||[]).push(scoreOf(r.data.ratings))});
+  const weeks={};Q.cur.forEach(r=>{const d=parse(r.data.date);const ws=iso(addDays(d,-d.getDay()));(weeks[ws]=weeks[ws]||[]).push(evScore(r))});
   const wk=Object.keys(weeks).sort().map(k=>({v:avgOf(weeks[k]),label:fmt(k),title:`Week of ${fmt(k)} · ${avgOf(weeks[k])}% · ${weeks[k].length} call(s)`}));
   const evList=[...Q.cur].sort((a,b)=>evalTime(b)-evalTime(a));
   return head('Quality',`Call evaluations · ${label}`,`<button class="btn" data-action="exportCycle">${ic('download',16)} Cycle summary</button>`)+qTabs()+
@@ -1355,10 +1451,10 @@ function viewCallQuality(){
   ${attention.length?callout('warn','alert',`${attention.length} staff need attention`,attention.map(u=>`${esc(u.name)}: ${[qs[u.id].coaching?'below target twice in a row':'',...qs[u.id].repeat.map(c=>'low '+c+' 3 times')].filter(Boolean).join(', ')}`).join(' · ')):''}
   <div class="card" style="margin-bottom:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Leaderboard <span class="muted" style="font-weight:500">· tap a name for the full profile</span></h2></div>
    <div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Average</th><th>Last 6 calls</th><th class="num-cell">Calls</th><th>Trend</th><th>Flags</th><th>Last evaluated</th></tr></thead><tbody>${lb}</tbody></table></div></div>
-  <div class="card" style="margin-bottom:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Criteria heatmap ${weakI!=null?`<span class="muted" style="font-weight:500">· team’s weakest: ${LISTS.criteria[weakI]} (${teamCrit[weakI]}%)</span>`:''}</h2></div>
-   <div class="table-wrap"><table class="heat"><thead><tr><th>Staff</th>${LISTS.criteria.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${heat}</tbody>
-   <tfoot><tr><td>Team</td>${teamCrit.map((v,i)=>cell(v,`Team · ${LISTS.criteria[i]}: ${v??'no data'}%`)).join('')}</tr></tfoot></table></div>
-   <div class="heat-legend">50%<i></i>100% · average score per criterion</div></div>
+  <div class="card" style="margin-bottom:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Section heatmap ${weakI!=null?`<span class="muted" style="font-weight:500">· team’s weakest: ${critNames()[weakI]} (${teamCrit[weakI]}%)</span>`:''}</h2></div>
+   <div class="table-wrap"><table class="heat"><thead><tr><th>Staff</th>${critNames().map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${heat}</tbody>
+   <tfoot><tr><td>Team</td>${teamCrit.map((v,i)=>cell(v,`Team · ${critNames()[i]}: ${v??'no data'}%`)).join('')}</tr></tfoot></table></div>
+   <div class="heat-legend">50%<i></i>100% · % of points achieved per section</div></div>
   <div class="card card-pad" style="margin-bottom:18px"><h2>Weekly average</h2>${seriesChart(wk,{target:tgt,label:'Weekly average score'})}</div>
   <div class="grid-2" style="grid-template-columns:1fr 1fr">
    <div class="card card-pad"><h2>By call type</h2><div class="bars">${types.map(([t,a,n])=>`<div class="bar-row" style="grid-template-columns:130px 1fr 72px"><span>${t}</span><div class="bar-track"><div class="bar-fill" style="width:${a||0}%;--c:var(--primary)"></div></div><b>${a!=null?a+'%':'—'} <span class="muted" style="font-weight:500">· ${n}</span></b></div>`).join('')}</div><div class="flow-note">Average score · number of calls</div></div>
@@ -1366,14 +1462,14 @@ function viewCallQuality(){
   </div>
   <div class="card" style="margin-top:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Evaluations <span class="muted" style="font-weight:500">· ${evList.length} in this view</span></h2></div>
    ${evList.length?`<div class="table-wrap"><table class="mini-table"><thead><tr><th>Date</th><th>Staff</th><th>Call type</th><th>Evaluator</th><th class="num-cell">Score</th></tr></thead><tbody>
-   ${evList.slice(0,100).map(r=>{const sc=scoreOf(r.data.ratings);return `<tr data-action="openRec" data-id="${r.id}"><td style="white-space:nowrap">${fmt(r.data.date)}</td><td style="white-space:nowrap">${esc(user(r.recipients[0]).name)}</td><td>${esc(r.data.callType||'—')}</td><td style="white-space:nowrap">${esc(user(r.createdBy).name)}</td><td class="num-cell"><span class="score-cell${sc<tgt?' below':''}">${sc}%</span></td></tr>`}).join('')}</tbody></table></div>${evList.length>100?'<div class="flow-note" style="padding:0 16px 14px">Showing the latest 100 — narrow the filters to see others.</div>':''}`:'<div class="empty-mini" style="padding:0 16px 16px">No evaluations match these filters.</div>'}</div>`;
+   ${evList.slice(0,100).map(r=>{const sc=evScore(r);return `<tr data-action="openRec" data-id="${r.id}"><td style="white-space:nowrap">${fmt(r.data.date)}</td><td style="white-space:nowrap">${esc(user(r.recipients[0]).name)}</td><td>${esc(r.data.callType||'—')}</td><td style="white-space:nowrap">${esc(user(r.createdBy).name)}</td><td class="num-cell"><span class="score-cell${sc<tgt?' below':''}">${sc}%</span></td></tr>`}).join('')}</tbody></table></div>${evList.length>100?'<div class="flow-note" style="padding:0 16px 14px">Showing the latest 100 — narrow the filters to see others.</div>':''}`:'<div class="empty-mini" style="padding:0 16px 16px">No evaluations match these filters.</div>'}</div>`;
 }
 function staffDrawer(uid){
   const u=user(uid),q=staffQuality(uid),tgt=S.rules.qualityTarget,star=mostImproved(staffUsers().map(x=>x.id));
   const vio=S.records.filter(r=>r.kind==='vio'&&r.recipients.includes(uid)).length,adh=S.records.filter(r=>r.kind==='adh'&&r.recipients.includes(uid)).length;
   const kpi=S.requests.filter(r=>r.type==='kpi'&&r.userId===uid&&r.status==='approved').length;
   const y=today().getFullYear(),leave=S.requests.filter(r=>r.type==='leave'&&r.userId===uid&&r.status==='approved'&&r.data.start.slice(0,4)==String(y)).reduce((a,r)=>a+daysBetween(r.data.start,r.data.end),0);
-  const list=[...q.all].reverse().map(r=>{const sc=scoreOf(r.data.ratings);return `<div class="req-card" data-action="openRec" data-id="${r.id}" role="button" tabindex="0"><div class="req-main"><div class="req-title"><span class="score-cell${sc<tgt?' below':''}">${sc}%</span> <small>${fmt(r.data.date)} · ${esc(r.data.callType||'—')} · by ${esc(user(r.createdBy).name)}</small></div><div class="req-sub" style="white-space:normal">${esc(r.data.feedback)}</div></div><div class="req-side">${r.requireAck?ackPill(!!r.acks[uid]):''}</div></div>`}).join('');
+  const list=[...q.all].reverse().map(r=>{const sc=evScore(r);return `<div class="req-card" data-action="openRec" data-id="${r.id}" role="button" tabindex="0"><div class="req-main"><div class="req-title"><span class="score-cell${sc<tgt?' below':''}">${sc}%</span> <small>${fmt(r.data.date)} · ${esc(r.data.callType||'—')} · by ${esc(user(r.createdBy).name)}</small></div><div class="req-sub" style="white-space:normal">${esc(r.data.feedback)}</div></div><div class="req-side">${r.requireAck?ackPill(!!r.acks[uid]):''}</div></div>`}).join('');
   const fl=flagsHtml(q,uid,star);
   return `<div class="sheet-handle"></div><div class="d-head">${avatar(u)}<div><h3>${esc(u.name)}</h3><small>${u.emp} · ${esc(teamName(u.team))}</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div>
   <div class="d-body">
@@ -1381,7 +1477,7 @@ function staffDrawer(uid){
    ${fl?`<div class="d-section">${fl}</div>`:''}
    <div class="d-section"><h4>Daily performance</h4>${perfSummaryHtml(uid,1)}${perfOf(uid).length>1?perfChart(perfOf(uid).slice(-30)):''}</div>
    <div class="d-section"><h4>Call quality analysis</h4>${evalAnalysisHtml(uid,false)}</div>
-   ${q.strong!=null?`<div class="d-section"><h4>Strengths &amp; focus</h4><div class="ins"><div><span>Strongest</span><b>${LISTS.criteria[q.strong]} · ${q.crit[q.strong]}%</b></div><div><span>Focus area</span><b>${LISTS.criteria[q.weak]} · ${q.crit[q.weak]}%</b></div></div></div>`:''}
+   ${q.strong!=null?`<div class="d-section"><h4>Strengths &amp; focus</h4><div class="ins"><div><span>Strongest</span><b>${critNames()[q.strong]} · ${q.crit[q.strong]}%</b></div><div><span>Focus area</span><b>${critNames()[q.weak]} · ${q.crit[q.weak]}%</b></div></div></div>`:''}
    <div class="d-section"><h4>Other records · ${y}</h4><div class="ins"><div><span>Violations</span><b>${vio}</b></div><div><span>Adherence notes</span><b>${adh}</b></div><div><span>KPI requests accepted</span><b>${kpi}</b></div><div><span>Leave days taken</span><b>${leave}</b></div></div></div>
    <div class="d-section"><h4>Feedback history</h4>${list?`<div class="req-list">${list}</div>`:'<div class="empty-mini">No evaluations yet.</div>'}</div>
   </div><div class="d-foot"><button class="btn primary" data-action="newEvalFor" data-id="${uid}">${ic('plus',16)} New call evaluation</button></div>`;
@@ -1391,13 +1487,14 @@ function exportCycle(){
   const head=['Employee','Employee ID','Team','Evaluations','Avg call score %','Trend','Flags','Latest daily performance %','Avg daily performance % (period)','KPI requests accepted','Violations','Adherence notes'];
   const rows=Q.staff.map(u=>{const e=Q.cur.filter(r=>r.recipients[0]===u.id),q=staffQuality(u.id),ps=perfOf(u.id),pp=ps.filter(p=>p.date>=fromIso);
     const fl=[q.coaching?'Needs coaching':'',...q.repeat.map(c=>'Repeat issue: '+c),star===u.id?'Most improved':''].filter(Boolean).join('; ');
-    return [u.name,u.emp,teamName(u.team),e.length,avgOf(e.map(r=>scoreOf(r.data.ratings)))??'',trendTxt[q.trend],fl,ps.length?ps.at(-1).score:'',pp.length?Math.round(pp.reduce((a,p)=>a+p.score,0)/pp.length*10)/10:'',
+    return [u.name,u.emp,teamName(u.team),e.length,avgOf(e.map(r=>evScore(r)))??'',trendTxt[q.trend],fl,ps.length?ps.at(-1).score:'',pp.length?Math.round(pp.reduce((a,p)=>a+p.score,0)/pp.length*10)/10:'',
       S.requests.filter(r=>r.type==='kpi'&&r.userId===u.id&&r.status==='approved'&&r.createdAt>=from).length,
       S.records.filter(r=>r.kind==='vio'&&r.recipients.includes(u.id)&&r.createdAt>=from).length,
       S.records.filter(r=>r.kind==='adh'&&r.recipients.includes(u.id)&&r.createdAt>=from).length]});
-  const evRows=[['Date','Employee','Employee ID','Team','Call type','Call ID','Evaluator','Score %',...LISTS.criteria.map(c=>c+' (1–5)'),'Feedback','Acknowledged']];
-  Q.cur.slice().sort((a,b)=>evalTime(a)-evalTime(b)).forEach(r=>{const u=user(r.recipients[0]);evRows.push([{d:r.data.date},u.name,u.emp,teamName(u.team),r.data.callType||'',r.data.callId||'',user(r.createdBy).name,scoreOf(r.data.ratings),...LISTS.criteria.map(c=>ratingFor(r,c)??''),r.data.feedback||'',r.acks[u.id]?'Yes':'No'])});
-  downloadXlsx(`cycle-summary-${iso(today())}.xlsx`,[{name:'Cycle summary',rows:[head,...rows],widths:[22,13,24,12,15,14,40,18,20,14,11,14]},{name:'Call evaluations',rows:evRows,widths:[12,22,13,24,16,16,18,10,...LISTS.criteria.map(()=>14),50,13]}]);
+  const secN=EVAL_FORM.sections.map(x=>x.name);
+  const evRows=[['Date','Employee','Employee ID','Team','Call type','Call ID','Evaluator',...secN.map(n=>n+' %'),'Bonus %','Monitor score %','Tag deductions %','Overall score %','Quality tags not achieved','Feedback','Acknowledged']];
+  Q.cur.slice().sort((a,b)=>evalTime(a)-evalTime(b)).forEach(r=>{const u=user(r.recipients[0]);const R=r.data.result;evRows.push([{d:r.data.date},u.name,u.emp,teamName(u.team),r.data.callType||'',r.data.callId||'',user(r.createdBy).name,...secN.map(n=>{const x=R&&R.sec.find(z=>z.name===n);return x?x.pct:''}),R?R.bonus:'',R?R.monitor:'',R?R.pen:'',evScore(r),R?R.tags.filter(t=>t.a==='no').map(t=>t.name).join('; '):'',r.data.feedback||'',r.acks[u.id]?'Yes':'No'])});
+  downloadXlsx(`cycle-summary-${iso(today())}.xlsx`,[{name:'Cycle summary',rows:[head,...rows],widths:[22,13,24,12,15,14,40,18,20,14,11,14]},{name:'Call evaluations',rows:evRows,widths:[12,22,13,24,16,16,18,...secN.map(()=>16),10,14,14,14,34,50,13]}]);
   toast(`Cycle summary exported · ${rows.length} staff`);
 }
 
@@ -1511,19 +1608,20 @@ function evalAnalysisHtml(uid,staffView,list){
   const q=staffQuality(uid),tgt=S.rules.qualityTarget,all=list||q.all;
   if(!all.length)return `<div class="empty-mini">${list?'No call evaluations match these filters.':'No call evaluations yet.'}</div>`;
   const last=all.slice(-3),prev=all.slice(-6,-3);
-  const rows=LISTS.criteria.map(n=>{const a=critAvg(all,n),l=critAvg(last,n),p=critAvg(prev,n),d=l!=null&&p!=null?l-p:null;
+  const rows=critNames().map(n=>{const a=critAvg(all,n),l=critAvg(last,n),p=critAvg(prev,n),d=l!=null&&p!=null?l-p:null;
     return {n,a,l,d}}).filter(r=>r.a!=null);
   const improved=rows.filter(r=>r.d!=null&&r.d>=5),declined=rows.filter(r=>r.d!=null&&r.d<=-5);
-  const types=LISTS.call_types.map(t=>{const e=all.filter(r=>r.data.callType===t);return [t,avgOf(e.map(r=>scoreOf(r.data.ratings))),e.length]}).filter(x=>x[2]);
-  const best=all.reduce((a,b)=>scoreOf(b.data.ratings)>scoreOf(a.data.ratings)?b:a),worst=all.reduce((a,b)=>scoreOf(b.data.ratings)<scoreOf(a.data.ratings)?b:a);
+  const types=LISTS.call_types.map(t=>{const e=all.filter(r=>r.data.callType===t);return [t,avgOf(e.map(r=>evScore(r))),e.length]}).filter(x=>x[2]);
+  const best=all.reduce((a,b)=>evScore(b)>evScore(a)?b:a),worst=all.reduce((a,b)=>evScore(b)<evScore(a)?b:a);
   const you=staffView?'You':'They';
   return `<div class="ins" style="margin-bottom:14px"><div><span>Improved recently</span><b style="color:${improved.length?'var(--ok)':'var(--text)'}">${improved.length?improved.map(r=>esc(r.n)).join(', '):'—'}</b></div><div><span>Declined recently</span><b style="color:${declined.length?'var(--bad)':'var(--text)'}">${declined.length?declined.map(r=>esc(r.n)).join(', '):'—'}</b></div></div>
-  <h4 class="mini-h">Score over time</h4>${seriesChart(all.map(r=>({v:scoreOf(r.data.ratings),label:fmt(r.data.date),title:`${fmt(r.data.date)} · ${scoreOf(r.data.ratings)}% · ${r.data.callType||''}`})),{target:tgt,lo:40,hi:100,label:'Call scores over time'})}
-  <h4 class="mini-h">Criteria · last 3 calls vs the 3 before</h4>
-  <div class="table-wrap"><table class="mini-table"><thead><tr><th>Criterion</th><th class="num-cell">Overall</th><th class="num-cell">Last 3</th><th>Change</th></tr></thead><tbody>
+  <h4 class="mini-h">Score over time</h4>${seriesChart(all.map(r=>({v:evScore(r),label:fmt(r.data.date),title:`${fmt(r.data.date)} · ${evScore(r)}% · ${r.data.callType||''}`})),{target:tgt,lo:40,hi:100,label:'Call scores over time'})}
+  <h4 class="mini-h">Sections · last 3 calls vs the 3 before</h4>
+  <div class="table-wrap"><table class="mini-table"><thead><tr><th>Section</th><th class="num-cell">Overall</th><th class="num-cell">Last 3</th><th>Change</th></tr></thead><tbody>
   ${rows.map(r=>`<tr><td>${esc(r.n)}</td><td class="num-cell">${r.a}%</td><td class="num-cell">${r.l!=null?r.l+'%':'—'}</td><td>${r.d==null?'<span class="muted">Not enough calls</span>':r.d>=5?`<span class="trend up">▲ ${r.d} pts</span>`:r.d<=-5?`<span class="trend down">▼ ${-r.d} pts</span>`:'<span class="trend flat">Steady</span>'}</td></tr>`).join('')}</tbody></table></div>
+  ${(()=>{const mi=missedItems(all).slice(0,6);return mi.length?`<h4 class="mini-h">Most points lost</h4><div class="table-wrap"><table class="mini-table"><thead><tr><th>Item</th><th class="num-cell">Avg</th><th class="num-cell">Below / missed</th><th class="num-cell">Points lost</th></tr></thead><tbody>${mi.map(x=>`<tr><td>${esc(x.name)}</td><td class="num-cell">${x.avg||'—'}</td><td class="num-cell">${x.below||'—'}</td><td class="num-cell"><b>${Math.round(x.lost*10)/10}%</b></td></tr>`).join('')}</tbody></table></div>`:''})()}
   ${types.length?`<h4 class="mini-h">By call type</h4><div class="bars">${types.map(([t,a,n])=>`<div class="bar-row" style="grid-template-columns:120px 1fr 70px"><span>${esc(t)}</span><div class="bar-track"><div class="bar-fill" style="width:${a}%;--c:var(--primary)"></div></div><b>${a}% <span class="muted" style="font-weight:500">· ${n}</span></b></div>`).join('')}</div>`:''}
-  ${all.length>1?`<div class="ins" style="margin-top:14px"><div data-action="openRec" data-id="${best.id}" style="cursor:pointer"><span>Best call</span><b>${scoreOf(best.data.ratings)}% · ${fmt(best.data.date)}</b></div><div data-action="openRec" data-id="${worst.id}" style="cursor:pointer"><span>Lowest call</span><b>${scoreOf(worst.data.ratings)}% · ${fmt(worst.data.date)}</b></div></div>`:''}`;
+  ${all.length>1?`<div class="ins" style="margin-top:14px"><div data-action="openRec" data-id="${best.id}" style="cursor:pointer"><span>Best call</span><b>${evScore(best)}% · ${fmt(best.data.date)}</b></div><div data-action="openRec" data-id="${worst.id}" style="cursor:pointer"><span>Lowest call</span><b>${evScore(worst)}% · ${fmt(worst.data.date)}</b></div></div>`:''}`;
 }
 function myRange(){
   const T=today(),p=ui.my.period;let a,b=T,label;
@@ -1550,7 +1648,7 @@ function viewMyPerf(){
     return `<tr><td style="white-space:nowrap">${fmt(p.date)} <span class="muted" style="font-size:12px">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][parse(p.date).getDay()]}</span></td><td class="num-cell"><span class="score-cell">${fmtScore(p.score)}</span></td>
     <td>${d==null?'<span class="muted">—</span>':`<span class="delta ${d>=0?'up':'down'}">${d>=0?'▲':'▼'} ${Math.abs(d)}</span>`}</td>
     <td style="text-align:right">${dp?`<button class="btn sm" data-action="openReq" data-id="${dp.id}">${pill(dp.status).replace('class="pill','class="pill sm')}</button>`:`<button class="btn sm" data-action="disputeNew" data-date="${p.date}">${ic('alert',13)} Dispute</button>`}</td></tr>`}).join('');
-  const evAvg=avgOf(evs.map(r=>scoreOf(r.data.ratings))),nFilters=(ui.my.type!=='all'?1:0);
+  const evAvg=avgOf(evs.map(r=>evScore(r))),nFilters=(ui.my.type!=='all'?1:0);
   return head('My performance',`Showing ${R.label.toLowerCase()}${ui.my.type!=='all'?` · ${esc(ui.my.type)} calls`:''}.`)+
   `<div class="card card-pad q-filter-card"><div class="q-filters">
     <select class="input" data-my="period">${opt('month','This month',ui.my.period==='month')}${opt('lastmonth','Last month',ui.my.period==='lastmonth')}${opt('ytd','Year to date',ui.my.period==='ytd')}${opt('all','All time',ui.my.period==='all')}${extra.length?`<optgroup label="Specific month">${extra.map(m=>opt(m,`${MONL[+m.slice(5)-1]} ${m.slice(0,4)}`,ui.my.period===m)).join('')}</optgroup>`:''}</select>
@@ -1562,7 +1660,7 @@ function viewMyPerf(){
    <div class="flow-note">Think a score is wrong? Tap <b>Dispute</b> next to the day and explain why — WFM will review it.</div>`:`<div class="empty-mini">No scores in ${R.label.toLowerCase()}.</div>`}`
    :'<div class="empty-mini">No daily performance scores yet. They’ll appear here once WFM uploads them.</div>'}</div>
   <div class="card card-pad" style="margin-bottom:18px"><h2>From WFM / managers <span class="muted" style="font-weight:500">· ${R.label.toLowerCase()}</span></h2>
-   <div class="stats" style="margin-top:14px">${tile('Call evaluations',recs.filter(r=>r.kind==='eval').length,recs.some(r=>r.kind==='eval')?`average ${avgOf(recs.filter(r=>r.kind==='eval').map(r=>scoreOf(r.data.ratings)))}%`:'none')}
+   <div class="stats" style="margin-top:14px">${tile('Call evaluations',recs.filter(r=>r.kind==='eval').length,recs.some(r=>r.kind==='eval')?`average ${avgOf(recs.filter(r=>r.kind==='eval').map(r=>evScore(r)))}%`:'none')}
    ${tile('Violation tickets',recs.filter(r=>r.kind==='vio').length,'',recs.some(r=>r.kind==='vio')?'var(--bad)':'')}
    ${tile('Minutes of meeting',recs.filter(r=>r.kind==='mom').length,'')}
    ${tile('Waiting for you',recs.filter(r=>r.requireAck&&!r.acks[uid]).length,'to acknowledge',recs.some(r=>r.requireAck&&!r.acks[uid])?'var(--warn)':'')}
@@ -1684,13 +1782,20 @@ function reqDrawer(r){
   ${r.files.length?`<div class="d-section"><h4>Attachments</h4>${fileList(r.files)}</div>`:''}
   <div class="d-section"><h4>History</h4>${timeline(r)}</div></div>${foot}`;
 }
+function evalBreakdownHtml(x){
+  const R=x.result,form=x.form||EVAL_FORM;
+  return `<div class="d-section"><h4>Score</h4><div class="ev-break">${R.sec.map(s2=>`<div><span>${esc(s2.name)}</span><b>${s2.earned} / ${s2.max}</b></div>`).join('')}<div><span>Bonus</span><b>+${R.bonus}</b></div><div class="tot"><span>Monitor score</span><b>${R.monitor}%</b></div><div><span>Quality tag deductions</span><b class="${R.pen?'neg':''}">${R.pen?'−'+R.pen:'0'}</b></div><div class="tot"><span>Overall score</span><b>${R.overall}%</b></div></div></div>
+  ${form.sections.map((sec,si)=>`<div class="d-section"><h4>${esc(sec.name)} · ${R.sec[si]?R.sec[si].earned:0}/${R.sec[si]?R.sec[si].max:0}</h4><div class="ev-list">${R.items.filter(it=>it.s===sec.name).map(it=>`<div><span>${esc(it.name)}</span><span class="achip ${it.a}">${ANS[it.a]}${it.a==='avg'||it.a==='below'?` · ${it.pts}/${it.max}`:''}</span></div>`).join('')}</div></div>`).join('')}
+  ${(form.bonus||[]).length?`<div class="d-section"><h4>Bonus</h4><div class="ev-list">${form.bonus.map((b2,i)=>`<div><span>${esc(b2.name)}</span><span class="achip ${(x.ans.bonus||{})[i]==='yes'?'good':'na'}">${(x.ans.bonus||{})[i]==='yes'?'Yes +'+b2.value:'No'}</span></div>`).join('')}</div></div>`:''}
+  ${R.tags.length?`<div class="d-section"><h4>Quality tags</h4><div class="ev-list">${R.tags.map(t=>`<div><span>${esc(t.name)}</span><span class="achip ${t.a==='no'?'below':'good'}">${t.a==='no'?'Not achieved −'+t.penalty:'Achieved'}</span></div>`).join('')}</div></div>`:''}`;
+}
 function recDrawer(r){
   const x=r.data,uid=S.current,wfm=isWfm();let body='';
   if(r.kind==='eval'){
-    const sc=scoreOf(x.ratings);
+    const sc=evScore(r);
     body=`<div class="score-box"><div class="score-num" style="color:${sc>=85?'var(--ok)':sc>=70?'var(--warn)':'var(--bad)'}">${sc}%</div><div><b>${sc>=85?'Good call':sc>=70?'Room to improve':'Needs attention'}</b><span style="display:block">Evaluated by ${esc(user(r.createdBy).name)} · ${fmtL(iso(new Date(r.createdAt)))}</span></div></div>
     <div class="d-section"><h4>Call</h4><div class="kv">${kv('Call date',`${fmtL(x.date)}${x.time?', '+esc(x.time):''}`)+kv('Call ID',esc(x.callId||'—'))+kv('Call type',esc(x.callType||'—'))+kv('Evaluator',esc(user(r.createdBy).name),1)}</div></div>
-    <div class="d-section"><h4>Scores</h4><div class="bars">${critOf(r).map((c,i)=>{const v=x.ratings[i]*20;return `<div class="bar-row" style="grid-template-columns:150px 1fr 40px"><span>${esc(c)}</span><div class="bar-track"><div class="bar-fill" style="width:${v}%;--c:${v>=90?'var(--ok)':v>=80?'var(--primary)':'var(--warn)'}"></div></div><b>${v}%</b></div>`}).join('')}</div></div>
+    ${x.result?evalBreakdownHtml(x):`<div class="d-section"><h4>Scores</h4><div class="bars">${critOf(r).map((c,i)=>{const v=x.ratings[i]*20;return `<div class="bar-row" style="grid-template-columns:150px 1fr 40px"><span>${esc(c)}</span><div class="bar-track"><div class="bar-fill" style="width:${v}%;--c:${v>=90?'var(--ok)':v>=80?'var(--primary)':'var(--warn)'}"></div></div><b>${v}%</b></div>`}).join('')}</div></div>`}
     <div class="d-section"><h4>Feedback</h4><div class="note-box">${esc(x.feedback)}</div></div>`;
   }else if(r.kind==='mom'){
     body=`<div class="d-section"><div class="kv">${kv('Title',esc(x.title),1)+kv('Meeting date',fmtL(x.date))+kv('From',esc(user(r.createdBy).name))}</div></div>
@@ -1776,7 +1881,7 @@ function submitRequest(){
 }
 function submitRecord(){
   const f=ui.form,v=f.vals,e={};let data={},recipients=[v.staff];
-  if(f.kind==='eval'){if(!v.date)e.date='Pick the date';if(!f.ratings.every(x=>x))e.ratings='Score every criterion';if(!(v.feedback||'').trim())e.feedback='Feedback is required';data={date:v.date,time:v.time||'',callId:v.callId||'',callType:v.callType||LISTS.call_types[0],criteria:[...LISTS.criteria],ratings:[...f.ratings],feedback:v.feedback||'',countInScore:!!v.countInScore}}
+  if(f.kind==='eval'){if(!v.date)e.date='Pick the date';if(!(v.feedback||'').trim())e.feedback='Feedback is required';const form=JSON.parse(JSON.stringify(EVAL_FORM));data={date:v.date,time:v.time||'',callId:v.callId||'',callType:v.callType||LISTS.call_types[0],form,ans:JSON.parse(JSON.stringify(f.ans)),result:calcEval(form,f.ans),feedback:v.feedback||'',countInScore:!!v.countInScore}}
   if(f.kind==='vio'){if(!v.date)e.date='Pick the date';if(!(v.details||'').trim())e.details='Details are required';data={vtype:v.vtype,date:v.date,details:v.details||''}}
   if(f.kind==='adh'){if(!v.date)e.date='Pick the date';data={reason:v.reason,date:v.date,note:v.note||''}}
   if(f.kind==='task'){recipients=momRecipients(f);if(f.sendTo==='teams'&&!f.teams.length)e.teams='Pick at least one team';if(!recipients.length)e.teams='Nobody to assign to';if(!(v.title||'').trim())e.title='Describe the task';if(!v.due)e.due='Pick a due date';data={title:(v.title||'').trim(),details:v.details||'',due:v.due,sendTo:f.sendTo,teams:[...f.teams]}}
@@ -1830,6 +1935,21 @@ document.addEventListener('click',ev=>{
   if(el.tagName==='BUTTON'&&el.closest('.req-card')&&a!=='openReq')ev.stopPropagation();
   switch(a){
     case 'account':openDrawer('account');break;
+    case 'efReset':ui.formDraft=null;render();break;
+    case 'efAddItem':ui.formDraft.sections[+el.dataset.s].items.push({name:'',ar:'',good:3,avg:1,na:false});render();break;
+    case 'efDelItem':ui.formDraft.sections[+el.dataset.s].items.splice(+el.dataset.i,1);render();break;
+    case 'efAddSec':ui.formDraft.sections.push({name:'New section',items:[{name:'',ar:'',good:3,avg:1,na:false}]});render();break;
+    case 'efDelSec':if(confirm(`Delete the section “${ui.formDraft.sections[+el.dataset.s].name}” and all its items?`)){ui.formDraft.sections.splice(+el.dataset.s,1);render()}break;
+    case 'efAdd':{const g=el.dataset.g;ui.formDraft[g]=ui.formDraft[g]||[];ui.formDraft[g].push(g==='bonus'?{name:'',ar:'',value:1}:{name:'',ar:'',penalty:3});render();break}
+    case 'efDel':ui.formDraft[el.dataset.g].splice(+el.dataset.i,1);render();break;
+    case 'efSave':{const d=ui.formDraft,err=[];
+      d.sections.forEach(sec=>{if(!String(sec.name).trim())err.push('a section has no name');sec.items.forEach(it=>{if(!String(it.name).trim())err.push(`an item in “${sec.name}” has no name`);if(+it.avg>+it.good)err.push(`“${it.name}”: Avg can’t be more than Good`)})});
+      (d.bonus||[]).forEach(b2=>{if(!String(b2.name).trim())err.push('a bonus has no name')});(d.tags||[]).forEach(t=>{if(!String(t.name).trim())err.push('a quality tag has no name')});
+      if(err.length){toast('Fix first: '+err[0],true);break}
+      const tot=formTotal(d);if(tot!==100&&!confirm(`A perfect call would score ${tot}%, not 100%. Save anyway?`))break;
+      const clean=JSON.parse(JSON.stringify(d));clean.sections.forEach(sec=>{sec.name=sec.name.trim();sec.items.forEach(it=>{it.name=it.name.trim();it.ar=(it.ar||'').trim();it.good=+it.good;it.avg=+it.avg;it.na=!!it.na})});
+      (clean.bonus||[]).forEach(b2=>{b2.value=+b2.value});(clean.tags||[]).forEach(t=>{t.penalty=+t.penalty});
+      busy(async()=>{await api('settings?on_conflict=key',{method:'POST',prefer:'resolution=merge-duplicates',body:{key:'eval_form',value:clean}});await fetchAll();ui.formDraft=null;render();toast('Evaluation form saved')});break}
     case 'createTab':ui.createTab=el.dataset.t;render();break;
     case 'taskFilter':ui.taskFilter=el.dataset.f;render();break;
     case 'taskDoneOpen':openDrawer('rec',id);setTimeout(()=>{const n=$('#taskNote');if(n)n.focus()},250);break;
@@ -1917,7 +2037,8 @@ document.addEventListener('click',ev=>{
       busy(async()=>{await patchReq(c,'waiting');await fetchAll();ui.drawer=null;closeDrawer();toast(acc?'Swap accepted · sent to WFM':'Swap declined')});break}
     case 'ack':{const reply=(($('#ackReply')||{}).value||'').trim();busy(async()=>{await rpc('ack_record',{p_id:id,p_uid:S.current,p_reply:reply});await fetchAll();render();toast('Acknowledged')});break}
     case 'pickRec':ui.form=newRecForm(el.dataset.kind);go('createForm');break;
-    case 'rate':ui.form.ratings[+el.dataset.c]=+el.dataset.n;ui.form.errors.ratings=null;render();break;
+    case 'evAns':{const [grp,k2]=el.dataset.k.split('.');ui.form.ans[grp][k2]=el.dataset.v;render();break}
+    case 'evAllGood':{const si=el.dataset.s;Object.keys(ui.form.ans.items).forEach(k2=>{if(k2.split('_')[0]===si)delete ui.form.ans.items[k2]});render();break}
     case 'toggleVal':ui.form.vals[el.dataset.name]=!ui.form.vals[el.dataset.name];render();break;
     case 'momTo':ui.form.sendTo=el.dataset.s;render();break;
     case 'momTeam':{const t=+el.dataset.t,arr=ui.form.teams,i=arr.indexOf(t);i>=0?arr.splice(i,1):arr.push(t);render();break}
@@ -1937,9 +2058,11 @@ document.addEventListener('click',ev=>{
   }
 });
 let drag=null;
-document.addEventListener('pointerdown',ev=>{const g=ev.target.closest('.grip');if(!g)return;ev.preventDefault();const row=g.closest('.li-row');drag={row,box:row.parentElement,k:g.dataset.k};row.classList.add('dragging');try{g.setPointerCapture(ev.pointerId)}catch(e){}});
-document.addEventListener('pointermove',ev=>{if(!drag)return;ev.preventDefault();const rows=[...drag.box.children].filter(r=>r!==drag.row);let before=null;for(const r of rows){const b=r.getBoundingClientRect();if(ev.clientY<b.top+b.height/2){before=r;break}}if(drag.row.nextSibling!==before)drag.box.insertBefore(drag.row,before)});
-const endDrag=()=>{if(!drag)return;ui.listDraft[drag.k]=[...drag.box.querySelectorAll('input[data-li]')].map(i=>i.value);drag.row.classList.remove('dragging');drag=null;render()};
+document.addEventListener('pointerdown',ev=>{const g=ev.target.closest('.grip');if(!g)return;const row=g.closest('[data-idx]');if(!row||!row.parentElement.dataset.drag)return;ev.preventDefault();drag={row,box:row.parentElement};row.classList.add('dragging');try{g.setPointerCapture(ev.pointerId)}catch(e){}});
+document.addEventListener('pointermove',ev=>{if(!drag)return;ev.preventDefault();const rows=[...drag.box.children].filter(r=>r!==drag.row&&r.dataset.idx!=null);let before=null;for(const r of rows){const b=r.getBoundingClientRect();if(ev.clientY<b.top+b.height/2){before=r;break}}if(drag.row.nextSibling!==before)drag.box.insertBefore(drag.row,before)});
+const endDrag=()=>{if(!drag)return;const key=drag.box.dataset.drag,order=[...drag.box.children].filter(c=>c.dataset.idx!=null).map(c=>+c.dataset.idx);
+  const arr=key.startsWith('list:')?ui.listDraft[key.slice(5)]:getPath(ui.formDraft,key);if(arr){const re=order.map(i=>arr[i]);arr.splice(0,arr.length,...re)}
+  drag.row.classList.remove('dragging');drag=null;render()};
 document.addEventListener('pointerup',endDrag);document.addEventListener('pointercancel',endDrag);
 document.addEventListener('keydown',ev=>{
   if(ev.key==='Escape'&&ui.drawer)closeDrawer();
@@ -1951,6 +2074,7 @@ document.addEventListener('input',ev=>{
   if(t.dataset.bf){ui.blockForm[t.dataset.bf]=t.value;return}
   if(t.dataset.rd){ui.rulesDraft[t.dataset.rd]=t.value;return}
   if(t.dataset.li){ui.listDraft[t.dataset.li][+t.dataset.i]=t.value;return}
+  if(t.dataset.ef&&t.type!=='checkbox'){setPath(ui.formDraft,t.dataset.ef,t.type==='number'?(t.value===''?0:+t.value):t.value);return}
   if(t.dataset.pd){ui.perfDate=t.value;return}
   if(t.dataset.us){ui.userSearch=t.value;const box=$('#main');if(box){const pos=t.selectionStart;box.innerHTML=renderView();const n=$('[data-us]');if(n){n.focus();n.setSelectionRange(pos,pos)}}return}
   if(t.id==='tmpPw'){ui.tmpPw=t.value;return}
@@ -1960,6 +2084,8 @@ document.addEventListener('input',ev=>{
 document.addEventListener('change',ev=>{
   const t=ev.target;
   if(t.matches('[data-file]')){readFiles(t.files);t.value='';return}
+  if(t.dataset.ef&&t.type==='checkbox'){setPath(ui.formDraft,t.dataset.ef,t.checked);return}
+  if(t.dataset.ef&&t.type==='number'){render();return}
   if(t.dataset.member){t.checked?ui.teamSel.add(t.dataset.member):ui.teamSel.delete(t.dataset.member);renderDrawer();return}
   if(t.dataset.my){ui.my[t.dataset.my]=t.value;render();return}
   if(t.matches('[data-perf]')){const f=t.files[0];t.value='';if(f)handlePerfFile(f);return}
