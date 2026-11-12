@@ -504,6 +504,8 @@ main{min-width:0}
 .req-card.inactive{opacity:.6}
 .req-card.editing{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
 .req-card .avatar{flex:none}
+.tab-badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--primary);color:#fff;font-size:11px;margin-left:4px}
+.req-card.overdue{border-color:color-mix(in srgb,var(--bad) 45%,var(--border))}
 .who-off{display:flex;gap:10px;align-items:flex-start;margin-top:10px;padding:11px 13px;border-radius:10px;background:var(--surface-2);font-size:13px}
 .who-off svg{flex:none;margin-top:2px;color:var(--muted)}
 .who-off b{display:block;margin-bottom:2px}
@@ -588,13 +590,15 @@ const TYPES={
 const OFF='Day off';
 const shiftOpts=()=>[...LISTS.shifts,OFF];
 const dS=x=>x.start||x.date,dE=x=>x.end||x.date||x.start;
+const shiftTxt=(sh,d)=>sh===OFF&&d?`Day off (${fmt(d)})`:shortShift(sh);
 const rng=x=>dS(x)===dE(x)?fmt(dS(x)):`${fmt(dS(x))} → ${fmt(dE(x))}`;
 const rngL=x=>dS(x)===dE(x)?fmtL(dS(x)):`${fmtL(dS(x))} → ${fmtL(dE(x))}`;
 const RECS={
   adh:{name:'Adherence Note',desc:'Internal record that adjusts adherence data',c:'#64748b',i:'clipboard',pre:'AN'},
   vio:{name:'Violation Ticket',desc:'Log a violation for a staff member',c:'#ef4444',i:'alert',pre:'VT'},
   eval:{name:'Call Evaluation',desc:'Score a monitored call and give feedback',c:'#6366f1',i:'headset',pre:'EV'},
-  mom:{name:'Minutes of Meeting',desc:'Send minutes to a person or a group',c:'#0891b2',i:'file',pre:'MOM'}
+  mom:{name:'Minutes of Meeting',desc:'Send minutes to a person or a group',c:'#0891b2',i:'file',pre:'MOM'},
+  task:{name:'Task',desc:'A simple to-do — they mark it done, you confirm',c:'#f97316',i:'check',pre:'TK'}
 };
 const DEFAULT_LISTS={
   shifts:['Morning · 07:00–15:00','Mid · 11:00–19:00','Evening · 15:00–23:00','Night · 23:00–07:00'],
@@ -612,7 +616,6 @@ const LIST_META={
   kpis:{name:'KPI types',hint:'Shown to staff on KPI requests'},
   criteria:{name:'Call evaluation criteria',hint:'Scored 1–5 each. Changes apply to new evaluations; past ones keep their own criteria.'},
   call_types:{name:'Call types',hint:'Used on call evaluations'},
-  outcomes:{name:'Call outcomes',hint:'Used on call evaluations and quality filters'},
   prefs:{name:'Schedule preferences',hint:'Shown to staff on schedule special requests'},
   shifts:{name:'Shifts',hint:'Used on shift swap and shift change requests'}
 };
@@ -654,7 +657,7 @@ const nextMonths=()=>{const t=today();return [1,2].map(k=>{const d=new Date(t.ge
 
 /* ================= State ================= */
 let S; // persisted
-const ui={q:{preset:'90',team:'all',staff:'all',type:'all',evaluator:'all',outcome:'all'},view:null,form:null,drawer:null,filters:{q:'',type:'all',status:'all',team:'all'},mineFilter:'all',inboxFilter:'all',createKind:null,blockForm:{scope:'user',target:'u1',type:'swap',from:'',to:'',reason:''},rulesDraft:null};
+const ui={my:{period:'month',type:'all'},q:{preset:'90',team:'all',staff:'all',type:'all',evaluator:'all',outcome:'all'},view:null,form:null,drawer:null,filters:{q:'',type:'all',status:'all',team:'all'},mineFilter:'all',inboxFilter:'all',createKind:null,blockForm:{scope:'user',target:'u1',type:'swap',from:'',to:'',reason:''},rulesDraft:null};
 
 /* ---- Server (Supabase) ---- */
 async function api(path,{method='GET',body,prefer}={}){
@@ -669,7 +672,7 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const mkH=(action,comment)=>({at:Date.now(),by:S.current,action,comment:comment||''});
 const reqFromDb=r=>({id:r.id,type:r.type,userId:r.user_id,partnerId:r.partner_id,status:r.status,createdAt:+r.created_at,data:r.data,files:r.files||[],history:r.history||[]});
 const reqToDb=r=>({type:r.type,user_id:r.userId,partner_id:r.partnerId||null,status:r.status,data:r.data,files:r.files,history:r.history});
-const recFromDb=r=>({id:r.id,kind:r.kind,createdBy:r.created_by,createdAt:+r.created_at,recipients:r.recipients||[],requireAck:r.require_ack,acks:r.acks||{},reads:r.reads||{},data:r.data,files:r.files||[]});
+const recFromDb=r=>({id:r.id,kind:r.kind,createdBy:r.created_by,createdAt:+r.created_at,recipients:r.recipients||[],requireAck:r.require_ack,acks:r.acks||{},reads:r.reads||{},taskState:r.task_state||{},data:r.data,files:r.files||[]});
 const recToDb=r=>({kind:r.kind,created_by:r.createdBy,recipients:r.recipients,require_ack:r.requireAck,data:r.data,files:r.files});
 const blockFromDb=b=>({id:b.id,scope:b.scope,target:b.target,type:b.type,from:b.from_date,to:b.to_date,reason:b.reason});
 let lastSig='';
@@ -754,8 +757,8 @@ function summary(r){
   const x=r.data;
   switch(r.type){
     case 'leave':return `${fmt(x.start)} → ${fmt(x.end)} · ${daysBetween(x.start,x.end)} day(s)`;
-    case 'swap':return `${rng(x)} · ${shortShift(x.myShift)} ⇄ ${shortShift(x.theirShift)} with ${user(r.partnerId).name}`;
-    case 'change':return `${rng(x)} · ${shortShift(x.current)} → ${shortShift(x.requested)}`;
+    case 'swap':return `${rng(x)} · ${shiftTxt(x.myShift,x.myOffDate)} ⇄ ${shiftTxt(x.theirShift,x.theirOffDate)} with ${user(r.partnerId).name}`;
+    case 'change':return `${rng(x)} · ${shiftTxt(x.current,x.currentOffDate)} → ${shiftTxt(x.requested,x.requestedOffDate)}`;
     case 'dispute':return `${fmt(x.date)} · score ${fmtScore(x.score)}${x.corrected!=null?` → ${fmtScore(x.corrected)}`:''}`;
     case 'special':return `${x.schedule} · ${(x.prefs||[]).join(', ')}`;
     case 'kpi':return `${x.kpi} · ${fmt(x.date)}${r.files.length?` · ${r.files.length} attachment(s)`:''}`;
@@ -766,13 +769,14 @@ function recSummary(r){
   switch(r.kind){
     case 'eval':return `Score ${scoreOf(x.ratings)}% · Call on ${fmt(x.date)} · by ${user(r.createdBy).name}`;
     case 'mom':return `${x.title}${r.files.length?` · ${r.files.length} attachment(s)`:''}`;
+    case 'task':return `${x.title}${x.due?` · due ${fmt(x.due)}`:''}`;
     case 'vio':return `${x.vtype} · ${fmt(x.date)}`;
     case 'adh':return `${x.reason} · ${fmt(x.date||x.from)}`;
   }
 }
 const lastDecision=r=>[...r.history].reverse().find(h=>['Accepted','Rejected','Returned'].includes(h.action));
 const incomingSwaps=uid=>S.requests.filter(r=>r.type==='swap'&&r.partnerId===uid&&r.status==='waiting');
-const myInbox=uid=>S.records.filter(r=>r.kind!=='adh'&&r.recipients.includes(uid)).sort((a,b)=>b.createdAt-a.createdAt);
+const myInbox=uid=>S.records.filter(r=>r.kind!=='adh'&&r.kind!=='task'&&r.recipients.includes(uid)).sort((a,b)=>b.createdAt-a.createdAt);
 const isUnread=(r,uid)=>r.requireAck?!r.acks[uid]:!r.reads[uid];
 
 /* ================= UI pieces ================= */
@@ -805,11 +809,12 @@ function quick(id){return `<div class="quick"><button class="btn sm bad" data-ac
 function navItems(){
   if(isWfm()){
     const p=S.requests.filter(r=>r.status==='pending').length;
-    return [['dash','grid','Dashboard'],['all','inbox','Requests',p],['quality','headset','Quality'],['create','upload','Send to staff'],['admin','sliders','Admin']];
+    return [['dash','grid','Dashboard'],['all','inbox','Requests',p],['quality','headset','Quality'],['create','upload','Send to staff',tasksToConfirm()],['admin','sliders','Admin']];
   }
   const uid=S.current,m=S.requests.filter(r=>r.userId===uid&&r.status==='returned').length+incomingSwaps(uid).length;
   const u=myInbox(uid).filter(r=>isUnread(r,uid)).length;
-  return [['new','plus','New request'],['mine','list','My requests',m],['inbox','inbox','From WFM',u],['perf','target','My performance']];
+  const tk=S.records.filter(r=>r.kind==='task'&&r.recipients.includes(uid)&&tState(r,uid).status==='open').length;
+  return [['new','plus','New request'],['mine','list','My requests',m],['inbox','inbox','From WFM',u],['tasks','check','My tasks',tk],['perf','target','My performance']];
 }
 const activeNav=()=>ui.view==='form'?'new':ui.view==='createForm'?'create':ui.view;
 function go(view){ui.view=view;if(view!=='form'&&view!=='createForm')ui.form=null;closeDrawer(true);render();window.scrollTo(0,0)}
@@ -825,7 +830,7 @@ function render(){
   ${items.map(([k,i,l,b])=>`<button class="nav-item${k===act?' on':''}" data-action="nav" data-view="${k}">${ic(i,18)}<span>${l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`).join('')}
   <div class="side-foot">Test version · shared data.${isWfm()?`<button data-action="resetDemo">${ic('trash',14)} Clear all data</button>`:''}<button data-action="signOut">${ic('back',14)} Sign out</button></div></aside>
   <main id="main">${renderView()}</main></div>
-  <nav class="bottom-nav">${items.map(([k,i,l,b])=>`<button class="${k===act?'on':''}" data-action="nav" data-view="${k}">${ic(i,22)}<span>${({'New request':'New','My requests':'Requests','From WFM':'Inbox','My performance':'Score','Send to staff':'Send'})[l]||l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`).join('')}</nav>`;
+  <nav class="bottom-nav">${items.map(([k,i,l,b])=>`<button class="${k===act?'on':''}" data-action="nav" data-view="${k}">${ic(i,22)}<span>${({'New request':'New','My requests':'Requests','From WFM':'Inbox','My performance':'Score','My tasks':'Tasks','Send to staff':'Send'})[l]||l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`).join('')}</nav>`;
   if(ui.drawer)renderDrawer();
 }
 function renderSignin(){
@@ -840,7 +845,7 @@ function renderSignin(){
 function renderView(){
   const v=ui.view;
   if(isWfm()){return v==='quality'?viewQuality():v==='all'?viewAll():v==='create'?viewCreate():v==='createForm'?viewCreateForm():v==='admin'?viewAdmin():viewDash()}
-  return v==='form'?viewForm():v==='mine'?viewMine():v==='inbox'?viewInbox():v==='perf'?viewMyPerf():viewNew();
+  return v==='form'?viewForm():v==='mine'?viewMine():v==='inbox'?viewInbox():v==='perf'?viewMyPerf():v==='tasks'?viewMyTasks():viewNew();
 }
 
 /* ================= Staff views ================= */
@@ -913,12 +918,16 @@ function viewForm(){
     ${field('Swap with',`<select name="partnerId">${others.map(o=>opt(o.id,`${o.name} · ${teamName(o.team)}`,o.id===p)).join('')}</select>`,{req:1,full:1})}
     ${field('Your shift (you give)',so('myShift',v.myShift),{req:1,invalid:e.myShift,hint:e.myShift})}
     ${field(`${esc(pn)}’s shift (you take)`,so('theirShift',v.theirShift),{req:1})}
+    ${v.myShift===OFF?field('Which day off of yours?',inp('myOffDate','date'),{req:1,invalid:e.myOffDate,hint:e.myOffDate||'The date of your day off you’re giving'}):''}
+    ${v.theirShift===OFF?field(`Which day off of ${esc(pn)}’s?`,inp('theirOffDate','date'),{req:1,invalid:e.theirOffDate,hint:e.theirOffDate||'The date of their day off you’re taking'}):''}
     ${field('Reason',ta('reason','Why do you need the swap? (optional)'),{full:1})}
     ${files(false,'Optional')}</div>`;
   }else if(f.type==='change'){
     body=`<div class="form-grid">${field('From date',inp('start','date'),{req:1,invalid:e.start,hint:e.start})}${field('To date',inp('end','date'),{invalid:e.end,hint:e.end||'Leave empty for one day'})}
     ${field('Current shift',`<select name="current">${shiftOpts().map(s=>opt(s,s,s===v.current)).join('')}</select>`,{req:1})}
     ${field('Requested shift',`<select name="requested"><option value="">Choose…</option>${shiftOpts().filter(s=>s!==v.current).map(s=>opt(s,s,s===v.requested)).join('')}</select>`,{req:1,invalid:e.requested,hint:e.requested})}
+    ${v.current===OFF?field('Which day off?',inp('currentOffDate','date'),{req:1,invalid:e.currentOffDate,hint:e.currentOffDate||'The date of your current day off'}):''}
+    ${v.requested===OFF?field('Day off on which date?',inp('requestedOffDate','date'),{req:1,invalid:e.requestedOffDate,hint:e.requestedOffDate||'The date you want as your day off'}):''}
     ${field('Reason',ta('reason','Why do you need this change?'),{full:1,req:1,invalid:e.reason,hint:e.reason})}
     ${files(false,'Optional')}</div>`;
   }else if(f.type==='special'){
@@ -936,10 +945,10 @@ function viewForm(){
   }
   const editing=f.editingId?S.requests.find(r=>r.id===f.editingId):null,lastRet=editing&&lastDecision(editing);
   return `<button class="back" data-action="nav" data-view="${f.editingId?'mine':'new'}">${ic('back',16)} ${f.editingId?'My requests':'All request types'}</button>`+
-    head(f.editingId?`Edit ${t.name}`:t.name,f.editingId?`${f.editingId} · make the changes and resubmit`:t.desc,'',bubble(f.type))+
+    head(f.editingId?`Edit ${t.name}`:t.name,f.editingId?`${f.editingId} · make your changes and save`:t.desc,'',bubble(f.type))+
     (lastRet&&lastRet.action==='Returned'?callout('ret','undo',`${esc(user(lastRet.by).name)} returned this for changes`,esc(lastRet.comment)):'')+
     (blocksFor(uid,f.type).length?callout('warn','lock','Some dates are blocked by WFM',blocksFor(uid,f.type).map(b=>`${rangeTxt(b)}${b.reason?' · '+esc(b.reason):''}`).join('<br>')):'')+
-    `<form class="card card-pad" id="reqForm" novalidate>${requester}${body}<div class="form-actions"><button type="button" class="btn" data-action="nav" data-view="${f.editingId?'mine':'new'}">Cancel</button><button type="submit" class="btn primary">${ic('check',16)} ${f.type==='swap'?(f.editingId?'Resend to colleague':'Send to colleague'):(f.editingId?'Resubmit':'Submit request')}</button></div></form>`;
+    `<form class="card card-pad" id="reqForm" novalidate>${requester}${body}<div class="form-actions"><button type="button" class="btn" data-action="nav" data-view="${f.editingId?'mine':'new'}">Cancel</button><button type="submit" class="btn primary">${ic('check',16)} ${f.type==='swap'?(f.editingId?'Save & resend to colleague':'Send to colleague'):(f.editingId?'Save changes':'Submit request')}</button></div></form>`;
 }
 function viewMine(){
   const uid=S.current,mine=S.requests.filter(r=>r.userId===uid||(r.type==='swap'&&r.partnerId===uid&&r.status!=='waiting')).sort((a,b)=>b.createdAt-a.createdAt);
@@ -947,7 +956,7 @@ function viewMine(){
   const groups=[['all','All'],['returned','Returned'],['waiting','Waiting'],['pending','Pending'],['approved','Accepted'],['rejected','Rejected'],['cancelled','Cancelled']];
   const cnt=k=>k==='all'?mine.length:mine.filter(r=>r.status===k).length;
   const list=mine.filter(r=>ui.mineFilter==='all'||r.status===ui.mineFilter);
-  const incHtml=inc.map(r=>`<div class="incoming">${bubble('swap',1)}<div class="req-main"><b>${esc(user(r.userId).name)} wants to swap with you</b><div class="req-sub">${rng(r.data)} · their ${shortShift(r.data.myShift)} ⇄ your ${shortShift(r.data.theirShift)}${r.data.reason?` · “${esc(r.data.reason)}”`:''} · goes to WFM after you accept</div></div><div class="quick"><button class="btn sm" data-action="swapAnswer" data-a="decline" data-id="${r.id}">Decline</button><button class="btn sm primary" data-action="swapAnswer" data-a="accept" data-id="${r.id}">${ic('check',15)} Accept</button></div></div>`).join('');
+  const incHtml=inc.map(r=>`<div class="incoming">${bubble('swap',1)}<div class="req-main"><b>${esc(user(r.userId).name)} wants to swap with you</b><div class="req-sub">${rng(r.data)} · their ${shiftTxt(r.data.myShift,r.data.myOffDate)} ⇄ your ${shiftTxt(r.data.theirShift,r.data.theirOffDate)}${r.data.reason?` · “${esc(r.data.reason)}”`:''} · goes to WFM after you accept</div></div><div class="quick"><button class="btn sm" data-action="swapAnswer" data-a="decline" data-id="${r.id}">Decline</button><button class="btn sm primary" data-action="swapAnswer" data-a="accept" data-id="${r.id}">${ic('check',15)} Accept</button></div></div>`).join('');
   const cards=list.map(r=>{
     const ld=lastDecision(r);let meta=`Submitted ${ago(r.createdAt)}`;
     if(r.userId!==uid)meta=`Swap requested by ${esc(user(r.userId).name)}`;
@@ -959,6 +968,14 @@ function viewMine(){
   return head('My requests','Track everything you’ve submitted.',`<button class="btn primary" data-action="nav" data-view="new">${ic('plus',16)} New request</button>`)+incHtml+
     `<div class="chips">${groups.filter(([k])=>k==='all'||cnt(k)).map(([k,l])=>`<button class="chip${ui.mineFilter===k?' on':''}" data-action="mineFilter" data-f="${k}">${l}<span class="n">${cnt(k)}</span></button>`).join('')}</div>`+
     (cards?`<div class="req-list">${cards}</div>`:`<div class="card empty"><b>No requests here</b>Start one from “New request”.</div>`);
+}
+function viewMyTasks(){
+  const uid=S.current,mine=S.records.filter(r=>r.kind==='task'&&r.recipients.includes(uid)).map(r=>({r,t:tState(r,uid)}));
+  const sec=(title,list,empty)=>`<h2 class="section-title">${title} <span class="muted" style="font-weight:500">· ${list.length}</span></h2>${list.length?`<div class="req-list">${list.map(({r,t})=>`<div class="req-card${t.overdue?' overdue':''}" data-action="openRec" data-id="${r.id}" role="button" tabindex="0">${bubble('task',1,1)}<div class="req-main"><div class="req-title">${esc(r.data.title)}</div>
+    <div class="req-sub">Due ${fmtL(r.data.due)} · from ${esc(user(r.createdBy).name)}</div>${t.comment&&t.status==='open'?`<div class="req-meta" style="color:var(--ret);font-weight:600">Reopened: ${esc(t.comment)}</div>`:''}</div>
+    <div class="req-side">${t.status==='open'?`<button class="btn sm ok" data-action="taskDoneOpen" data-id="${r.id}">${ic('check',15)} Done</button>`:taskPill(t)}</div></div>`).join('')}</div>`:`<div class="empty-mini">${empty}</div>`}`;
+  const todo=mine.filter(x=>x.t.status==='open').sort((a,b)=>(a.r.data.due||'').localeCompare(b.r.data.due||''));
+  return head('My tasks','Things your manager asked you to do.')+sec('To do',todo,'Nothing to do — nice.')+sec('Waiting for your manager to confirm',mine.filter(x=>x.t.status==='done'),'Nothing waiting.')+sec('Completed',mine.filter(x=>x.t.status==='confirmed').sort((a,b)=>b.t.confirmedAt-a.t.confirmedAt).slice(0,20),'No completed tasks yet.');
 }
 function viewInbox(){
   const uid=S.current,all=myInbox(uid);
@@ -1033,11 +1050,28 @@ function viewAll(){
   <select class="input" data-filter="team">${opt('all','All teams',f.team==='all')}${TEAM_LIST.map(t=>opt(String(t.id),t.name,f.team===String(t.id))).join('')}</select></div>
   <div id="results">${resultsHtml()}</div>`;
 }
+const tState=(r,uid)=>{const t=r.taskState[uid]||{};const st=t.status||'open';return {...t,status:st,overdue:st==='open'&&r.data.due&&r.data.due<iso(today())}};
+const taskPill=t=>t.status==='confirmed'?'<span class="pill approved">Completed</span>':t.status==='done'?'<span class="pill waiting">Waiting for confirmation</span>':t.overdue?'<span class="pill rejected">Overdue</span>':'<span class="pill need">To do</span>';
+const tasksToConfirm=()=>S.records.filter(r=>r.kind==='task').reduce((n,r)=>n+r.recipients.filter(u=>tState(r,u).status==='done').length,0);
+function viewTasksWfm(){
+  const f=ui.taskFilter||'confirm',rows=[];
+  S.records.filter(r=>r.kind==='task').forEach(r=>r.recipients.forEach(u=>rows.push({r,u,t:tState(r,u)})));
+  const groups=[['confirm','Waiting for you',x=>x.t.status==='done'],['open','To do',x=>x.t.status==='open'],['overdue','Overdue',x=>x.t.overdue],['done','Completed',x=>x.t.status==='confirmed'],['all','All',()=>true]];
+  const g=groups.find(x=>x[0]===f)||groups[0],list=rows.filter(g[2]).sort((a,b)=>(a.r.data.due||'').localeCompare(b.r.data.due||''));
+  return `<div class="chips">${groups.map(([k,l,fn])=>`<button class="chip${k===f?' on':''}" data-action="taskFilter" data-f="${k}">${l}<span class="n">${rows.filter(fn).length}</span></button>`).join('')}</div>
+  ${list.length?`<div class="req-list">${list.map(({r,u,t})=>`<div class="req-card" data-action="openRec" data-id="${r.id}" role="button" tabindex="0">${bubble('task',1,1)}<div class="req-main"><div class="req-title">${esc(r.data.title)} <small>${r.id}</small></div>
+    <div class="req-sub">${esc(user(u).name)} · due ${fmt(r.data.due)}${t.note?` · “${esc(t.note)}”`:''}</div><div class="req-meta">Assigned by ${esc(user(r.createdBy).name)} · ${ago(r.createdAt)}</div></div>
+    <div class="req-side">${t.status==='done'?`<div class="quick"><button class="btn sm ret" data-action="taskReopen" data-id="${r.id}" data-u="${u}" title="Reopen">${ic('undo',15)}</button><button class="btn sm ok" data-action="taskConfirm" data-id="${r.id}" data-u="${u}">${ic('check',15)} Confirm</button></div>`:taskPill(t)}</div></div>`).join('')}</div>`
+  :`<div class="card empty"><b>Nothing here</b>${f==='confirm'?'No tasks are waiting for your confirmation.':'No tasks in this view.'}</div>`}`;
+}
 function viewCreate(){
-  const recent=[...S.records].sort((a,b)=>b.createdAt-a.createdAt).slice(0,12);
-  return head('Send to staff','What would you like to send?')+
+  const tab=ui.createTab||'send',nc=tasksToConfirm();
+  const tabs=`<div class="tabs"><button class="${tab==='send'?'on':''}" data-action="createTab" data-t="send">Send</button><button class="${tab==='tasks'?'on':''}" data-action="createTab" data-t="tasks">Tasks${nc?` <span class="tab-badge">${nc}</span>`:''}</button></div>`;
+  if(tab==='tasks')return head('Send to staff','Track the tasks you’ve assigned.',`<button class="btn primary" data-action="pickRec" data-kind="task">${ic('plus',16)} New task</button>`)+tabs+viewTasksWfm();
+  const recent=[...S.records].filter(r=>r.kind!=='task').sort((a,b)=>b.createdAt-a.createdAt).slice(0,12);
+  return head('Send to staff','What would you like to send?')+tabs+
   `<div class="type-grid">${Object.entries(RECS).map(([k,t])=>`<button class="type-card" style="--c:${t.c}" data-action="pickRec" data-kind="${k}">${bubble(k,0,1)}<div><b>${t.name}</b><br><span>${t.desc}</span></div></button>`).join('')}</div>
-  <div class="flow-note" style="margin-top:14px">Adherence notes stay internal. Violation tickets, call evaluations and minutes go to the staff member’s “From WFM” inbox.</div>
+  <div class="flow-note" style="margin-top:14px">Adherence notes stay internal. Violation tickets, call evaluations and minutes go to the staff member’s “From WFM” inbox. Tasks go to their “My tasks” page.</div>
   <h2 class="section-title">Recently sent</h2><div class="req-list">${recent.map(r=>{
     const n=r.recipients.length,a=Object.keys(r.acks).length,to=r.kind==='mom'?(r.data.sendTo==='all'?'Whole department':r.data.sendTo==='teams'?r.data.teams.map(t=>teamName(t)).join(', '):user(r.recipients[0]).name):user(r.recipients[0]).name;
     return `<div class="req-card" data-action="openRec" data-id="${r.id}" role="button" tabindex="0">${bubble(r.kind,1,1)}<div class="req-main"><div class="req-title">${RECS[r.kind].name} <small>${r.id}</small></div><div class="req-sub">${esc(recSummary(r))}</div><div class="req-meta">To ${esc(to)} · ${ago(r.createdAt)}</div></div><div class="req-side">${r.requireAck?`<span class="pill ${a===n?'ack':'need'}">${a}/${n} acknowledged</span>`:'<span class="pill cancelled">Internal</span>'}</div></div>`}).join('')}</div>`;
@@ -1047,8 +1081,9 @@ function newRecForm(kind){
   const f={kind,vals:{staff:(staffUsers()[0]||{}).id,requireAck:kind!=='adh',countInScore:true},files:[],errors:{},ratings:LISTS.criteria.map(()=>0),teams:TEAM_LIST.length?[TEAM_LIST[0].id]:[],sendTo:'teams'};
   if(kind==='vio'){f.vals.vtype=LISTS.vtypes[0];f.vals.date=iso(T)}
   if(kind==='adh'){f.vals.reason=LISTS.adh_reasons[0];f.vals.date=iso(T)}
-  if(kind==='eval'){f.vals.date=iso(T);f.vals.callType=LISTS.call_types[0];f.vals.outcome=LISTS.outcomes[0]}
+  if(kind==='eval'){f.vals.date=iso(T);f.vals.callType=LISTS.call_types[0]}
   if(kind==='mom'){f.vals.date=iso(T)}
+  if(kind==='task'){f.vals.due=iso(addDays(T,1));f.sendTo='person'}
   return f;
 }
 function viewCreateForm(){
@@ -1061,7 +1096,7 @@ function viewCreateForm(){
   let main='',side='';
   if(k==='eval'){
     const sc=f.ratings.every(x=>x)?scoreOf(f.ratings):null;
-    main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Call date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}${field('Call time',inp('time','time'))}${field('Call ID',inp('callId','text','e.g. CL-77219034'))}${field('Call type',`<select name="callType">${LISTS.call_types.map(c=>opt(c,c,c===v.callType)).join('')}</select>`,{req:1})}${field('Outcome',`<select name="outcome">${LISTS.outcomes.map(c=>opt(c,c,c===v.outcome)).join('')}</select>`,{req:1})}</div>
+    main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Call date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}${field('Call time',inp('time','time'))}${field('Call ID',inp('callId','text','e.g. CL-77219034'))}${field('Call type',`<select name="callType">${LISTS.call_types.map(c=>opt(c,c,c===v.callType)).join('')}</select>`,{req:1})}</div>
     <h2 style="margin:20px 0 12px">Scores ${e.ratings?`<span class="err-text" style="font-weight:500">· ${e.ratings}</span>`:''}</h2><div class="crit-grid">${LISTS.criteria.map((c,i)=>`<span>${c}</span><div class="rating">${[1,2,3,4,5].map(n=>`<i class="${n<=f.ratings[i]?'on':''}" data-action="rate" data-c="${i}" data-n="${n}">${n}</i>`).join('')}</div><b style="text-align:right">${f.ratings[i]?f.ratings[i]*20+'%':'—'}</b>`).join('')}</div>
     <div class="form-grid" style="margin-top:18px">${field('Feedback',ta('feedback','What went well, and what to improve'),{full:1,req:1,invalid:e.feedback,hint:e.feedback})}${files('e.g. evaluation form or call notes')}</div>`;
     side=`<div class="card card-pad"><div class="score-box" style="margin:0"><div class="score-num" style="${sc===null?'color:var(--faint)':''}">${sc===null?'—':sc+'%'}</div><div><b>Total score</b><span style="display:block">Average of ${LISTS.criteria.length} criteria</span></div></div></div>
@@ -1072,6 +1107,15 @@ function viewCreateForm(){
   }else if(k==='adh'){
     main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Reason',`<select name="reason">${LISTS.adh_reasons.map(s=>opt(s,s,s===v.reason)).join('')}</select>`,{req:1})}${field('Date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}${field('Note',ta('note','e.g. certificate received'),{full:1})}${files('e.g. sick certificate')}</div>`;
     side=callout('info','info','Internal only','Adherence notes are not sent to the staff member. They adjust adherence data and appear in the dashboard.');
+  }else if(k==='task'){
+    const seg=[['person','One person'],['teams','Team(s)'],['all','Whole department']],n=momRecipients(f).length;
+    main=`<div class="form-grid">${field('Assign to',`<div class="seg">${seg.map(([s2,l])=>`<button type="button" class="${f.sendTo===s2?'on':''}" data-action="momTo" data-s="${s2}">${l}</button>`).join('')}</div>`,{full:1,req:1})}
+    ${f.sendTo==='person'?field('Staff member',staffSel,{full:1,req:1}):f.sendTo==='teams'?field('Teams',`<div class="opt-chips">${TEAM_LIST.map(tm=>`<span class="chip${f.teams.includes(tm.id)?' on':''}" data-action="momTeam" data-t="${tm.id}">${esc(tm.name)} · ${staffUsers().filter(u=>u.team===tm.id).length}</span>`).join('')}</div>`,{full:1,req:1,invalid:e.teams,hint:e.teams}):''}
+    ${field('Task',inp('title','text','e.g. Update your contact details in the CRM'),{full:1,req:1,invalid:e.title,hint:e.title})}
+    ${field('Due date',inp('due','date'),{req:1,invalid:e.due,hint:e.due})}<div></div>
+    ${field('Details',ta('details','Anything they need to know (optional)'),{full:1})}${files('Optional')}</div>`;
+    side=callout('info','info','How tasks work',`<div class="flow" style="margin-top:6px"><span class="flow-step">You assign</span><span class="flow-arrow">${ic('arrow',14)}</span><span class="flow-step">Staff marks done</span><span class="flow-arrow">${ic('arrow',14)}</span><span class="flow-step">You confirm</span></div><div style="margin-top:6px">Each person gets their own copy to tick off. You can reopen it if it isn’t really done.</div>`)+
+    `<div class="card card-pad"><h2>Assigned to</h2><div class="exp-summary" style="margin:0"><span style="color:var(--primary)">${ic('users',26)}</span><div><b>${n}</b> <span>staff</span></div></div></div>`;
   }else if(k==='mom'){
     const seg=[['person','One person'],['teams','Team(s)'],['all','Whole department']];
     const n=momRecipients(f).length;
@@ -1083,7 +1127,7 @@ function viewCreateForm(){
     <div class="card card-pad"><h2>Recipients</h2><div class="exp-summary" style="margin:0"><span style="color:var(--primary)">${ic('users',26)}</span><div><b>${n}</b> <span>staff will receive this</span></div></div></div>`;
   }
   return `<button class="back" data-action="nav" data-view="create">${ic('back',16)} Send to staff</button>`+head(t.name,t.desc,'',bubble(k,0,1))+
-   `<form id="recForm" novalidate><div class="grid-2"><div class="card card-pad">${main}<div class="form-actions"><button type="button" class="btn" data-action="nav" data-view="create">Cancel</button><button type="submit" class="btn primary">${ic('check',16)} ${k==='adh'?'Save note':k==='mom'?'Send minutes':k==='vio'?'Send ticket':'Send to staff'}</button></div></div><div class="stack">${side}</div></div></form>`;
+   `<form id="recForm" novalidate><div class="grid-2"><div class="card card-pad">${main}<div class="form-actions"><button type="button" class="btn" data-action="nav" data-view="create">Cancel</button><button type="submit" class="btn primary">${ic('check',16)} ${k==='adh'?'Save note':k==='mom'?'Send minutes':k==='vio'?'Send ticket':k==='task'?'Assign task':'Send to staff'}</button></div></div><div class="stack">${side}</div></div></form>`;
 }
 function momRecipients(f){
   if(f.sendTo==='all')return staffUsers().map(u=>u.id);
@@ -1289,10 +1333,9 @@ function viewCallQuality(){
   const types=LISTS.call_types.map(t=>{const e=Q.cur.filter(r=>r.data.callType===t);return [t,avgOf(e.map(r=>scoreOf(r.data.ratings))),e.length]});
   const evaluators=USERS.filter(u=>u.role==='wfm').map(u=>{const e=Q.cur.filter(r=>r.createdBy===u.id);return [u,avgOf(e.map(r=>scoreOf(r.data.ratings))),e.length]}).filter(x=>x[2]);
   const label=`${fmtL(iso(Q.a))} – ${fmtL(iso(Q.b))}`,qv=k=>ui.q[k]||'all';
-  const active=['staff','type','evaluator','outcome'].filter(k=>qv(k)!=='all').length+(ui.q.team!=='all'?1:0);
+  const active=['staff','type','evaluator'].filter(k=>qv(k)!=='all').length+(ui.q.team!=='all'?1:0);
   const weeks={};Q.cur.forEach(r=>{const d=parse(r.data.date);const ws=iso(addDays(d,-d.getDay()));(weeks[ws]=weeks[ws]||[]).push(scoreOf(r.data.ratings))});
   const wk=Object.keys(weeks).sort().map(k=>({v:avgOf(weeks[k]),label:fmt(k),title:`Week of ${fmt(k)} · ${avgOf(weeks[k])}% · ${weeks[k].length} call(s)`}));
-  const outcomes=LISTS.outcomes.map(t=>{const e=Q.cur.filter(r=>r.data.outcome===t);return [t,avgOf(e.map(r=>scoreOf(r.data.ratings))),e.length]});
   const evList=[...Q.cur].sort((a,b)=>evalTime(b)-evalTime(a));
   return head('Quality',`Call evaluations · ${label}`,`<button class="btn" data-action="exportCycle">${ic('download',16)} Cycle summary</button>`)+qTabs()+
   `<div class="card card-pad q-filter-card"><div class="q-filters">
@@ -1301,7 +1344,6 @@ function viewCallQuality(){
    <select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select>
    <select class="input" data-q="staff">${opt('all','All staff',qv('staff')==='all')}${staffUsers().filter(u=>ui.q.team==='all'||String(u.team)===ui.q.team).map(u=>opt(u.id,u.name,qv('staff')===u.id)).join('')}</select>
    <select class="input" data-q="type">${opt('all','All call types',qv('type')==='all')}${LISTS.call_types.map(t=>opt(t,t,qv('type')===t)).join('')}</select>
-   <select class="input" data-q="outcome">${opt('all','All outcomes',qv('outcome')==='all')}${LISTS.outcomes.map(t=>opt(t,t,qv('outcome')===t)).join('')}</select>
    <select class="input" data-q="evaluator">${opt('all','All evaluators',qv('evaluator')==='all')}${USERS.filter(u=>u.role==='wfm').map(u=>opt(u.id,u.name,qv('evaluator')===u.id)).join('')}</select>
    ${active?`<button class="btn sm" data-action="qClear">${ic('x',14)} Clear ${active} filter${active>1?'s':''}</button>`:''}</div></div>
   <div class="stats">
@@ -1321,11 +1363,10 @@ function viewCallQuality(){
   <div class="grid-2" style="grid-template-columns:1fr 1fr">
    <div class="card card-pad"><h2>By call type</h2><div class="bars">${types.map(([t,a,n])=>`<div class="bar-row" style="grid-template-columns:130px 1fr 72px"><span>${t}</span><div class="bar-track"><div class="bar-fill" style="width:${a||0}%;--c:var(--primary)"></div></div><b>${a!=null?a+'%':'—'} <span class="muted" style="font-weight:500">· ${n}</span></b></div>`).join('')}</div><div class="flow-note">Average score · number of calls</div></div>
    <div class="card card-pad"><h2>Evaluator calibration</h2>${evaluators.length?`<div class="bars">${evaluators.map(([u,a,n])=>{const d=curAvg!=null?a-curAvg:0;return `<div class="bar-row" style="grid-template-columns:130px 1fr 72px"><span>${esc(u.name)}</span><div class="bar-track"><div class="bar-fill" style="width:${a}%;--c:var(--primary)"></div></div><b>${a}% <span class="muted" style="font-weight:500">· ${n}</span></b></div><div class="flow-note" style="margin:-6px 0 4px">${Math.abs(d)<=3?'In line with the team average':d<0?`Scores ${-d} pts lower than average — stricter`:`Scores ${d} pts higher than average — more lenient`}</div>`}).join('')}</div>`:'<div class="empty-mini">No evaluations in this period.</div>'}</div>
-   <div class="card card-pad"><h2>By outcome</h2><div class="bars">${outcomes.map(([t,a,n])=>`<div class="bar-row" style="grid-template-columns:130px 1fr 72px"><span>${esc(t)}</span><div class="bar-track"><div class="bar-fill" style="width:${a||0}%;--c:var(--primary)"></div></div><b>${a!=null?a+'%':'—'} <span class="muted" style="font-weight:500">· ${n}</span></b></div>`).join('')}</div><div class="flow-note">Average score · number of calls</div></div>
   </div>
   <div class="card" style="margin-top:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Evaluations <span class="muted" style="font-weight:500">· ${evList.length} in this view</span></h2></div>
-   ${evList.length?`<div class="table-wrap"><table class="mini-table"><thead><tr><th>Date</th><th>Staff</th><th>Call type</th><th>Outcome</th><th>Evaluator</th><th class="num-cell">Score</th></tr></thead><tbody>
-   ${evList.slice(0,100).map(r=>{const sc=scoreOf(r.data.ratings);return `<tr data-action="openRec" data-id="${r.id}"><td style="white-space:nowrap">${fmt(r.data.date)}</td><td style="white-space:nowrap">${esc(user(r.recipients[0]).name)}</td><td>${esc(r.data.callType||'—')}</td><td>${esc(r.data.outcome||'—')}</td><td style="white-space:nowrap">${esc(user(r.createdBy).name)}</td><td class="num-cell"><span class="score-cell${sc<tgt?' below':''}">${sc}%</span></td></tr>`}).join('')}</tbody></table></div>${evList.length>100?'<div class="flow-note" style="padding:0 16px 14px">Showing the latest 100 — narrow the filters to see others.</div>':''}`:'<div class="empty-mini" style="padding:0 16px 16px">No evaluations match these filters.</div>'}</div>`;
+   ${evList.length?`<div class="table-wrap"><table class="mini-table"><thead><tr><th>Date</th><th>Staff</th><th>Call type</th><th>Evaluator</th><th class="num-cell">Score</th></tr></thead><tbody>
+   ${evList.slice(0,100).map(r=>{const sc=scoreOf(r.data.ratings);return `<tr data-action="openRec" data-id="${r.id}"><td style="white-space:nowrap">${fmt(r.data.date)}</td><td style="white-space:nowrap">${esc(user(r.recipients[0]).name)}</td><td>${esc(r.data.callType||'—')}</td><td style="white-space:nowrap">${esc(user(r.createdBy).name)}</td><td class="num-cell"><span class="score-cell${sc<tgt?' below':''}">${sc}%</span></td></tr>`}).join('')}</tbody></table></div>${evList.length>100?'<div class="flow-note" style="padding:0 16px 14px">Showing the latest 100 — narrow the filters to see others.</div>':''}`:'<div class="empty-mini" style="padding:0 16px 16px">No evaluations match these filters.</div>'}</div>`;
 }
 function staffDrawer(uid){
   const u=user(uid),q=staffQuality(uid),tgt=S.rules.qualityTarget,star=mostImproved(staffUsers().map(x=>x.id));
@@ -1466,9 +1507,9 @@ function perfStats(ps){
   return {latest:ps.at(-1),mtd:av(ps.filter(p=>p.date>=m)),ytd:av(ps.filter(p=>p.date>=y)),mtdN:ps.filter(p=>p.date>=m).length,ytdN:ps.filter(p=>p.date>=y).length};
 }
 const openDispute=(uid,date)=>S.requests.filter(r=>r.type==='dispute'&&r.userId===uid&&r.data.date===date).sort((a,b)=>b.createdAt-a.createdAt)[0];
-function evalAnalysisHtml(uid,staffView){
-  const q=staffQuality(uid),tgt=S.rules.qualityTarget,all=q.all;
-  if(!all.length)return '<div class="empty-mini">No call evaluations yet.</div>';
+function evalAnalysisHtml(uid,staffView,list){
+  const q=staffQuality(uid),tgt=S.rules.qualityTarget,all=list||q.all;
+  if(!all.length)return `<div class="empty-mini">${list?'No call evaluations match these filters.':'No call evaluations yet.'}</div>`;
   const last=all.slice(-3),prev=all.slice(-6,-3);
   const rows=LISTS.criteria.map(n=>{const a=critAvg(all,n),l=critAvg(last,n),p=critAvg(prev,n),d=l!=null&&p!=null?l-p:null;
     return {n,a,l,d}}).filter(r=>r.a!=null);
@@ -1484,38 +1525,53 @@ function evalAnalysisHtml(uid,staffView){
   ${types.length?`<h4 class="mini-h">By call type</h4><div class="bars">${types.map(([t,a,n])=>`<div class="bar-row" style="grid-template-columns:120px 1fr 70px"><span>${esc(t)}</span><div class="bar-track"><div class="bar-fill" style="width:${a}%;--c:var(--primary)"></div></div><b>${a}% <span class="muted" style="font-weight:500">· ${n}</span></b></div>`).join('')}</div>`:''}
   ${all.length>1?`<div class="ins" style="margin-top:14px"><div data-action="openRec" data-id="${best.id}" style="cursor:pointer"><span>Best call</span><b>${scoreOf(best.data.ratings)}% · ${fmt(best.data.date)}</b></div><div data-action="openRec" data-id="${worst.id}" style="cursor:pointer"><span>Lowest call</span><b>${scoreOf(worst.data.ratings)}% · ${fmt(worst.data.date)}</b></div></div>`:''}`;
 }
+function myRange(){
+  const T=today(),p=ui.my.period;let a,b=T,label;
+  if(p==='month'){a=new Date(T.getFullYear(),T.getMonth(),1);label='This month'}
+  else if(p==='lastmonth'){a=new Date(T.getFullYear(),T.getMonth()-1,1);b=new Date(T.getFullYear(),T.getMonth(),0);label='Last month'}
+  else if(p==='ytd'){a=new Date(T.getFullYear(),0,1);label='Year to date'}
+  else if(p==='all'){a=new Date(2000,0,1);label='All time'}
+  else{const [y,m]=p.split('-').map(Number);a=new Date(y,m-1,1);b=new Date(y,m,0);label=`${MONL[m-1]} ${y}`}
+  return {a:iso(a),b:iso(b),from:a.getTime(),to:b.getTime()+86399999,label};
+}
 function viewMyPerf(){
-  const uid=S.current,ps=perfOf(uid),st=perfStats(ps),q=staffQuality(uid),tgt=S.rules.qualityTarget;
-  const months=[...new Set(ps.map(p=>p.date.slice(0,7)))].sort().reverse();
-  const mon=ui.perfMonth&&months.includes(ui.perfMonth)?ui.perfMonth:months[0];
-  const mlist=ps.filter(p=>p.date.slice(0,7)===mon);
-  const per=ui.myPeriod||'year',T=today(),pfrom=per==='month'?new Date(T.getFullYear(),T.getMonth(),1).getTime():per==='year'?new Date(T.getFullYear(),0,1).getTime():0;
-  const inP=t=>t>=pfrom;
+  const uid=S.current,ps=perfOf(uid),q=staffQuality(uid),tgt=S.rules.qualityTarget,R=myRange();
+  const evAll=q.all,months=[...new Set([...ps.map(p=>p.date.slice(0,7)),...evAll.map(r=>r.data.date.slice(0,7))])].sort().reverse();
+  const T=today(),cur=iso(T).slice(0,7),last=iso(new Date(T.getFullYear(),T.getMonth()-1,1)).slice(0,7),extra=months.filter(m=>m!==cur&&m!==last);
+  const plist=ps.filter(p=>p.date>=R.a&&p.date<=R.b),ytd=perfStats(ps);
+  const pavg=plist.length?Math.round(plist.reduce((x,p)=>x+p.score,0)/plist.length*10)/10:null;
+  const evs=evAll.filter(r=>r.data.date>=R.a&&r.data.date<=R.b&&(ui.my.type==='all'||r.data.callType===ui.my.type));
+  const inP=t=>t>=R.from&&t<=R.to;
   const recs=S.records.filter(r=>r.recipients.includes(uid)&&r.kind!=='adh'&&inP(r.createdAt));
-  const evs=recs.filter(r=>r.kind==='eval'),reqs=S.requests.filter(r=>r.userId===uid&&r.type!=='dispute'&&inP(r.createdAt));
+  const reqs=S.requests.filter(r=>r.userId===uid&&r.type!=='dispute'&&inP(r.createdAt));
+  const tasks=S.records.filter(r=>r.kind==='task'&&r.recipients.includes(uid)&&inP(r.createdAt));
   const tile=(l,v,sub,col)=>`<div class="card stat"><span>${l}</span><b${col?` style="color:${col}"`:''}>${v}</b><small>${sub||''}</small></div>`;
-  const dayRows=[...mlist].reverse().map((p,i,arr)=>{const prev=ps[ps.indexOf(p)-1],d=prev?Math.round((p.score-prev.score)*10)/10:null,dp=openDispute(uid,p.date);
+  const dayRows=[...plist].reverse().map(p=>{const prev=ps[ps.indexOf(p)-1],d=prev?Math.round((p.score-prev.score)*10)/10:null,dp=openDispute(uid,p.date);
     return `<tr><td style="white-space:nowrap">${fmt(p.date)} <span class="muted" style="font-size:12px">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][parse(p.date).getDay()]}</span></td><td class="num-cell"><span class="score-cell">${fmtScore(p.score)}</span></td>
     <td>${d==null?'<span class="muted">—</span>':`<span class="delta ${d>=0?'up':'down'}">${d>=0?'▲':'▼'} ${Math.abs(d)}</span>`}</td>
     <td style="text-align:right">${dp?`<button class="btn sm" data-action="openReq" data-id="${dp.id}">${pill(dp.status).replace('class="pill','class="pill sm')}</button>`:`<button class="btn sm" data-action="disputeNew" data-date="${p.date}">${ic('alert',13)} Dispute</button>`}</td></tr>`}).join('');
-  return head('My performance','Your scores and everything WFM has shared with you.')+
-  `<div class="card card-pad" style="margin-bottom:18px"><h2>Daily performance</h2>
-   ${st.latest?`<div class="stats" style="margin-bottom:14px">${tile('Latest',fmtScore(st.latest.score),'on '+fmt(st.latest.date),'var(--primary)')}${tile('Month to date',fmtScore(st.mtd),st.mtdN+' days')}${tile('Year to date',fmtScore(st.ytd),st.ytdN+' days')}</div>
-   <div class="perf-head"><h4 class="mini-h" style="margin:0">Day by day</h4><select class="input" data-pm="1" style="width:auto">${months.map(m=>opt(m,`${MONL[+m.slice(5)-1]} ${m.slice(0,4)}`,m===mon)).join('')}</select></div>
-   <div class="grid-2 perf-grid" style="margin-top:10px"><div>${perfChart(mlist)}</div><div class="table-wrap day-table"><table class="mini-table"><thead><tr><th>Date</th><th class="num-cell">Score</th><th>Change</th><th></th></tr></thead><tbody>${dayRows}</tbody></table></div></div>
-   <div class="flow-note">Think a score is wrong? Tap <b>Dispute</b> next to the day and explain why — WFM will review it.</div>`
+  const evAvg=avgOf(evs.map(r=>scoreOf(r.data.ratings))),nFilters=(ui.my.type!=='all'?1:0);
+  return head('My performance',`Showing ${R.label.toLowerCase()}${ui.my.type!=='all'?` · ${esc(ui.my.type)} calls`:''}.`)+
+  `<div class="card card-pad q-filter-card"><div class="q-filters">
+    <select class="input" data-my="period">${opt('month','This month',ui.my.period==='month')}${opt('lastmonth','Last month',ui.my.period==='lastmonth')}${opt('ytd','Year to date',ui.my.period==='ytd')}${opt('all','All time',ui.my.period==='all')}${extra.length?`<optgroup label="Specific month">${extra.map(m=>opt(m,`${MONL[+m.slice(5)-1]} ${m.slice(0,4)}`,ui.my.period===m)).join('')}</optgroup>`:''}</select>
+    <select class="input" data-my="type">${opt('all','All call types',ui.my.type==='all')}${LISTS.call_types.map(t=>opt(t,t,ui.my.type===t)).join('')}</select>
+    ${nFilters||ui.my.period!=='month'?`<button class="btn sm" data-action="myClear">${ic('x',14)} Reset</button>`:''}</div></div>
+  <div class="card card-pad" style="margin-bottom:18px"><h2>Daily performance</h2>
+   ${ps.length?`<div class="stats" style="margin-bottom:14px">${tile(R.label+' average',fmtScore(pavg),`${plist.length} day(s)`,'var(--primary)')}${tile('Latest',fmtScore(ytd.latest.score),'on '+fmt(ytd.latest.date))}${tile('Month to date',fmtScore(ytd.mtd),ytd.mtdN+' days')}${tile('Year to date',fmtScore(ytd.ytd),ytd.ytdN+' days')}</div>
+   ${plist.length?`<div class="grid-2 perf-grid"><div>${perfChart(plist)}</div><div class="table-wrap day-table"><table class="mini-table"><thead><tr><th>Date</th><th class="num-cell">Score</th><th>Change</th><th></th></tr></thead><tbody>${dayRows}</tbody></table></div></div>
+   <div class="flow-note">Think a score is wrong? Tap <b>Dispute</b> next to the day and explain why — WFM will review it.</div>`:`<div class="empty-mini">No scores in ${R.label.toLowerCase()}.</div>`}`
    :'<div class="empty-mini">No daily performance scores yet. They’ll appear here once WFM uploads them.</div>'}</div>
-  <div class="card card-pad" style="margin-bottom:18px"><div class="perf-head"><h2 style="margin:0">From WFM / managers</h2><select class="input" data-mp="1" style="width:auto">${[['month','This month'],['year','This year'],['all','All time']].map(([k,l])=>opt(k,l,per===k)).join('')}</select></div>
-   <div class="stats" style="margin-top:14px">${tile('Call evaluations',evs.length,evs.length?`average ${avgOf(evs.map(r=>scoreOf(r.data.ratings)))}%`:'none yet')}
+  <div class="card card-pad" style="margin-bottom:18px"><h2>From WFM / managers <span class="muted" style="font-weight:500">· ${R.label.toLowerCase()}</span></h2>
+   <div class="stats" style="margin-top:14px">${tile('Call evaluations',recs.filter(r=>r.kind==='eval').length,recs.some(r=>r.kind==='eval')?`average ${avgOf(recs.filter(r=>r.kind==='eval').map(r=>scoreOf(r.data.ratings)))}%`:'none')}
    ${tile('Violation tickets',recs.filter(r=>r.kind==='vio').length,'',recs.some(r=>r.kind==='vio')?'var(--bad)':'')}
    ${tile('Minutes of meeting',recs.filter(r=>r.kind==='mom').length,'')}
    ${tile('Waiting for you',recs.filter(r=>r.requireAck&&!r.acks[uid]).length,'to acknowledge',recs.some(r=>r.requireAck&&!r.acks[uid])?'var(--warn)':'')}
+   ${tile('Tasks',tasks.length,`${tasks.filter(r=>tState(r,uid).status==='confirmed').length} completed · ${tasks.filter(r=>tState(r,uid).status==='open').length} to do`)}
    ${tile('Requests accepted',reqs.filter(r=>r.status==='approved').length,`of ${reqs.filter(r=>['approved','rejected'].includes(r.status)).length} decided`,'var(--ok)')}
    ${tile('Requests rejected',reqs.filter(r=>r.status==='rejected').length,'')}
-   ${tile('Still open',reqs.filter(r=>['pending','waiting','returned'].includes(r.status)).length,'pending, waiting or returned')}
-   ${tile('KPI requests accepted',reqs.filter(r=>r.type==='kpi'&&r.status==='approved').length,'')}</div></div>
-  <div class="card card-pad"><h2>Call quality</h2>${q.sc.length?`<div class="score-box"><div class="score-num" style="color:${q.recent>=tgt?'var(--ok)':'var(--bad)'}">${q.recent}%</div><div><b>${q.sc.length===1?'Last call':`Average of last ${Math.min(6,q.sc.length)} calls`}</b><span style="display:block">Target ${tgt}% · ${q.sc.length} evaluation(s) in total</span><div style="margin-top:6px">${trendBadge(q.trend)}</div></div></div>`:''}
-   ${evalAnalysisHtml(uid,true)}</div>`;
+   ${tile('Still open',reqs.filter(r=>['pending','waiting','returned'].includes(r.status)).length,'pending, waiting or returned')}</div></div>
+  <div class="card card-pad"><h2>Call quality <span class="muted" style="font-weight:500">· ${R.label.toLowerCase()}${ui.my.type!=='all'?' · '+esc(ui.my.type):''}</span></h2>${evs.length?`<div class="score-box"><div class="score-num" style="color:${evAvg>=tgt?'var(--ok)':'var(--bad)'}">${evAvg}%</div><div><b>Average of ${evs.length} call${evs.length>1?'s':''}</b><span style="display:block">Target ${tgt}%</span><div style="margin-top:6px">${trendBadge(q.trend)} <span class="muted" style="font-size:11.5px">overall trend</span></div></div></div>`:''}
+   ${evalAnalysisHtml(uid,true,evs)}</div>`;
 }
 function disputeDrawer(date){
   const p=S.perf.find(x=>x.userId===S.current&&x.date===date);
@@ -1590,8 +1646,8 @@ function reqDetails(r){
   const x=r.data;
   switch(r.type){
     case 'leave':return kv('Start date',fmtL(x.start))+kv('End date',fmtL(x.end))+kv('Duration',`${daysBetween(x.start,x.end)} day(s)`)+kv('Cover arranged with',esc(x.cover||'—'));
-    case 'swap':return kv('Dates',rngL(x))+kv('Days',daysBetween(dS(x),dE(x)))+kv('Swap with',esc(user(r.partnerId).name),1)+kv(`${esc(user(r.userId).name.split(' ')[0])}’s shift`,esc(x.myShift))+kv(`${esc(user(r.partnerId).name.split(' ')[0])}’s shift`,esc(x.theirShift));
-    case 'change':return kv('Dates',rngL(x))+kv('Days',daysBetween(dS(x),dE(x)))+kv('Current shift',esc(x.current))+kv('Requested shift',esc(x.requested));
+    case 'swap':return kv('Dates',rngL(x))+kv('Days',daysBetween(dS(x),dE(x)))+kv('Swap with',esc(user(r.partnerId).name),1)+kv(`${esc(user(r.userId).name.split(' ')[0])}’s shift`,esc(x.myShift===OFF&&x.myOffDate?`Day off · ${fmtL(x.myOffDate)}`:x.myShift))+kv(`${esc(user(r.partnerId).name.split(' ')[0])}’s shift`,esc(x.theirShift===OFF&&x.theirOffDate?`Day off · ${fmtL(x.theirOffDate)}`:x.theirShift));
+    case 'change':return kv('Dates',rngL(x))+kv('Days',daysBetween(dS(x),dE(x)))+kv('Current shift',esc(x.current===OFF&&x.currentOffDate?`Day off · ${fmtL(x.currentOffDate)}`:x.current))+kv('Requested shift',esc(x.requested===OFF&&x.requestedOffDate?`Day off · ${fmtL(x.requestedOffDate)}`:x.requested));
     case 'dispute':return kv('Score date',fmtL(x.date))+kv('Score',fmtScore(x.score))+(x.corrected!=null?kv('Corrected score',fmtScore(x.corrected),1):'');
     case 'special':return kv('For schedule',esc(x.schedule))+kv('Period',esc(x.period==='Specific dates'?x.dates:x.period))+kv('Preference',esc((x.prefs||[]).join(', ')),1);
     case 'kpi':return kv('KPI affected',esc(x.kpi))+kv('Date',fmtL(x.date));
@@ -1599,7 +1655,7 @@ function reqDetails(r){
 }
 function reqNotes(r){const x=r.data,t=x.notes||x.reason||x.details||x.justification;return t?`<div class="d-section"><h4>${r.type==='kpi'?'Justification':r.type==='special'?'Details':r.type==='leave'?'Notes':'Reason'}</h4><div class="note-box">${esc(t)}</div></div>`:''}
 function timeline(r){
-  const cls=a=>a==='Accepted'?'approved':a==='Rejected'||a==='Declined by colleague'?'rejected':a==='Returned'?'returned':a==='Cancelled'?'cancelled':a==='Colleague accepted'?'waiting':'';
+  const cls=a=>a==='Edited'?'waiting':a==='Accepted'?'approved':a==='Rejected'||a==='Declined by colleague'?'rejected':a==='Returned'?'returned':a==='Cancelled'?'cancelled':a==='Colleague accepted'?'waiting':'';
   return `<div class="timeline">${r.history.map(h=>`<div class="t-item ${cls(h.action)}"><b>${h.action==='Returned'?'Returned for changes':h.action}</b><span>${esc(user(h.by).name)} · ${fmtTs(h.at)}</span>${h.comment?`<em>${esc(h.comment)}</em>`:''}</div>`).join('')}</div>`;
 }
 function reqDrawer(r){
@@ -1616,7 +1672,8 @@ function reqDrawer(r){
   if(wfm&&r.status==='pending'){
     foot=`<div class="d-foot">${r.type==='dispute'?`<div class="dispute-fix"><label for="decisionScore">Corrected score (optional)</label><input class="input" id="decisionScore" type="number" step="0.1" min="0" max="200" placeholder="${r.data.score}"><span class="muted">Accept with a value to update the staff member’s score.</span></div>`:''}<textarea class="input" id="decisionComment" rows="2" placeholder="Comment (required to return or reject)"></textarea><div class="row"><button class="btn bad" data-action="decide" data-d="reject" data-id="${r.id}">${ic('x',16)} Reject</button><button class="btn ret" data-action="decide" data-d="return" data-id="${r.id}">${ic('undo',16)} Return</button><button class="btn ok" data-action="decide" data-d="accept" data-id="${r.id}">${ic('check',16)} Accept</button></div></div>`;
   }else if(!wfm&&r.userId===uid&&['pending','waiting','returned'].includes(r.status)){
-    foot=`<div class="d-foot"><div class="row"><button class="btn bad" data-action="cancelReq" data-id="${r.id}">${ic('x',16)} Cancel request</button>${r.status==='returned'?`<button class="btn primary" data-action="editReq" data-id="${r.id}">${ic('edit',16)} Edit &amp; resubmit</button>`:''}</div></div>`;
+    const canEdit=r.type!=='dispute'&&(r.status==='returned'||r.status==='waiting'||(r.status==='pending'&&r.type!=='swap'));
+    foot=`<div class="d-foot">${r.status==='pending'&&r.type==='swap'?'<div class="flow-note" style="margin:0 0 8px">Your colleague already accepted, so this swap can only be cancelled now.</div>':r.status!=='returned'?'<div class="flow-note" style="margin:0 0 8px">You can change or cancel this until it’s acted on.</div>':''}<div class="row"><button class="btn bad" data-action="cancelReq" data-id="${r.id}">${ic('x',16)} Cancel request</button>${canEdit?`<button class="btn primary" data-action="editReq" data-id="${r.id}">${ic('edit',16)} ${r.status==='returned'?'Edit &amp; resubmit':'Edit request'}</button>`:''}</div></div>`;
   }else if(!wfm&&r.partnerId===uid&&r.status==='waiting'){
     foot=`<div class="d-foot"><div class="row"><button class="btn" data-action="swapAnswer" data-a="decline" data-id="${r.id}">Decline</button><button class="btn primary" data-action="swapAnswer" data-a="accept" data-id="${r.id}">${ic('check',16)} Accept swap</button></div></div>`;
   }
@@ -1632,7 +1689,7 @@ function recDrawer(r){
   if(r.kind==='eval'){
     const sc=scoreOf(x.ratings);
     body=`<div class="score-box"><div class="score-num" style="color:${sc>=85?'var(--ok)':sc>=70?'var(--warn)':'var(--bad)'}">${sc}%</div><div><b>${sc>=85?'Good call':sc>=70?'Room to improve':'Needs attention'}</b><span style="display:block">Evaluated by ${esc(user(r.createdBy).name)} · ${fmtL(iso(new Date(r.createdAt)))}</span></div></div>
-    <div class="d-section"><h4>Call</h4><div class="kv">${kv('Call date',`${fmtL(x.date)}${x.time?', '+esc(x.time):''}`)+kv('Call ID',esc(x.callId||'—'))+kv('Call type',esc(x.callType||'—'))+kv('Outcome',esc(x.outcome||'—'))+kv('Evaluator',esc(user(r.createdBy).name),1)}</div></div>
+    <div class="d-section"><h4>Call</h4><div class="kv">${kv('Call date',`${fmtL(x.date)}${x.time?', '+esc(x.time):''}`)+kv('Call ID',esc(x.callId||'—'))+kv('Call type',esc(x.callType||'—'))+kv('Evaluator',esc(user(r.createdBy).name),1)}</div></div>
     <div class="d-section"><h4>Scores</h4><div class="bars">${critOf(r).map((c,i)=>{const v=x.ratings[i]*20;return `<div class="bar-row" style="grid-template-columns:150px 1fr 40px"><span>${esc(c)}</span><div class="bar-track"><div class="bar-fill" style="width:${v}%;--c:${v>=90?'var(--ok)':v>=80?'var(--primary)':'var(--warn)'}"></div></div><b>${v}%</b></div>`}).join('')}</div></div>
     <div class="d-section"><h4>Feedback</h4><div class="note-box">${esc(x.feedback)}</div></div>`;
   }else if(r.kind==='mom'){
@@ -1640,12 +1697,26 @@ function recDrawer(r){
     <div class="d-section"><h4>Summary</h4><div class="note-box">${esc(x.summary)}</div></div>${x.actions?`<div class="d-section"><h4>Action items</h4><div class="note-box">${esc(x.actions)}</div></div>`:''}`;
   }else if(r.kind==='vio'){
     body=`<div class="d-section"><div class="kv">${kv('Violation type',esc(x.vtype))+kv('Date',fmtL(x.date))+kv('Issued by',esc(user(r.createdBy).name),1)}</div></div><div class="d-section"><h4>Details</h4><div class="note-box">${esc(x.details)}</div></div>`;
+  }else if(r.kind==='task'){
+    body=`<div class="d-section"><div class="kv">${kv('Task',esc(x.title),1)+kv('Due',fmtL(x.due))+kv('Assigned by',esc(user(r.createdBy).name))}</div></div>${x.details?`<div class="d-section"><h4>Details</h4><div class="note-box">${esc(x.details)}</div></div>`:''}`;
   }else if(r.kind==='adh'){
     body=`<div class="d-section"><div class="kv">${kv('Staff member',esc(user(r.recipients[0]).name))+kv('Reason',esc(x.reason))+kv('Date',fmtL(x.date||x.from))+kv('Created by',esc(user(r.createdBy).name),1)}</div></div>${x.note?`<div class="d-section"><h4>Note</h4><div class="note-box">${esc(x.note)}</div></div>`:''}`;
   }
   if(r.files.length)body+=`<div class="d-section"><h4>Attachments</h4>${fileList(r.files)}</div>`;
   let foot='';
-  if(wfm&&r.kind!=='adh'){
+  if(r.kind==='task'){
+    if(wfm){
+      const done=r.recipients.filter(u=>tState(r,u).status!=='open').length;
+      body+=`<div class="d-section"><h4>Assigned to · ${done}/${r.recipients.length} done</h4><div class="recip">${r.recipients.map(u=>{const t=tState(r,u);return `<div><span class="av">${initials(user(u).name)}</span>${esc(user(u).name)}${t.status==='done'?`<span class="quick" style="margin-left:auto"><button class="btn sm ret" data-action="taskReopen" data-id="${r.id}" data-u="${u}" title="Reopen">${ic('undo',14)}</button><button class="btn sm ok" data-action="taskConfirm" data-id="${r.id}" data-u="${u}">${ic('check',14)} Confirm</button></span>`:taskPill(t)}</div>${t.note?`<em class="note-box" style="display:block;font-style:normal;margin:0 0 6px 36px;font-size:12.5px">“${esc(t.note)}”</em>`:''}`}).join('')}</div>
+      <textarea class="input" id="reopenComment" rows="2" placeholder="Comment if you reopen a task (optional)" style="margin-top:10px"></textarea></div>`;
+    }else{
+      const t=tState(r,uid);
+      if(t.comment&&t.status==='open')body=callout('ret','undo',`${esc(user(t.reopenedBy).name)} reopened this`,esc(t.comment))+body;
+      foot=t.status==='open'?`<div class="d-foot"><textarea class="input" id="taskNote" rows="2" placeholder="Note for your manager (optional)"></textarea><div class="row"><button class="btn ok" data-action="taskDone" data-id="${r.id}">${ic('check',16)} Mark as done</button></div></div>`
+        :t.status==='done'?`<div class="d-foot"><div class="ack-done" style="color:var(--primary)">${ic('clock',16)} Done ${fmtTs(t.doneAt)} · waiting for your manager to confirm</div></div>`
+        :`<div class="d-foot"><div class="ack-done">${ic('check',16)} Completed · confirmed ${fmtTs(t.confirmedAt)}</div></div>`;
+    }
+  }else if(wfm&&r.kind!=='adh'){
     body+=`<div class="d-section"><h4>Recipients · ${Object.keys(r.acks).length}/${r.recipients.length} acknowledged</h4><div class="recip">${r.recipients.map(id=>{const a=r.acks[id];return `<div><span class="av">${initials(user(id).name)}</span>${esc(user(id).name)}${r.requireAck?ackPill(!!a):'<span class="pill cancelled">No ack needed</span>'}</div>${a&&a.reply?`<em class="note-box" style="display:block;font-style:normal;margin:0 0 6px 36px;font-size:12.5px">“${esc(a.reply)}”</em>`:''}`}).join('')}</div></div>`;
   }else if(!wfm&&r.requireAck){
     const a=r.acks[uid];
@@ -1671,10 +1742,13 @@ function submitRequest(){
     else if(en<st)e.end='Must be on or after the “From” date';
     else if(daysBetween(st,en)>31)e.end='Maximum 31 days per request';
     if(!e.start&&!e.end){const bl=blockedInRange(uid,f.type,st,en);if(bl.length){const b=blockOn(uid,f.type,bl[0]);e.start=`${fmt(bl[0])} is blocked by WFM${b&&b.reason?': '+b.reason:''}`}}
+    const offChk=(sel,key)=>{if(v[sel]===OFF){if(!v[key])e[key]='Pick the date of the day off';else if(v[key]<=tIso)e[key]='Pick a future date'}};
     if(f.type==='swap'){if(v.myShift===OFF&&v.theirShift===OFF)e.myShift='Both can’t be days off';else if(v.myShift===v.theirShift)e.myShift='Pick different shifts — otherwise nothing changes';
-      data={start:st,end:en,myShift:v.myShift,theirShift:v.theirShift,reason:v.reason||''}}
+      offChk('myShift','myOffDate');offChk('theirShift','theirOffDate');
+      data={start:st,end:en,myShift:v.myShift,theirShift:v.theirShift,myOffDate:v.myShift===OFF?v.myOffDate:'',theirOffDate:v.theirShift===OFF?v.theirOffDate:'',reason:v.reason||''}}
     else{if(!v.requested)e.requested='Choose a shift';if(!(v.reason||'').trim())e.reason='Please give a reason';
-      data={start:st,end:en,current:v.current,requested:v.requested,reason:v.reason||''}}
+      offChk('current','currentOffDate');offChk('requested','requestedOffDate');
+      data={start:st,end:en,current:v.current,requested:v.requested,currentOffDate:v.current===OFF?v.currentOffDate:'',requestedOffDate:v.requested===OFF?v.requestedOffDate:'',reason:v.reason||''}}
   }else if(f.type==='special'){
     if(!f.prefs.length)e.prefs='Pick at least one preference';if(!(v.details||'').trim())e.details='Please explain your request';
     if(v.period==='Specific dates'&&!(v.dates||'').trim())e.dates='Enter the dates';
@@ -1691,8 +1765,8 @@ function submitRequest(){
   busy(async()=>{
     if(f.editingId){
       const orig=S.requests.find(x=>x.id===f.editingId),r=clone(orig);
-      r.data=data;r.files=f.files;r.status=status;if(f.type==='swap')r.partnerId=v.partnerId;r.history.push(mkH('Resubmitted'));
-      await patchReq(r,orig.status);await fetchAll();ui.mineFilter='all';go('mine');toast(`${r.id} resubmitted`);
+      r.data=data;r.files=f.files;r.status=status;if(f.type==='swap')r.partnerId=v.partnerId;const act=orig.status==='returned'?'Resubmitted':'Edited';r.history.push(mkH(act));
+      await patchReq(r,orig.status);await fetchAll();ui.mineFilter='all';go('mine');toast(`${r.id} ${act==='Edited'?'updated':'resubmitted'}`);
     }else{
       const r={type:f.type,userId:uid,partnerId:f.type==='swap'?v.partnerId:null,status,data,files:f.files,history:[mkH('Submitted')]};
       const rows=await api('requests',{method:'POST',prefer:'return=representation',body:reqToDb(r)});
@@ -1702,16 +1776,18 @@ function submitRequest(){
 }
 function submitRecord(){
   const f=ui.form,v=f.vals,e={};let data={},recipients=[v.staff];
-  if(f.kind==='eval'){if(!v.date)e.date='Pick the date';if(!f.ratings.every(x=>x))e.ratings='Score every criterion';if(!(v.feedback||'').trim())e.feedback='Feedback is required';data={date:v.date,time:v.time||'',callId:v.callId||'',callType:v.callType||LISTS.call_types[0],outcome:v.outcome||LISTS.outcomes[0],criteria:[...LISTS.criteria],ratings:[...f.ratings],feedback:v.feedback||'',countInScore:!!v.countInScore}}
+  if(f.kind==='eval'){if(!v.date)e.date='Pick the date';if(!f.ratings.every(x=>x))e.ratings='Score every criterion';if(!(v.feedback||'').trim())e.feedback='Feedback is required';data={date:v.date,time:v.time||'',callId:v.callId||'',callType:v.callType||LISTS.call_types[0],criteria:[...LISTS.criteria],ratings:[...f.ratings],feedback:v.feedback||'',countInScore:!!v.countInScore}}
   if(f.kind==='vio'){if(!v.date)e.date='Pick the date';if(!(v.details||'').trim())e.details='Details are required';data={vtype:v.vtype,date:v.date,details:v.details||''}}
   if(f.kind==='adh'){if(!v.date)e.date='Pick the date';data={reason:v.reason,date:v.date,note:v.note||''}}
+  if(f.kind==='task'){recipients=momRecipients(f);if(f.sendTo==='teams'&&!f.teams.length)e.teams='Pick at least one team';if(!recipients.length)e.teams='Nobody to assign to';if(!(v.title||'').trim())e.title='Describe the task';if(!v.due)e.due='Pick a due date';data={title:(v.title||'').trim(),details:v.details||'',due:v.due,sendTo:f.sendTo,teams:[...f.teams]}}
   if(f.kind==='mom'){recipients=momRecipients(f);if(f.sendTo==='teams'&&!f.teams.length)e.teams='Pick at least one team';if(!(v.title||'').trim())e.title='Title is required';if(!v.date)e.date='Pick the date';if(!(v.summary||'').trim())e.summary='Summary is required';data={title:v.title,date:v.date,summary:v.summary||'',actions:v.actions||'',sendTo:f.sendTo,teams:[...f.teams]}}
   f.errors=e;if(Object.keys(e).length){render();toast('Please fix the highlighted fields',true);return}
-  const r={kind:f.kind,createdBy:S.current,recipients,requireAck:f.kind==='adh'?false:!!v.requireAck,data,files:f.files};
+  const r={kind:f.kind,createdBy:S.current,recipients,requireAck:f.kind==='adh'||f.kind==='task'?false:!!v.requireAck,data,files:f.files};
   busy(async()=>{
     const rows=await api('records',{method:'POST',prefer:'return=representation',body:recToDb(r)});const id=rows[0].id;
     await fetchAll();go('create');
-    toast(f.kind==='adh'?`${id} saved`:`${id} sent to ${recipients.length===1?user(recipients[0]).name:recipients.length+' staff'}`);
+    if(f.kind==='task')ui.createTab='tasks';
+    toast(f.kind==='adh'?`${id} saved`:f.kind==='task'?`${id} assigned to ${recipients.length===1?user(recipients[0]).name:recipients.length+' staff'}`:`${id} sent to ${recipients.length===1?user(recipients[0]).name:recipients.length+' staff'}`);
   });
 }
 function decide(id,d,comment){
@@ -1737,7 +1813,7 @@ function exportCsv(){
   const list=filteredRequests();
   const head=['ID','Type','Status','Employee','Employee ID','Team','Submitted','Start date','End date','Days','Date','Swap with','Current / own shift','Requested / other shift','KPI','Schedule','Preferences','Notes / reason','Attachments','Last decision by','Decision date','Comment'];
   const rows=list.map(r=>{const u=user(r.userId),d=lastDecision(r),x=r.data;return [r.id,TYPES[r.type].name,STATUS[r.status],u.name,u.emp,teamName(u.team),{dt:r.createdAt},
-    x.start?{d:x.start}:'',x.end?{d:x.end}:'',x.start?daysBetween(x.start,x.end):'',x.date?{d:x.date}:'',r.partnerId?user(r.partnerId).name:'',x.myShift||x.current||'',x.theirShift||x.requested||'',x.kpi||'',x.schedule||'',(x.prefs||[]).join(', '),
+    x.start?{d:x.start}:'',x.end?{d:x.end}:'',x.start?daysBetween(x.start,x.end):'',x.date?{d:x.date}:'',r.partnerId?user(r.partnerId).name:'',x.myShift?shiftTxt(x.myShift,x.myOffDate):x.current?shiftTxt(x.current,x.currentOffDate):'',x.theirShift?shiftTxt(x.theirShift,x.theirOffDate):x.requested?shiftTxt(x.requested,x.requestedOffDate):'',x.kpi||'',x.schedule||'',(x.prefs||[]).join(', '),
     x.notes||x.reason||x.details||x.justification||'',r.files.map(f=>f.name).join('; '),d?user(d.by).name:'',d?{dt:d.at}:'',d?d.comment:'']});
   downloadXlsx(`wfm-requests-${iso(today())}.xlsx`,[{name:'Requests',rows:[head,...rows],widths:[11,22,20,20,12,24,18,12,12,7,12,18,22,22,18,16,24,40,24,18,18,36]}]);
   toast(`Exported ${list.length} request(s) to Excel`);
@@ -1754,6 +1830,13 @@ document.addEventListener('click',ev=>{
   if(el.tagName==='BUTTON'&&el.closest('.req-card')&&a!=='openReq')ev.stopPropagation();
   switch(a){
     case 'account':openDrawer('account');break;
+    case 'createTab':ui.createTab=el.dataset.t;render();break;
+    case 'taskFilter':ui.taskFilter=el.dataset.f;render();break;
+    case 'taskDoneOpen':openDrawer('rec',id);setTimeout(()=>{const n=$('#taskNote');if(n)n.focus()},250);break;
+    case 'taskDone':{const note=(($('#taskNote')||{}).value||'').trim();busy(async()=>{await rpc('task_done',{p_id:id,p_uid:S.current,p_note:note});await fetchAll();closeDrawer();toast('Marked as done · your manager will confirm')});break}
+    case 'taskConfirm':{const u=el.dataset.u;busy(async()=>{await rpc('task_confirm',{p_id:id,p_uid:u,p_by:S.current});await fetchAll();render();toast(`Confirmed · ${user(u).name}’s task is complete`)});break}
+    case 'taskReopen':{const u=el.dataset.u,c=(($('#reopenComment')||{}).value||'').trim()||prompt(`Why are you reopening ${user(u).name}’s task? (optional)`)||'';busy(async()=>{await rpc('task_reopen',{p_id:id,p_uid:u,p_by:S.current,p_comment:c});await fetchAll();render();toast(`Reopened for ${user(u).name}`)});break}
+    case 'myClear':ui.my={period:'month',type:'all'};render();break;
     case 'qClear':ui.q={...ui.q,team:'all',staff:'all',type:'all',evaluator:'all',outcome:'all'};render();break;
     case 'openDisputes':ui.view='all';ui.filters={q:'',type:'dispute',status:'pending',team:'all'};render();window.scrollTo(0,0);break;
     case 'disputeNew':openDrawer('dispute',el.dataset.date);break;
@@ -1878,15 +1961,14 @@ document.addEventListener('change',ev=>{
   const t=ev.target;
   if(t.matches('[data-file]')){readFiles(t.files);t.value='';return}
   if(t.dataset.member){t.checked?ui.teamSel.add(t.dataset.member):ui.teamSel.delete(t.dataset.member);renderDrawer();return}
-  if(t.dataset.pm){ui.perfMonth=t.value;render();return}
-  if(t.dataset.mp){ui.myPeriod=t.value;render();return}
+  if(t.dataset.my){ui.my[t.dataset.my]=t.value;render();return}
   if(t.matches('[data-perf]')){const f=t.files[0];t.value='';if(f)handlePerfFile(f);return}
   if(ui.userForm&&t.name&&t.closest('#userForm')){ui.userForm[t.name]=t.value;if(t.name==='role')renderDrawer();return}
   if(t.dataset.bf==='scope'){ui.blockForm.scope=t.value;ui.blockForm.target=t.value==='user'?(staffUsers()[0]||{}).id:t.value==='team'?String((TEAM_LIST[0]||{}).id):null;render();return}
   if(t.dataset.filter){ui.filters[t.dataset.filter]=t.value;const res=$('#results');if(res)res.innerHTML=resultsHtml();return}
   if(t.dataset.q){ui.q[t.dataset.q]=t.value;if(t.dataset.q==='team')ui.q.staff='all';if(t.type==='date')return;render();return}
   if(ui.form&&t.name&&t.closest('#reqForm,#recForm')){ui.form.vals[t.name]=t.value;
-    if(['date','partnerId','period','staff','current','start'].includes(t.name))render();}
+    if(['date','partnerId','period','staff','current','start','myShift','theirShift','requested','sendTo'].includes(t.name))render();}
 });
 document.addEventListener('submit',ev=>{ev.preventDefault();const f=ev.target;
   if(f.id==='reqForm')submitRequest();if(f.id==='recForm')submitRecord();
