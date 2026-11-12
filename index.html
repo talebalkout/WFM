@@ -2009,7 +2009,7 @@ document.addEventListener('click',ev=>{
     case 'perfConfirm':{const ok=ui.perfPreview.rows.filter(r=>r.ok);
       busy(async()=>{await api('performance?on_conflict=user_id,date',{method:'POST',prefer:'resolution=merge-duplicates',body:ok.map(r=>({user_id:r.user.id,date:r.date,score:r.score,uploaded_at:Date.now(),uploaded_by:S.current}))});
         ui.perfPreview=null;await fetchAll();render();toast(`${ok.length} scores uploaded`)});break}
-    case 'resetDemo':if(confirm('Delete ALL requests, records, blocks and performance scores for EVERYONE? Users, teams and lists are kept. This can’t be undone.')){busy(async()=>{await rpc('reset_demo');await fetchAll();ui.form=null;ui.rulesDraft=null;closeDrawer(true);if(S.current)ui.view=isWfm()?'dash':'new';render();toast('All data cleared')})}break;
+    case 'resetDemo':if(confirm('Delete ALL requests, evaluations, tickets, notes, minutes, tasks, blocks and performance scores for EVERYONE?\n\nKept: users, teams, lists, the evaluation form and the rules.\n\nThis can’t be undone.')){busy(async()=>{await rpc('reset_demo');await fetchAll();ui.form=null;ui.rulesDraft=null;closeDrawer(true);if(S.current)ui.view=isWfm()?'dash':'new';render();toast('All data cleared')})}break;
     case 'nav':go(el.dataset.view);break;
     case 'pickType':ui.form=newForm(el.dataset.type);go('form');break;
     case 'calMove':{const m=ui.form.cal.month;ui.form.cal.month=new Date(m.getFullYear(),m.getMonth()+(+el.dataset.d),1);render();break}
