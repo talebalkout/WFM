@@ -593,6 +593,7 @@ body:has(.ef-row.dragging){user-select:none}
 .cmt-new{display:flex;gap:8px;align-items:flex-end}
 .cmt-new textarea{flex:1}
 .acc-row{grid-template-columns:28px 1fr auto auto 34px}
+.vio-head{display:grid;grid-template-columns:1fr 34px;gap:6px;align-items:center;margin-bottom:8px}.vio-opts{display:flex;gap:14px;margin-bottom:8px}
 .acc-cnt{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .combo{position:relative}
 .combo-input{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:0 12px;background:var(--surface)}
@@ -744,7 +745,6 @@ const DEFAULT_LISTS={
   outcomes:['Resolved','Follow-up needed','Escalated']
 };
 const LIST_META={
-  vtypes:{name:'Violation types',hint:'Used on violation tickets'},
   adh_reasons:{name:'Adherence note reasons',hint:'Used on adherence notes'},
   kpis:{name:'KPI types',hint:'Shown to staff on KPI requests'},
   call_types:{name:'Call types',hint:'Used on call evaluations'},
@@ -755,6 +755,11 @@ let TEAMS={},TEAM_LIST=[],USERS=[];
 const DEFAULT_CRIT=DEFAULT_LISTS.criteria;
 const DEFAULT_FORM={"sections": [{"name": "Opening & Soft Skills", "items": [{"name": "Ready for the call", "ar": "الاستعداد لاستلام المكالمة", "good": 3, "avg": 1, "na": false}, {"name": "Greeting", "ar": "التحية", "good": 3, "avg": 1, "na": false}, {"name": "Mention Warba bank", "ar": "ذكر اسم البنك", "good": 3, "avg": 1, "na": false}, {"name": "Mention your name", "ar": "ذكر اسمك (الموظف) بشكل واضح", "good": 3, "avg": 1, "na": false}, {"name": "Tone of voice (Welcoming, active, warm)", "ar": "نبرة الصوت ترحيبية ,متفاعلة ,دافئة", "good": 3, "avg": 1, "na": false}, {"name": "Volume of voice (balanced \"Not loud or Low\")", "ar": "مستوى الصوت يكون (ليس عالي ولا منخفض)", "good": 3, "avg": 1, "na": false}, {"name": "Use appropriate pace", "ar": "استخدام الرتم(السرعة) المناسب", "good": 3, "avg": 1, "na": false}, {"name": "Voice Quality (Staff & Headset)", "ar": "جودة الصوت سواء من قبل الموظف أو السماعة", "good": 3, "avg": 1, "na": false}, {"name": "Use customer name & title (Beginning, During, End)", "ar": "استخدام اسم العميل مع اللقب في بداية ووسط ونهاية المكالمة", "good": 3, "avg": 1, "na": false}, {"name": "Friendliness & Attitude", "ar": "حسن التصرف والودية", "good": 4, "avg": 2, "na": false}, {"name": "Caring & Patient", "ar": "الاهتمام بالعميل وان تكون صبور", "good": 3, "avg": 1, "na": false}, {"name": "Follow hold protocol (Permission, Duration 45 Sec & Mute 20 Sec)", "ar": "اتباع بروتكول الانتظار والصامت", "good": 4, "avg": 2, "na": true}, {"name": "Avoid interrupting customer", "ar": "تجنب مقاطعة العميل", "good": 4, "avg": 2, "na": false}, {"name": "Ask security questions", "ar": "سؤال العميل الأسئلة الأمنية", "good": 3, "avg": 1, "na": false}, {"name": "Use professional terms", "ar": "استخدام مصطلحات احترافيه - استخدام مصطلحات بنكية / بنكية تقليدية (قرض / فوائد)", "good": 3, "avg": 1, "na": false}, {"name": "Avoid using slang terms", "ar": "تجنب استخدام المصطلحات العاميه", "good": 3, "avg": 1, "na": false}]}, {"name": "Selling Skills & Product Knowledge", "items": [{"name": "Probing further into customer request", "ar": "فهم طلب العميل ( الأسئلة المناسبة )", "good": 5, "avg": 3, "na": false}, {"name": "Listen actively (don't ask the customer to repeat himself)", "ar": "الأستماع الفعال و التركيز مع العميل", "good": 4, "avg": 2, "na": false}, {"name": "Provide accurate information", "ar": "توفير معلومات دقيقة وصحيحه", "good": 5, "avg": 3, "na": false}, {"name": "Explain product/service benefit related to the inquiry (Benefits)", "ar": "شرح كامل لأستفسار العميل / (المميزات)", "good": 6, "avg": 3, "na": false}, {"name": "Mention a direct channel (App, Social Media, Branches, WhatsApp)", "ar": "ذكر القنوات المباشرة", "good": 5, "avg": 3, "na": true}, {"name": "Mention current promotion and/ or cross sell other product", "ar": "ذكر العروض الحالية /او عرض منتج او خدمة", "good": 5, "avg": 3, "na": false}, {"name": "Mentioning documents (when needed)", "ar": "ذكر المستندات المطلوبة", "good": 4, "avg": 2, "na": true}, {"name": "Issue or Problem handled properly (if applicable)", "ar": "معالجة المشكلة او المسألة / توجيه الطلب للجهة المعنية", "good": 4, "avg": 2, "na": true}]}, {"name": "Closure", "items": [{"name": "Call Summary (if applicable)", "ar": "تلخيص المكالمه", "good": 4, "avg": 2, "na": true}, {"name": "Offer additional assistance", "ar": "سؤال العميل عن اي خدمة أخرى", "good": 4, "avg": 2, "na": false}, {"name": "Thank customer and goodbye", "ar": "شكر العميل وتوديعه", "good": 3, "avg": 1, "na": false}]}], "bonus": [{"name": "Mention the notice (Lets be aware)", "ar": "ذكر التنويه ( لنكن على دراية )", "value": 1}], "tags": [{"name": "Voice Quality", "ar": "مستوى الصوت - النشاط - الرتم - التنفس", "penalty": 3}, {"name": "Step Explaining", "ar": "سبب السؤال - توضيح ما سيتم", "penalty": 3}, {"name": "Info Timing", "ar": "اختيار الوقت المناسب", "penalty": 3}, {"name": "Language & Clarity", "ar": "ماسك الحسابات vs مسؤول عن الحسابات", "penalty": 3}, {"name": "Personal Remarks", "ar": "ابداء رأي بخصوص ارصدة العملاء", "penalty": 3}, {"name": "Hold Protocol", "ar": "المدة - السبب - المتابعة", "penalty": 3}, {"name": "Explain Requirements", "ar": "شرح المطلوب حسب حاجة العميل وليس بشكل عام", "penalty": 3}, {"name": "Offer an Action", "ar": "طلب أو تصحيح", "penalty": 3}, {"name": "Engagement", "ar": "التواصل المستمر خلالتنفيذ الطلب", "penalty": 3}, {"name": "Probing Questions", "ar": "أسئلة إضافية للتأكد من طلب العميل", "penalty": 3}]};
 let EVAL_FORM=JSON.parse(JSON.stringify(DEFAULT_FORM));
+const DEFAULT_VIO={"categories": [{"name": "Professional behavior and communication", "multi": false, "month": false, "types": ["Adhere to the supervisor’s instructions regarding work", "Cooperate with everyone as a team, build good relationships with colleagues and avoid conflicts", "Maintain a calm and quiet environment, without disturbing others or laughing loudly", "Obtain supervisor approval for breaks before setting the system to “Not ready”", "Do not use your mobile phone while handling calls with clients", "Do not leave the office while the call system is in “Ready” mode", "Keep the lights on throughout working hours (security cameras)", "Others"]}, {"name": "General appearance", "multi": false, "month": false, "types": ["Dress code", "Workplace organization and cleanliness", "Use the break room for eating and keep it in order", "Smoking in the working area", "Other violation"]}, {"name": "Wrong process", "multi": false, "month": false, "types": []}, {"name": "Performance", "multi": true, "month": false, "types": ["RONA (returned on no answer calls)", "AHT (average handling time)", "SOA (speed of answer)", "Hold time", "Login time", "Total login", "Not ready", "Wrap up"]}, {"name": "Target achievement", "multi": true, "month": true, "types": ["Monthly CXM less than 95%", "Sales target"]}], "closing": "This behavior is unacceptable and negatively impacts your evaluation and the overall call center working environment. The call center confirms your commitment to the call center’s operational requirements and working behavior. If we do not observe any improvement in your adherence, this will result in applying official procedures and penalties."};
+let VIO=JSON.parse(JSON.stringify(DEFAULT_VIO));
+const vioCat=n=>VIO.categories.find(c=>c.name===n);
+const vioLabel=x=>x.category?x.category+((x.types||[]).length?' · '+x.types.join(', '):''):(x.vtype||'');
+const monLabel=m=>m?`${MONL[+m.slice(5)-1]} ${m.slice(0,4)}`:'';
 const DEFAULT_ACC={max:100,weight:5,reasons:[{name:"Didn’t inform TL before taking a break",points:10},{name:"Report sick leave after staff shift time",points:5},{name:"Late without informing TL or floor manager (10 min above)",points:5},{name:"Invalid case",points:5},{name:"Swap with another staff and didn’t attend",points:10},{name:"Locked users without applying for a new one or follow up",points:10},{name:"Swap without taking the required approval",points:5},{name:"Invalid e-mail communication (department)",points:5},{name:"Adhering to TL/Floor Manager instructions",points:10},{name:"General mistakes (work/information/process)",points:5},{name:"Multimedia daily report",points:5},{name:"Repeated mistakes",points:10},{name:"Data entry (Outbound)",points:5},{name:"Playing with the phone during a customer call",points:10},{name:"Dress code",points:5},{name:"Clean work place / desk",points:5},{name:"Reject permission",points:0,counter:true}]};
 let ACC=JSON.parse(JSON.stringify(DEFAULT_ACC));
 const r2=v=>Math.round(v*100)/100;
@@ -841,6 +846,7 @@ async function fetchAll(){
   TEAM_LIST=tm.map(t=>({id:t.id,name:t.name,sort:t.sort}));TEAMS=Object.fromEntries(TEAM_LIST.map(t=>[t.id,t.name]));
   LISTS=JSON.parse(JSON.stringify(DEFAULT_LISTS));st.forEach(x=>{if(Array.isArray(x.value)&&x.value.length)LISTS[x.key]=x.value});
   {const ac=st.find(x=>x.key==='accuracy');ACC=ac&&ac.value&&Array.isArray(ac.value.reasons)&&ac.value.reasons.every(x=>'points' in x)?{max:100,weight:5,...ac.value}:JSON.parse(JSON.stringify(DEFAULT_ACC))}
+  {const vo=st.find(x=>x.key==='violations');VIO=vo&&vo.value&&Array.isArray(vo.value.categories)&&vo.value.categories.length?{closing:'',...vo.value}:JSON.parse(JSON.stringify(DEFAULT_VIO))}
   {const ef=st.find(x=>x.key==='eval_form');EVAL_FORM=ef&&ef.value&&Array.isArray(ef.value.sections)&&ef.value.sections.length?ef.value:JSON.parse(JSON.stringify(DEFAULT_FORM))}
   S.perf=pf.map(x=>({userId:x.user_id,date:x.date,score:+x.score,at:+x.uploaded_at}));
   const r0=ru[0]||{leave_limit:2,count_pending:true};
@@ -931,7 +937,7 @@ function recSummary(r){
     case 'mom':return `${x.title}${r.files.length?` · ${r.files.length} attachment(s)`:''}`;
     case 'task':return `${x.title}${x.due?` · due ${fmt(x.due)}`:''}`;
     case 'acc':return `${x.reason} · ${x.counter?'counter only':`−${noteDeduct(r)} pts`} · ${fmt(x.date)}`;
-    case 'vio':return `${x.vtype} · ${fmt(x.date)}`;
+    case 'vio':return `${vioLabel(x)}${x.month?' · '+monLabel(x.month):''} · ${fmt(x.date)}`;
     case 'adh':return `${x.reason} · ${fmt(x.date||x.from)}`;
   }
 }
@@ -1277,7 +1283,7 @@ function viewCreate(){
 function newRecForm(kind){
   const T=today();
   const f={kind,vals:{staff:(staffUsers()[0]||{}).id,requireAck:kind!=='adh',countInScore:true},files:[],errors:{},ans:{items:{},bonus:{},tags:{}},teams:TEAM_LIST.length?[TEAM_LIST[0].id]:[],sendTo:'teams'};
-  if(kind==='vio'){f.vals.vtype=LISTS.vtypes[0];f.vals.date=iso(T)}
+  if(kind==='vio'){const c=VIO.categories[0]||{types:[]};f.vals.vcat=c.name||'';f.vals.vtype=c.multi?'':(c.types[0]||'');f.vio=[];f.vals.date=iso(T);const pm=new Date(T.getFullYear(),T.getMonth()-1,1);f.vals.vmonth=iso(pm).slice(0,7)}
   if(kind==='adh'){f.vals.reason=LISTS.adh_reasons[0];f.vals.date=iso(T)}
   if(kind==='eval'){f.vals.date=iso(T);f.vals.callType=LISTS.call_types[0]}
   if(kind==='mom'){f.vals.date=iso(T)}
@@ -1308,8 +1314,15 @@ function viewCreateForm(){
       <div class="ev-break">${R.sec.map(x=>`<div><span>${esc(x.name)}</span><b>${x.earned} / ${x.max}</b></div>`).join('')}<div><span>Bonus</span><b>+${R.bonus}</b></div><div class="tot"><span>Monitor score</span><b>${R.monitor}%</b></div><div><span>Quality tag deductions</span><b class="${R.pen?'neg':''}">${R.pen?'−'+R.pen:'0'}</b></div><div class="tot"><span>Overall score</span><b>${R.overall}%</b></div></div></div>
     <div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Staff must tap “I’ve read this”')}${sw('countInScore','Count in end-of-cycle score','Included in the staff member’s average')}</div>`;
   }else if(k==='vio'){
-    main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Violation type',`<select name="vtype">${LISTS.vtypes.map(s=>opt(s,s,s===v.vtype)).join('')}</select>`,{req:1})}${field('Date of violation',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}<div></div>${field('Details',ta('details','What happened'),{full:1,req:1,invalid:e.details,hint:e.details})}${files('Optional')}</div>`;
-    side=`<div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Staff must tap “I’ve read this”')}</div>`;
+    const c=vioCat(v.vcat)||VIO.categories[0]||{name:'',types:[]},ty=c.types||[];
+    const typeField=!ty.length?'':c.multi?field('What applies',`<div class="opt-chips">${ty.map((t2,i)=>`<span class="chip${(f.vio||[]).includes(t2)?' on':''}" data-action="vioTick" data-i="${i}">${esc(t2)}</span>`).join('')}</div>`,{full:1,req:1,invalid:e.vio,hint:e.vio||'Tick one or more'})
+      :field('Violation type',`<select name="vtype">${ty.map(t2=>opt(t2,t2,t2===v.vtype)).join('')}</select>`,{full:1,req:1});
+    main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Date of violation',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}
+    ${field('Category',`<select name="vcat">${VIO.categories.map(x2=>opt(x2.name,x2.name,x2.name===c.name)).join('')}</select>`,{full:1,req:1})}
+    ${typeField}${c.month?field('Month',`<input class="input" type="month" name="vmonth" value="${esc(v.vmonth||'')}">`,{req:1,invalid:e.vmonth,hint:e.vmonth}):''}
+    ${field('Details',ta('details','What happened / what must improve (Arabic or English)'),{full:1,req:1,invalid:e.details,hint:e.details})}${files('Optional')}</div>`;
+    side=`<div class="card card-pad"><h2>Staff will see</h2><div class="ev-break"><div><span>Title</span><b>${esc(c.name)} violation</b></div></div>${VIO.closing?`<div class="flow-note" style="margin:10px 0 0">${esc(VIO.closing)}</div>`:''}</div>
+    <div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Staff must tap “I’ve read this”')}</div>`;
   }else if(k==='acc'){
     const rs=ACC.reasons.find(x=>x.name===v.reason)||ACC.reasons[0]||{name:'',points:0},[ma,mb]=monthBounds(v.date?parse(v.date):today());
     const lv=Math.min(4,Math.max(1,+v.level||1)),ded=rs.counter?0:(+rs.points||0)*lv,pts=accPoints(v.staff,ma,mb),after=Math.max(0,r2(pts-ded));
@@ -1375,9 +1388,9 @@ function viewRules(){
   </div><div class="form-actions">${b.id?`<button class="btn" data-action="cancelBlockEdit">Cancel</button>`:''}<button class="btn primary" data-action="addBlock">${ic(b.id?'check':'lock',16)} ${b.id?'Save changes':'Add block'}</button></div></div></div></div>`;
 }
 function viewAdmin(){
-  const tabs=[['users','Users'],['teams','Teams'],['lists','Lists'],['form','Evaluation form'],['accuracy','Accuracy'],['rules','Rules & blocks']];
+  const tabs=[['users','Users'],['teams','Teams'],['lists','Lists'],['form','Evaluation form'],['violations','Violations'],['accuracy','Accuracy'],['rules','Rules & blocks']];
   const tab=ui.adminTab||'users';
-  const body=tab==='teams'?adminTeams():tab==='lists'?adminLists():tab==='form'?adminForm():tab==='accuracy'?adminAccuracy():tab==='rules'?viewRules():adminUsers();
+  const body=tab==='teams'?adminTeams():tab==='lists'?adminLists():tab==='form'?adminForm():tab==='violations'?adminViolations():tab==='accuracy'?adminAccuracy():tab==='rules'?viewRules():adminUsers();
   return head('Admin','Users, teams, lists and rules.',tab==='users'?`<button class="btn primary" data-action="userNew">${ic('plus',16)} Add user</button>`:'')+
     `<div class="tabs">${tabs.map(([k,l])=>`<button class="${k===tab?'on':''}" data-action="adminTab" data-t="${k}">${l}</button>`).join('')}</div>${body}`;
 }
@@ -1432,6 +1445,18 @@ function adminAccuracy(){
     <button class="btn sm" data-action="accAddReason" style="margin-top:8px">${ic('plus',14)} Add reason</button></div></div>
    <div class="card card-pad"><h2>This month · ${MONL[today().getMonth()]}</h2><div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Notes</th><th class="num-cell">Points</th><th class="num-cell">Accuracy</th></tr></thead><tbody>
    ${staffUsers().map(u=>{const c=accCounters(u.id,ma,mb);return `<tr><td><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:12px">${esc(teamName(u.team))}</div></td><td class="num-cell">${accScored(u.id,ma,mb)}${c?` <span class="muted" style="font-size:12px">· ${c} counted</span>`:''}</td><td class="num-cell">${accPoints(u.id,ma,mb)}/${accMax()}</td><td class="num-cell"><b>${accScore(u.id,ma,mb)}%</b></td></tr>`}).join('')}</tbody></table></div></div></div>`;
+}
+function adminViolations(){
+  const d=ui.vioDraft||(ui.vioDraft=JSON.parse(JSON.stringify(VIO))),dirty=JSON.stringify(d)!==JSON.stringify(VIO);
+  const grip=`<span class="grip" title="Drag to reorder" aria-label="Drag to reorder"><i></i><i></i><i></i></span>`;
+  return `<div class="ef-top card card-pad"><div><b>Violation categories</b><div class="flow-note" style="margin:2px 0 0">Each category has its own types. “Tick several” lets you pick more than one (e.g. Performance). A category with no types only asks for details.</div></div>
+   <div class="form-actions" style="margin:0">${dirty?`<span class="pill need">Unsaved</span><button class="btn" data-action="vioReset">Undo changes</button>`:''}<button class="btn primary" data-action="vioSave" ${dirty?'':'disabled style="opacity:.5"'}>${ic('check',16)} Save</button></div></div>
+  <div class="list-grid">${d.categories.map((c,ci)=>`<div class="card card-pad ef-card"><div class="vio-head"><input class="input" data-viov="categories.${ci}.name" value="${esc(c.name)}" placeholder="Category name" style="font-weight:600"><button class="btn sm icon bad" data-action="vioDelCat" data-i="${ci}" ${d.categories.length>1?'':'disabled style="opacity:.35"'} title="Remove category">${ic('trash',14)}</button></div>
+    <div class="vio-opts"><label class="acc-cnt"><input type="checkbox" data-viov="categories.${ci}.multi" ${c.multi?'checked':''}> Tick several</label><label class="acc-cnt"><input type="checkbox" data-viov="categories.${ci}.month" ${c.month?'checked':''}> Ask for month</label></div>
+    <div class="li-rows" data-drag="vio:categories.${ci}.types">${c.types.map((t2,ti)=>`<div class="li-row" data-idx="${ti}">${grip}<input class="input" data-viov="categories.${ci}.types.${ti}" value="${esc(t2)}" aria-label="Type ${ti+1}"><button class="btn sm icon bad" data-action="vioDelType" data-c="${ci}" data-i="${ti}" title="Remove">${ic('trash',14)}</button></div>`).join('')||'<div class="muted" style="font-size:13px;padding:4px 0">No types · details only</div>'}</div>
+    <button class="btn sm" data-action="vioAddType" data-c="${ci}" style="margin-top:8px">${ic('plus',14)} Add type</button></div>`).join('')}
+   <div class="card card-pad" style="display:flex;align-items:center;justify-content:center;min-height:120px"><button class="btn" data-action="vioAddCat">${ic('plus',16)} Add category</button></div></div>
+  <div class="card card-pad" style="margin-top:16px"><h2>Closing text <span class="muted" style="font-weight:500">· added under every violation ticket</span></h2><textarea class="input" rows="3" data-viov="closing" dir="auto">${esc(d.closing||'')}</textarea></div>`;
 }
 function adminLists(){
   ui.listDraft=ui.listDraft||{};
@@ -1990,7 +2015,7 @@ function recDrawer(r){
     body=`<div class="d-section"><div class="kv">${kv('Title',esc(x.title),1)+kv('Meeting date',fmtL(x.date))+kv('From',esc(user(r.createdBy).name))}</div></div>
     <div class="d-section"><h4>Summary</h4><div class="note-box">${esc(x.summary)}</div></div>${x.actions?`<div class="d-section"><h4>Action items</h4><div class="note-box">${esc(x.actions)}</div></div>`:''}`;
   }else if(r.kind==='vio'){
-    body=`<div class="d-section"><div class="kv">${kv('Violation type',esc(x.vtype))+kv('Date',fmtL(x.date))+kv('Issued by',esc(user(r.createdBy).name),1)}</div></div><div class="d-section"><h4>Details</h4><div class="note-box">${esc(x.details)}</div></div>`;
+    body=`<div class="d-section"><div class="kv">${x.category?kv('Category',esc(x.category),1):''}${(x.types||[]).length?kv(x.types.length>1?'What applies':'Violation type',x.types.map(esc).join('<br>'),1):x.category?'':kv('Violation type',esc(x.vtype),1)}${x.month?kv('Month',monLabel(x.month)):''}${kv('Date',fmtL(x.date))+kv('Issued by',esc(user(r.createdBy).name))}</div></div><div class="d-section"><h4>Details</h4><div class="note-box" dir="auto">${esc(x.details)}</div></div>${x.closing?`<div class="d-section"><div class="flow-note" style="margin:0">${esc(x.closing)}</div></div>`:''}`;
   }else if(r.kind==='acc'){
     const sid=r.recipients[0],[ma,mb]=monthBounds(parse(x.date)),pts=accPoints(sid,ma,mb);
     body=`<div class="d-section"><div class="kv">${kv('Staff member',esc(user(sid).name))+kv('Date',fmtL(x.date))+kv('Reason',esc(x.reason),1)+kv('Deduction',accLine(r))+kv('Issued by',esc(user(r.createdBy).name))}</div></div>
@@ -2080,7 +2105,7 @@ function submitRequest(){
 function submitRecord(){
   const f=ui.form,v=f.vals,e={};let data={},recipients=[v.staff];
   if(f.kind==='eval'){if(!v.date)e.date='Pick the date';if(!(v.feedback||'').trim())e.feedback='Feedback is required';const form=JSON.parse(JSON.stringify(f.evalForm||EVAL_FORM));data={date:v.date,time:v.time||'',callId:v.callId||'',callType:v.callType||LISTS.call_types[0],form,ans:JSON.parse(JSON.stringify(f.ans)),result:calcEval(form,f.ans),feedback:v.feedback||'',countInScore:!!v.countInScore}}
-  if(f.kind==='vio'){if(!v.date)e.date='Pick the date';if(!(v.details||'').trim())e.details='Details are required';data={vtype:v.vtype,date:v.date,details:v.details||''}}
+  if(f.kind==='vio'){const c=vioCat(v.vcat);if(!v.date)e.date='Pick the date';if(!(v.details||'').trim())e.details='Details are required';const ty=c&&c.types.length?(c.multi?(f.vio||[]).filter(t2=>c.types.includes(t2)):[c.types.includes(v.vtype)?v.vtype:c.types[0]]):[];if(c&&c.multi&&c.types.length&&!ty.length)e.vio='Tick at least one';if(c&&c.month&&!v.vmonth)e.vmonth='Pick the month';data={category:c?c.name:'',types:ty,vtype:ty.join(', ')||(c?c.name:''),month:c&&c.month?v.vmonth:'',date:v.date,details:v.details||'',closing:VIO.closing||''}}
   if(f.kind==='adh'){if(!v.date)e.date='Pick the date';data={reason:v.reason,date:v.date,note:v.note||''}}
   if(f.kind==='acc'){const rs=ACC.reasons.find(x=>x.name===v.reason);if(!rs)e.reason='Pick a reason';if(!v.date)e.date='Pick the date';if(!(v.details||'').trim())e.details='Please describe what happened';const lv=Math.min(4,Math.max(1,+v.level||1));data=rs&&rs.counter?{reason:v.reason,counter:true,date:v.date,details:v.details||''}:{reason:v.reason,points:rs?+rs.points:0,level:lv,deduct:rs?(+rs.points)*lv:0,date:v.date,details:v.details||''}}
   if(f.kind==='task'){recipients=momRecipients(f);if(f.sendTo==='teams'&&!f.teams.length)e.teams='Pick at least one team';if(!recipients.length)e.teams='Nobody to assign to';if(!(v.title||'').trim())e.title='Describe the task';if(!v.due)e.due='Pick a due date';data={title:(v.title||'').trim(),details:v.details||'',due:v.due,sendTo:f.sendTo,teams:[...f.teams]}}
@@ -2153,6 +2178,17 @@ document.addEventListener('click',ev=>{
     case 'postComment':{const t=(($('#commentText')||{}).value||'').trim();if(!t){toast('Write a comment first',true);break}busy(async()=>{await rpc('add_comment',{p_id:id,p_uid:S.current,p_text:t});await fetchAll();renderDrawer();toast('Comment posted')});break}
     case 'amendEval':{const r=S.records.find(x=>x.id===id);if(!r)break;const f=newRecForm('eval');Object.assign(f.vals,{staff:r.recipients[0],date:r.data.date,time:r.data.time||'',callId:r.data.callId||'',callType:r.data.callType||LISTS.call_types[0],feedback:r.data.feedback||'',countInScore:r.data.countInScore!==false,requireAck:true});
       f.ans=clone(r.data.ans||{items:{},bonus:{},tags:{}});f.evalForm=clone(r.data.form||EVAL_FORM);f.amendId=r.id;ui.form=f;closeDrawer(true);ui.view='createForm';render();window.scrollTo(0,0);break}
+    case 'vioTick':{const f=ui.form,c=vioCat(f.vals.vcat);if(!c)break;const t2=c.types[+el.dataset.i];f.vio=f.vio||[];const i=f.vio.indexOf(t2);i>=0?f.vio.splice(i,1):f.vio.push(t2);f.errors.vio=null;render();break}
+    case 'vioReset':ui.vioDraft=null;render();break;
+    case 'vioAddCat':ui.vioDraft.categories.push({name:'',multi:false,month:false,types:[]});render();break;
+    case 'vioDelCat':{const c=ui.vioDraft.categories[+el.dataset.i];if(confirm(`Remove the category “${c.name||'untitled'}”? Tickets already sent keep it.`)){ui.vioDraft.categories.splice(+el.dataset.i,1);render()}break}
+    case 'vioAddType':ui.vioDraft.categories[+el.dataset.c].types.push('');render();setTimeout(()=>{const n=[...document.querySelectorAll(`[data-viov^="categories.${el.dataset.c}.types."]`)].pop();if(n)n.focus()},30);break;
+    case 'vioDelType':ui.vioDraft.categories[+el.dataset.c].types.splice(+el.dataset.i,1);render();break;
+    case 'vioSave':{const d=ui.vioDraft;const cs=d.categories.map(c=>({name:String(c.name).trim(),multi:!!c.multi,month:!!c.month,types:c.types.map(t2=>String(t2).trim()).filter(Boolean)}));
+      if(cs.some(c=>!c.name)){toast('Every category needs a name',true);break}if(new Set(cs.map(c=>c.name.toLowerCase())).size!==cs.length){toast('Two categories have the same name',true);break}
+      if(cs.some(c=>new Set(c.types.map(t2=>t2.toLowerCase())).size!==c.types.length)){toast('A category has the same type twice',true);break}
+      const clean={categories:cs,closing:String(d.closing||'').trim()};
+      busy(async()=>{await api('settings?on_conflict=key',{method:'POST',prefer:'resolution=merge-duplicates',body:{key:'violations',value:clean}});await fetchAll();ui.vioDraft=null;render();toast('Violation categories saved')});break}
     case 'accReset':ui.accDraft=null;render();break;
     case 'accAddReason':ui.accDraft.reasons.push({name:'',points:5});render();break;
     case 'accLevel':ui.form.vals.level=el.dataset.n;render();break;
@@ -2279,7 +2315,7 @@ let drag=null;
 document.addEventListener('pointerdown',ev=>{const g=ev.target.closest('.grip');if(!g)return;const row=g.closest('[data-idx]');if(!row||!row.parentElement.dataset.drag)return;ev.preventDefault();drag={row,box:row.parentElement};row.classList.add('dragging');try{g.setPointerCapture(ev.pointerId)}catch(e){}});
 document.addEventListener('pointermove',ev=>{if(!drag)return;ev.preventDefault();const rows=[...drag.box.children].filter(r=>r!==drag.row&&r.dataset.idx!=null);let before=null;for(const r of rows){const b=r.getBoundingClientRect();if(ev.clientY<b.top+b.height/2){before=r;break}}if(drag.row.nextSibling!==before)drag.box.insertBefore(drag.row,before)});
 const endDrag=()=>{if(!drag)return;const key=drag.box.dataset.drag,order=[...drag.box.children].filter(c=>c.dataset.idx!=null).map(c=>+c.dataset.idx);
-  const arr=key.startsWith('list:')?ui.listDraft[key.slice(5)]:key.startsWith('acc:')?getPath(ui.accDraft,key.slice(4)):getPath(ui.formDraft,key);if(arr){const re=order.map(i=>arr[i]);arr.splice(0,arr.length,...re)}
+  const arr=key.startsWith('list:')?ui.listDraft[key.slice(5)]:key.startsWith('acc:')?getPath(ui.accDraft,key.slice(4)):key.startsWith('vio:')?getPath(ui.vioDraft,key.slice(4)):getPath(ui.formDraft,key);if(arr){const re=order.map(i=>arr[i]);arr.splice(0,arr.length,...re)}
   drag.row.classList.remove('dragging');drag=null;render()};
 document.addEventListener('pointerup',endDrag);document.addEventListener('pointercancel',endDrag);
 document.addEventListener('keydown',ev=>{
@@ -2293,6 +2329,7 @@ document.addEventListener('input',ev=>{
   if(t.dataset.bf){ui.blockForm[t.dataset.bf]=t.value;return}
   if(t.dataset.rd){ui.rulesDraft[t.dataset.rd]=t.value;return}
   if(t.dataset.li){ui.listDraft[t.dataset.li][+t.dataset.i]=t.value;return}
+  if(t.dataset.viov){setPath(ui.vioDraft,t.dataset.viov,t.type==='checkbox'?t.checked:t.value);return}
   if(t.dataset.accv){setPath(ui.accDraft,t.dataset.accv,t.type==='checkbox'?t.checked:t.type==='number'?(t.value===''?0:+t.value):t.value);return}
   if(t.dataset.ef&&t.type!=='checkbox'){setPath(ui.formDraft,t.dataset.ef,t.type==='number'?(t.value===''?0:+t.value):t.value);return}
   if(t.dataset.pd){ui.perfDate=t.value;return}
@@ -2306,6 +2343,7 @@ document.addEventListener('change',ev=>{
   if(t.matches('[data-file]')){readFiles(t.files);t.value='';return}
   if(t.dataset.ef&&t.type==='checkbox'){setPath(ui.formDraft,t.dataset.ef,t.checked);return}
   if(t.dataset.ef&&t.type==='number'){render();return}
+  if(t.dataset.viov){if(t.type==='checkbox'){setPath(ui.vioDraft,t.dataset.viov,t.checked);render()}else{const top=$('.ef-top .form-actions');if(top)render()}return}
   if(t.dataset.accv){if(t.type==='checkbox')setPath(ui.accDraft,t.dataset.accv,t.checked);render();return}
   if(t.dataset.member){t.checked?ui.teamSel.add(t.dataset.member):ui.teamSel.delete(t.dataset.member);renderDrawer();return}
   if(t.dataset.my){ui.my[t.dataset.my]=t.value;render();return}
@@ -2315,7 +2353,8 @@ document.addEventListener('change',ev=>{
   if(t.dataset.filter){ui.filters[t.dataset.filter]=t.value;const res=$('#results');if(res)res.innerHTML=resultsHtml();return}
   if(t.dataset.q){ui.q[t.dataset.q]=t.value;if(t.dataset.q==='team')ui.q.staff='all';if(t.type==='date')return;render();return}
   if(ui.form&&t.name&&t.closest('#reqForm,#recForm')){ui.form.vals[t.name]=t.value;
-    if(['date','partnerId','period','staff','current','start','myShift','theirShift','requested','sendTo','schedule'].includes(t.name)||(ui.form.kind==='acc'&&t.name==='reason'))render();}
+    if(['date','partnerId','period','staff','current','start','myShift','theirShift','requested','sendTo','schedule'].includes(t.name)||(ui.form.kind==='acc'&&t.name==='reason'))render();
+    if(ui.form.kind==='vio'&&t.name==='vcat'){const c=vioCat(t.value);ui.form.vio=[];ui.form.vals.vtype=c&&!c.multi?(c.types[0]||''):'';ui.form.errors.vio=null;render()}}
 });
 document.addEventListener('submit',ev=>{ev.preventDefault();const f=ev.target;
   if(f.id==='reqForm')submitRequest();if(f.id==='recForm')submitRecord();
