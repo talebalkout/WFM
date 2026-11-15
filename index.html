@@ -608,6 +608,14 @@ body:has(.ef-row.dragging){user-select:none}
 .day-row{cursor:pointer}.day-row .link{color:var(--primary);font-weight:600}.mini-days{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .pm-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.sub-h{font-size:14px;margin:0 0 4px}
 .radio-row{display:grid;grid-template-columns:20px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}.radio-row span{display:block;font-size:12.5px;color:var(--muted)}.radio-row input{margin-top:3px}
+.scope-seg{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-left:auto;margin-right:10px}.scope-seg button{padding:7px 12px;font-size:12.5px;font-weight:600;background:none;border:0;color:var(--muted);cursor:pointer}.scope-seg button.on{background:var(--primary);color:#fff}
+.scorecard{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.sc-card{text-align:left;border:1px solid var(--border);border-radius:14px;padding:14px 16px;background:var(--surface);cursor:pointer;font:inherit;color:inherit;transition:border-color .15s,transform .15s}
+.sc-card:hover{border-color:var(--primary);transform:translateY(-1px)}.sc-card span{display:block;font-size:12.5px;color:var(--muted)}.sc-card b{display:block;font-size:30px;font-weight:700;line-height:1.15;margin:4px 0 2px}.sc-card small{display:block;font-size:12px;color:var(--muted)}.sc-d{font-size:12px;margin-top:6px}
+@media (max-width:820px){.scorecard{grid-template-columns:1fr 1fr}.sc-card b{font-size:24px}.scope-seg button{padding:6px 9px}}
+.hist-table tr{cursor:pointer}.hist-table tr.sel td{background:var(--primary-soft,rgba(59,91,219,.07))}.h-cell{font-weight:600}.h-cell.g{color:var(--ok)}.h-cell.b{color:var(--bad)}
+.stats-2{grid-template-columns:repeat(2,1fr)!important}.perf-grid>*,.grid-2>*{min-width:0}.table-wrap{max-width:100%;overflow-x:auto}@media (max-width:560px){.hist-table th,.hist-table td{padding-left:6px;padding-right:6px;font-size:12.5px}.prof-acts .btn{flex:1 1 45%}}.prof-acts{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.sec-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.sec-head .section-title{margin-bottom:10px}
+.kv-line{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--border)}.staff-table tr{cursor:pointer}
 .pm-list{display:flex;flex-direction:column}.pm-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}.pm-row:last-child{border-bottom:0}
 .acc-cnt{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .combo{position:relative}
@@ -825,7 +833,11 @@ const user=id=>USERS.find(u=>u.id===id)||{id,name:'Unknown user',emp:'',role:'st
 const teamName=id=>id==null||id===''?'No team':(TEAMS[id]??'No team');
 const teamOf=u=>u.role==='wfm'?(u.title||'WFM'):teamName(u.team);
 const initials=n=>n.split(' ').map(x=>x[0]).slice(0,2).join('');
-const staffUsers=()=>USERS.filter(u=>u.role==='staff'&&u.active&&!u.deleted);
+const allStaff=()=>USERS.filter(u=>u.role==='staff'&&u.active&&!u.deleted);
+const myTeams=()=>TEAM_LIST.filter(t=>(t.leaders||[]).includes(S.current)).map(t=>t.id);
+const scoped=()=>!!S.current&&isWfm()&&ui.scope!=='all'&&myTeams().length>0;
+const staffUsers=()=>{const a=allStaff();if(!scoped())return a;const ts=myTeams();return a.filter(u=>ts.includes(u.team))};
+const inScope=uid=>!scoped()||myTeams().includes(user(uid).team);
 const shortShift=s=>String(s||'').split(' · ')[0];
 const shiftFor=(uid,date)=>{let h=7;for(const c of uid+date)h=(h*31+c.charCodeAt(0))>>>0;const L=LISTS.shifts;return L[[0,2,1][h%3]%L.length]||''};
 const fmtSize=b=>b>1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB';
@@ -835,7 +847,7 @@ const nextMonths=()=>{const t=today();return [1,2,3].map(k=>{const d=new Date(t.
 
 /* ================= State ================= */
 let S; // persisted
-const ui={my:{period:'month',type:'all'},q:{preset:'90',team:'all',staff:'all',type:'all',evaluator:'all',outcome:'all'},view:null,form:null,drawer:null,filters:{q:'',type:'all',status:'all',team:'all'},mineFilter:'all',inboxFilter:'all',createKind:null,blockForm:{scope:'user',target:'u1',type:'swap',from:'',to:'',reason:''},rulesDraft:null};
+const ui={my:{period:'month',type:'all',tab:'overview'},prof:{tab:'overview',period:'month'},sent:{kind:'all',month:'all',q:''},q:{preset:'90',team:'all',staff:'all',type:'all',evaluator:'all',outcome:'all'},view:null,form:null,drawer:null,filters:{q:'',type:'all',status:'all',team:'all'},mineFilter:'all',inboxFilter:'all',createKind:null,blockForm:{scope:'user',target:'u1',type:'swap',from:'',to:'',reason:''},rulesDraft:null};
 
 /* ---- Server (Supabase) ---- */
 async function api(path,{method='GET',body,prefer}={}){
@@ -858,7 +870,7 @@ async function fetchAll(){
   const [rq,rc,ru,bl,us,tm,st,pf,pm]=await Promise.all([api('requests?select=*&order=created_at.desc'),api('records?select=*&order=created_at.desc'),api('rules?select=*'),api('blocks?select=*'),
     api('app_users?select=id,emp,name,role,title,team,active,must_change,deleted,created_at&order=name'),api('teams?select=*&order=sort,id'),api('settings?select=*'),api('performance?select=user_id,date,score,uploaded_at,data&order=date'),api('perf_month?select=*&order=month')]);
   USERS=us.map(u=>({id:u.id,emp:u.emp,name:u.name,role:u.role,title:u.title,team:u.team,active:u.active&&!u.deleted,deleted:!!u.deleted,mustChange:u.must_change}));
-  TEAM_LIST=tm.map(t=>({id:t.id,name:t.name,sort:t.sort}));TEAMS=Object.fromEntries(TEAM_LIST.map(t=>[t.id,t.name]));
+  TEAM_LIST=tm.map(t=>({id:t.id,name:t.name,sort:t.sort,leaders:Array.isArray(t.leaders)?t.leaders:[]}));TEAMS=Object.fromEntries(TEAM_LIST.map(t=>[t.id,t.name]));
   LISTS=JSON.parse(JSON.stringify(DEFAULT_LISTS));st.forEach(x=>{if(Array.isArray(x.value)&&x.value.length)LISTS[x.key]=x.value});
   {const ac=st.find(x=>x.key==='accuracy');ACC=ac&&ac.value&&Array.isArray(ac.value.reasons)&&ac.value.reasons.every(x=>'points' in x)?{max:100,weight:5,...ac.value}:JSON.parse(JSON.stringify(DEFAULT_ACC))}
   {const vo=st.find(x=>x.key==='violations');VIO=vo&&vo.value&&Array.isArray(vo.value.categories)&&vo.value.categories.length?{closing:'',...vo.value}:JSON.parse(JSON.stringify(DEFAULT_VIO))}
@@ -901,7 +913,7 @@ function testUsersCard(){
    <td style="font-variant-numeric:tabular-nums">${esc(u.emp)}</td><td>${pw?`<code>${esc(pw)}</code>`:'<span class="muted" style="font-size:12px">Changed elsewhere</span>'}</td>
    <td style="text-align:right"><button class="btn sm${pw?' primary':''}" data-action="useTest" data-emp="${esc(u.emp)}" data-pw="${esc(pw||'')}">Use</button></td></tr>`}).join('')}</tbody></table></div></div>`;
 }
-function signIn(id){S.current=id;if(!ui.blockForm.target)ui.blockForm.target=(staffUsers()[0]||{}).id;ui.pending=null;ui.view=user(id).role==='wfm'?'dash':'new';ui.form=null;ui.rulesDraft=null;ui.listDraft=null;save();closeDrawer(true);render();window.scrollTo(0,0);toast(`Welcome, ${user(id).name.split(' ')[0]}`)}
+function signIn(id){S.current=id;if(!ui.blockForm.target)ui.blockForm.target=(staffUsers()[0]||{}).id;ui.pending=null;ui.view=user(id).role==='wfm'?'dash':'perf';ui.form=null;ui.rulesDraft=null;ui.listDraft=null;save();closeDrawer(true);render();window.scrollTo(0,0);toast(`Welcome, ${user(id).name.split(' ')[0]}`)}
 function signOut(msg){S.current=null;ui.pending=null;ui.drawer=null;save();closeDrawer(true);render();if(msg)toast(msg,true)}
 const sessionValid=()=>{const u=USERS.find(x=>x.id===S.current);return !!(u&&u.active&&!u.mustChange)};
 const genPw=()=>{const c='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';let s='';const r=crypto.getRandomValues(new Uint32Array(8));r.forEach(n=>s+=c[n%c.length]);return s};
@@ -993,15 +1005,15 @@ function quick(id){return `<div class="quick"><button class="btn sm bad" data-ac
 /* ================= Navigation ================= */
 function navItems(){
   if(isWfm()){
-    const p=S.requests.filter(r=>r.status==='pending').length;
-    return [['dash','grid','Dashboard'],['all','inbox','Requests',p],['quality','headset','Quality'],['create','upload','Send to staff',tasksToConfirm()],['admin','sliders','Admin']];
+    const p=S.requests.filter(r=>r.status==='pending'&&inScope(r.userId)).length;
+    return [['dash','grid','Dashboard'],['all','inbox','Requests',p],['staff','users','Staff'],['quality','target','Performance'],['create','upload','Send to staff',tasksToConfirm()],['admin','sliders','Admin']];
   }
   const uid=S.current,m=S.requests.filter(r=>r.userId===uid&&r.status==='returned').length+incomingSwaps(uid).length;
   const u=myInbox(uid).filter(r=>isUnread(r,uid)).length;
   const tk=S.records.filter(r=>r.kind==='task'&&r.recipients.includes(uid)&&tState(r,uid).status==='open').length;
-  return [['new','plus','New request'],['mine','list','My requests',m],['inbox','inbox','From WFM',u],['tasks','check','My tasks',tk],['perf','target','My performance']];
+  return [['perf','target','My performance'],['new','plus','New request'],['mine','list','My requests',m],['inbox','inbox','From WFM',u],['tasks','check','My tasks',tk]];
 }
-const activeNav=()=>ui.view==='form'?'new':ui.view==='createForm'?'create':ui.view;
+const activeNav=()=>ui.view==='form'?'new':ui.view==='createForm'?(ui.form&&ui.form.returnTo==='profile'?'staff':'create'):ui.view==='profile'?'staff':ui.view;
 function go(view){ui.view=view;if(view!=='form'&&view!=='createForm')ui.form=null;closeDrawer(true);render();window.scrollTo(0,0)}
 
 /* ================= Render: shell ================= */
@@ -1010,12 +1022,13 @@ function render(){
   if(!S.current){app.innerHTML=renderSignin();return}
   const u=me(),items=navItems(),act=activeNav();
   app.innerHTML=`<header class="topbar"><div class="brand"><div class="logo">${ic('layers',18)}</div><span class="brand-name">WFM Requests</span><span class="proto">Demo</span></div>
+  ${isWfm()&&myTeams().length?`<div class="scope-seg" title="Which staff the pages show"><button class="${scoped()?'on':''}" data-action="scope" data-s="mine">My teams</button><button class="${scoped()?'':'on'}" data-action="scope" data-s="all">All</button></div>`:''}
   <button class="user-btn" data-action="account" title="Account">${avatar(u)}<div class="me-text"><b>${esc(u.name)}</b><span>${esc(teamOf(u))}</span></div>${ic('next',16).replace('<svg','<svg style="transform:rotate(90deg)"')}</button></header>
   <div class="shell"><aside class="sidebar"><div class="side-label">${isWfm()?'WFM / Manager':'Staff'}</div>
   ${items.map(([k,i,l,b])=>`<button class="nav-item${k===act?' on':''}" data-action="nav" data-view="${k}">${ic(i,18)}<span>${l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`).join('')}
   <div class="side-foot">Test version · shared data.${isWfm()?`<button data-action="resetDemo">${ic('trash',14)} Clear all data</button>`:''}<button data-action="signOut">${ic('back',14)} Sign out</button></div></aside>
   <main id="main">${renderView()}</main></div>
-  <nav class="bottom-nav">${items.map(([k,i,l,b])=>`<button class="${k===act?'on':''}" data-action="nav" data-view="${k}">${ic(i,22)}<span>${({'New request':'New','My requests':'Requests','From WFM':'Inbox','My performance':'Score','My tasks':'Tasks','Send to staff':'Send'})[l]||l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`).join('')}</nav>`;
+  <nav class="bottom-nav">${items.map(([k,i,l,b])=>`<button class="${k===act?'on':''}" data-action="nav" data-view="${k}">${ic(i,22)}<span>${({'New request':'New','My requests':'Requests','From WFM':'Inbox','My performance':'Me','My tasks':'Tasks','Send to staff':'Send','Performance':'Perf.','Dashboard':'Home'})[l]||l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`).join('')}</nav>`;
   if(ui.drawer)renderDrawer();
 }
 function renderSignin(){
@@ -1029,7 +1042,7 @@ function renderSignin(){
 }
 function renderView(){
   const v=ui.view;
-  if(isWfm()){return v==='quality'?viewQuality():v==='all'?viewAll():v==='create'?viewCreate():v==='createForm'?viewCreateForm():v==='admin'?viewAdmin():viewDash()}
+  if(isWfm()){return v==='staff'?viewStaff():v==='profile'?viewProfile():v==='quality'?viewQuality():v==='all'?viewAll():v==='create'?viewCreate():v==='createForm'?viewCreateForm():v==='admin'?viewAdmin():viewDash()}
   return v==='form'?viewForm():v==='mine'?viewMine():v==='inbox'?viewInbox():v==='perf'?viewMyPerf():v==='tasks'?viewMyTasks():viewNew();
 }
 
@@ -1189,7 +1202,7 @@ function viewInbox(){
   const cnt=k=>all.filter(r=>match(r,k)).length;
   const list=all.filter(r=>match(r,ui.inboxFilter));
   const cards=list.map(r=>{const un=isUnread(r,uid);return `<div class="req-card${un?' unread':''}" data-action="openRec" data-id="${r.id}" role="button" tabindex="0">${un?'<span class="unread-dot"></span>':'<span class="read-gap"></span>'}${bubble(r.kind,1,1)}
-    <div class="req-main"><div class="req-title">${RECS[r.kind].name} <small>${r.id}</small></div><div class="req-sub">${esc(recSummary(r))}</div><div class="req-meta">${esc(user(r.createdBy).name)} · ${ago(r.createdAt)}${(r.comments||[]).length?` · ${r.comments.length} comment${r.comments.length>1?'s':''}`:''}${(r.data.amended||[]).length?' · amended':''}</div></div>
+    <div class="req-main"><div class="req-title">${RECS[r.kind].name} <small>${r.id}</small></div><div class="req-sub">${esc(recSummary(r))}</div><div class="req-meta">${esc(user(r.createdBy).name)} · ${ago(r.createdAt)}${(r.comments||[]).length?` · ${r.comments.length} comment${r.comments.length>1?'s':''}`:''}${(r.data.amended||[]).length||(r.data.edited||[]).length?' · <b style="color:var(--primary)">updated</b>':''}</div></div>
     <div class="req-side">${r.requireAck?ackPill(!!r.acks[uid]):''}</div></div>`}).join('');
   return head('From WFM','Minutes, evaluations and tickets sent to you.')+
     `<div class="chips">${groups.filter(([k])=>k==='all'||cnt(k)).map(([k,l])=>`<button class="chip${ui.inboxFilter===k?' on':''}" data-action="inboxFilter" data-f="${k}">${l}<span class="n">${cnt(k)}</span></button>`).join('')}</div>`+
@@ -1199,16 +1212,16 @@ function viewInbox(){
 /* ================= WFM views ================= */
 function viewDash(){
   const T=today(),tIso=iso(T),y=T.getFullYear(),mStart=iso(new Date(y,T.getMonth(),1)),yStart=iso(new Date(y,0,1)),[ma,mb]=monthBounds(T);
-  const pend=S.requests.filter(r=>r.status==='pending').sort((a,b)=>a.createdAt-b.createdAt);
-  const evs=S.records.filter(r=>r.kind==='eval'&&r.data.countInScore!==false);
+  const pend=S.requests.filter(r=>r.status==='pending'&&inScope(r.userId)).sort((a,b)=>a.createdAt-b.createdAt);
+  const evs=S.records.filter(r=>r.kind==='eval'&&r.data.countInScore!==false&&inScope(r.recipients[0]));
   const evIn=(list,a)=>list.filter(r=>r.data.date>=a&&r.data.date<=tIso);
   const avgEv=l=>l.length?Math.round(l.reduce((t,r)=>t+evScore(r),0)/l.length*10)/10:null;
-  const pf=(a,uids)=>S.perf.filter(p=>p.date>=a&&p.date<=tIso&&(!uids||uids.includes(p.userId)));
+  const pf=(a,uids)=>S.perf.filter(p=>p.date>=a&&p.date<=tIso&&(uids?uids.includes(p.userId):inScope(p.userId)));
   const avgP=l=>l.length?Math.round(l.reduce((t,p)=>t+p.score,0)/l.length*10)/10:null;
   const staff=staffUsers(),latestVals=staff.map(u=>perfOf(u.id).at(-1)).filter(Boolean),latestAvg=avgP(latestVals);
   const tile=(l,v,sub,col)=>`<div class="card stat"><span>${l}</span><b${col?` style="color:${col}"`:''}>${v}</b><small>${sub}</small></div>`;
   const tgt=S.rules.qualityTarget,qm=avgEv(evIn(evs,mStart)),qy=avgEv(evIn(evs,yStart)),pm=avgP(pf(mStart)),py=avgP(pf(yStart));
-  const teamRows=TEAM_LIST.map(t=>{const ids=staff.filter(u=>u.team===t.id).map(u=>u.id);if(!ids.length)return '';const te=evs.filter(r=>ids.includes(r.recipients[0]));
+  const teamRows=TEAM_LIST.filter(t=>!scoped()||myTeams().includes(t.id)).map(t=>{const ids=staff.filter(u=>u.team===t.id).map(u=>u.id);if(!ids.length)return '';const te=evs.filter(r=>ids.includes(r.recipients[0]));
     const am=ids.length?r2(ids.reduce((x,u)=>x+accScore(u,ma,mb),0)/ids.length):null,a1=avgEv(evIn(te,mStart)),a2=avgEv(evIn(te,yStart));
     return `<tr><td><b style="font-weight:600">${esc(t.name)}</b><div class="muted" style="font-size:12px">${ids.length} staff</div></td><td class="num-cell"><span class="score-cell${a1!=null&&a1<tgt?' below':''}">${a1!=null?a1+'%':'—'}</span></td><td class="num-cell"><span class="score-cell${a2!=null&&a2<tgt?' below':''}">${a2!=null?a2+'%':'—'}</span></td><td class="num-cell">${fmtScore(avgP(pf(mStart,ids)))}</td><td class="num-cell">${fmtScore(avgP(pf(yStart,ids)))}</td><td class="num-cell">${am!=null?am+'%':'—'}</td></tr>`}).join('');
   // leave capacity: rest of the year, grouped by month
@@ -1221,7 +1234,7 @@ function viewDash(){
       g+=`<div class="cap l${u>=S.rules.leaveLimit?2:u?1:0}${bk?' blk':''}" title="${fmtL(s)} · ${u} of ${S.rules.leaveLimit} on leave${bk?' · blocked for everyone':''}"><b>${d}</b>${u}/${S.rules.leaveLimit}</div>`}
     if(any)capHtml+=`<div class="cap-month"><div class="cap-mname">${MONL[m.getMonth()]}</div><div class="cap-grid">${['S','M','T','W','T','F','S'].map(x=>`<div class="cap-dow">${x}</div>`).join('')}${g}</div></div>`;
   }
-  const monthReqs=S.requests.filter(r=>iso(new Date(r.createdAt))>=mStart);
+  const monthReqs=S.requests.filter(r=>iso(new Date(r.createdAt))>=mStart&&inScope(r.userId));
   const byType=Object.keys(TYPES).map(k=>[k,monthReqs.filter(r=>r.type===k).length]);const mx=Math.max(1,...byType.map(x=>x[1]));
   const ytd=staff.map(u=>{
     const leave=S.requests.filter(r=>r.type==='leave'&&r.userId===u.id&&r.status==='approved'&&r.data.start.slice(0,4)==String(y)).reduce((a,r)=>a+daysBetween(r.data.start,r.data.end),0);
@@ -1232,7 +1245,7 @@ function viewDash(){
     const kpi=S.requests.filter(r=>r.type==='kpi'&&r.userId===u.id&&r.status==='approved').length;
     return `<tr><td style="white-space:nowrap"><span class="av">${initials(u.name)}</span><b style="font-weight:600">${esc(u.name)}</b> <span class="muted" style="font-size:12px">· ${teamName(u.team)}</span></td><td class="num-cell">${leave}</td><td class="num-cell">${adh}</td><td class="num-cell">${vio}</td><td class="num-cell">${avg}</td><td class="num-cell">${accScore(u.id,ma,mb)}%</td><td class="num-cell">${kpi}</td></tr>`;
   }).join('');
-  return head('Dashboard',`Department overview · ${MONL[T.getMonth()]} ${y}`,`<button class="btn primary" data-action="nav" data-view="create">${ic('upload',16)} Send to staff</button>`)+
+  return head('Dashboard',`${scoped()?'Your teams':'Department overview'} · ${MONL[T.getMonth()]} ${y}`,`<button class="btn primary" data-action="nav" data-view="create">${ic('upload',16)} Send to staff</button>`)+
   `<div class="stats">${tile('Call quality · this month',qm!=null?qm+'%':'—',`${evIn(evs,mStart).length} evaluation(s) · target ${tgt}%`,qm!=null?(qm>=tgt?'var(--ok)':'var(--bad)'):'')}
   ${tile('Call quality · year to date',qy!=null?qy+'%':'—',`${evIn(evs,yStart).length} evaluation(s)`,qy!=null?(qy>=tgt?'var(--ok)':'var(--bad)'):'')}
   ${tile('Daily performance · this month',fmtScore(pm),latestAvg!=null?`latest day average ${fmtScore(latestAvg)}`:'no scores yet','var(--primary)')}
@@ -1251,6 +1264,7 @@ function filteredRequests(){
     const u=user(r.userId);
     if(f.type!=='all'&&r.type!==f.type)return false;
     if(f.status!=='all'&&r.status!==f.status)return false;
+    if(!inScope(r.userId))return false;
     if(f.team!=='all'&&String(u.team)!==f.team)return false;
     if(q&&![r.id,u.name,u.emp,teamName(u.team),TYPES[r.type].name,summary(r)].join(' ').toLowerCase().includes(q))return false;
     return true;
@@ -1289,15 +1303,14 @@ function viewTasksWfm(){
 }
 function viewCreate(){
   const tab=ui.createTab||'send',nc=tasksToConfirm();
-  const tabs=`<div class="tabs"><button class="${tab==='send'?'on':''}" data-action="createTab" data-t="send">Send</button><button class="${tab==='tasks'?'on':''}" data-action="createTab" data-t="tasks">Tasks${nc?` <span class="tab-badge">${nc}</span>`:''}</button></div>`;
+  const tabs=tabBar('createTab',tab,[['send','Send'],['sent','Sent'],['tasks','Tasks',nc]]);
+  if(tab==='sent')return head('Send to staff','Everything sent to staff — open an item to edit or delete it.')+tabs+viewSent();
   if(tab==='tasks')return head('Send to staff','Track the tasks you’ve assigned.',`<button class="btn primary" data-action="pickRec" data-kind="task">${ic('plus',16)} New task</button>`)+tabs+viewTasksWfm();
-  const recent=[...S.records].filter(r=>r.kind!=='task').sort((a,b)=>b.createdAt-a.createdAt).slice(0,12);
+  const recent=[...S.records].filter(r=>r.kind!=='task'&&r.recipients.some(inScope)).sort((a,b)=>b.createdAt-a.createdAt).slice(0,5);
   return head('Send to staff','What would you like to send?')+tabs+
   `<div class="type-grid">${Object.entries(RECS).map(([k,t])=>`<button class="type-card" style="--c:${t.c}" data-action="pickRec" data-kind="${k}">${bubble(k,0,1)}<div><b>${t.name}</b><br><span>${t.desc}</span></div></button>`).join('')}</div>
   <div class="flow-note" style="margin-top:14px">Adherence notes stay internal. Violation tickets, call evaluations and minutes go to the staff member’s “From WFM” inbox. Tasks go to their “My tasks” page.</div>
-  <h2 class="section-title">Recently sent</h2><div class="req-list">${recent.map(r=>{
-    const n=r.recipients.length,a=Object.keys(r.acks).length,to=r.kind==='mom'?(r.data.sendTo==='all'?'Whole department':r.data.sendTo==='teams'?r.data.teams.map(t=>teamName(t)).join(', '):user(r.recipients[0]).name):user(r.recipients[0]).name;
-    return `<div class="req-card" data-action="openRec" data-id="${r.id}" role="button" tabindex="0">${bubble(r.kind,1,1)}<div class="req-main"><div class="req-title">${RECS[r.kind].name} <small>${r.id}</small></div><div class="req-sub">${esc(recSummary(r))}</div><div class="req-meta">To ${esc(to)} · ${ago(r.createdAt)}</div></div><div class="req-side">${r.requireAck?`<span class="pill ${a===n?'ack':'need'}">${a}/${n} acknowledged</span>`:'<span class="pill cancelled">Internal</span>'}</div></div>`}).join('')}</div>`;
+  <div class="sec-head"><h2 class="section-title">Recently sent</h2><button class="btn sm" data-action="createTab" data-t="sent">See all sent ${ic('next',14)}</button></div>${recent.length?`<div class="req-list">${recent.map(r=>sentCard(r)).join('')}</div>`:'<div class="card empty"><b>Nothing sent yet</b></div>'}`;
 }
 function newRecForm(kind){
   const T=today();
@@ -1344,12 +1357,12 @@ function viewCreateForm(){
     <div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Staff must tap “I’ve read this”')}</div>`;
   }else if(k==='acc'){
     const rs=ACC.reasons.find(x=>x.name===v.reason)||ACC.reasons[0]||{name:'',points:0},[ma,mb]=monthBounds(v.date?parse(v.date):today());
-    const lv=Math.min(4,Math.max(1,+v.level||1)),ded=rs.counter?0:(+rs.points||0)*lv,pts=accPoints(v.staff,ma,mb),after=Math.max(0,r2(pts-ded));
+    const lv=Math.min(4,Math.max(1,+v.level||1)),ded=rs.counter?0:(+rs.points||0)*lv,old=f.editId&&S.records.find(x=>x.id===f.editId),pts=Math.min(accMax(),r2(accPoints(v.staff,ma,mb)+(old&&old.recipients[0]===v.staff&&old.data.date>=ma&&old.data.date<=mb?noteDeduct(old):0))),after=Math.max(0,r2(pts-ded));
     main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}
     ${field('Reason',`<select name="reason">${ACC.reasons.map(x=>opt(x.name,`${x.name} · ${x.counter?'counter only':x.points+' pts'}`,x.name===v.reason)).join('')}</select>`,{req:1,full:1,invalid:e.reason,hint:e.reason})}
     ${rs.counter?`<div class="field full"><div class="flow-note" style="margin:0">This reason is only counted. It doesn’t change the accuracy score.</div></div>`:field('Level',`<div class="seg">${[1,2,3,4].map(n=>`<button type="button" class="${lv===n?'on':''}" data-action="accLevel" data-n="${n}">${n} · −${(+rs.points||0)*n}</button>`).join('')}</div>`,{full:1,req:1,hint:`Deduction = ${rs.points} pts × level`})}
     ${field('Details',ta('details','What happened (shown to the staff member)'),{full:1,req:1,invalid:e.details,hint:e.details})}${files('Optional')}</div>`;
-    side=`<div class="card card-pad"><h2>Accuracy · ${MONL[parse(ma).getMonth()]}</h2><div class="ev-break"><div><span>Full score</span><b>${accMax()} pts</b></div><div><span>Deducted so far (${accScored(v.staff,ma,mb)} note${accScored(v.staff,ma,mb)===1?'':'s'})</span><b class="neg">−${r2(accMax()-pts)}</b></div><div><span>This note</span><b class="neg">${rs.counter?'0':'−'+ded}</b></div><div class="tot"><span>After this note</span><b>${after} pts · ${accPct(after)}%</b></div></div><div class="flow-note" style="margin:10px 0 0">Accuracy is worth ${accW()}% of the scorecard: ${accMax()} pts = ${accW()}%.</div></div>
+    side=`<div class="card card-pad"><h2>Accuracy · ${MONL[parse(ma).getMonth()]}</h2><div class="ev-break"><div><span>Full score</span><b>${accMax()} pts</b></div><div><span>Deducted so far (${(n=>`${n} note${n===1?'':'s'}`)(accScored(v.staff,ma,mb)-(old&&old.recipients[0]===v.staff&&old.data.date>=ma&&old.data.date<=mb&&!old.data.counter?1:0))})</span><b class="neg">−${r2(accMax()-pts)}</b></div><div><span>This note</span><b class="neg">${rs.counter?'0':'−'+ded}</b></div><div class="tot"><span>After this note</span><b>${after} pts · ${accPct(after)}%</b></div></div><div class="flow-note" style="margin:10px 0 0">Accuracy is worth ${accW()}% of the scorecard: ${accMax()} pts = ${accW()}%.</div></div>
     <div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Staff must tap “I’ve read this”')}</div>`;
   }else if(k==='adh'){
     main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Reason',`<select name="reason">${LISTS.adh_reasons.map(s=>opt(s,s,s===v.reason)).join('')}</select>`,{req:1})}${field('Date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}${field('Note',ta('note','e.g. certificate received'),{full:1})}${files('e.g. sick certificate')}</div>`;
@@ -1357,7 +1370,7 @@ function viewCreateForm(){
   }else if(k==='task'){
     const seg=[['person','One person'],['teams','Team(s)'],['all','Whole department']],n=momRecipients(f).length;
     main=`<div class="form-grid">${field('Assign to',`<div class="seg">${seg.map(([s2,l])=>`<button type="button" class="${f.sendTo===s2?'on':''}" data-action="momTo" data-s="${s2}">${l}</button>`).join('')}</div>`,{full:1,req:1})}
-    ${f.sendTo==='person'?field('Staff member',staffSel,{full:1,req:1}):f.sendTo==='teams'?field('Teams',`<div class="opt-chips">${TEAM_LIST.map(tm=>`<span class="chip${f.teams.includes(tm.id)?' on':''}" data-action="momTeam" data-t="${tm.id}">${esc(tm.name)} · ${staffUsers().filter(u=>u.team===tm.id).length}</span>`).join('')}</div>`,{full:1,req:1,invalid:e.teams,hint:e.teams}):''}
+    ${f.sendTo==='person'?field('Staff member',staffSel,{full:1,req:1}):f.sendTo==='teams'?field('Teams',`<div class="opt-chips">${TEAM_LIST.map(tm=>`<span class="chip${f.teams.includes(tm.id)?' on':''}" data-action="momTeam" data-t="${tm.id}">${esc(tm.name)} · ${allStaff().filter(u=>u.team===tm.id).length}</span>`).join('')}</div>`,{full:1,req:1,invalid:e.teams,hint:e.teams}):''}
     ${field('Task',inp('title','text','e.g. Update your contact details in the CRM'),{full:1,req:1,invalid:e.title,hint:e.title})}
     ${field('Due date',inp('due','date'),{req:1,invalid:e.due,hint:e.due})}<div></div>
     ${field('Details',ta('details','Anything they need to know (optional)'),{full:1})}${files('Optional')}</div>`;
@@ -1367,18 +1380,19 @@ function viewCreateForm(){
     const seg=[['person','One person'],['teams','Team(s)'],['all','Whole department']];
     const n=momRecipients(f).length;
     main=`<div class="form-grid">${field('Send to',`<div class="seg">${seg.map(([s,l])=>`<button type="button" class="${f.sendTo===s?'on':''}" data-action="momTo" data-s="${s}">${l}</button>`).join('')}</div>`,{full:1,req:1})}
-    ${f.sendTo==='person'?field('Staff member',staffSel,{full:1,req:1}):f.sendTo==='teams'?field('Teams',`<div class="opt-chips">${TEAM_LIST.map(tm=>`<span class="chip${f.teams.includes(tm.id)?' on':''}" data-action="momTeam" data-t="${tm.id}">${esc(tm.name)} · ${staffUsers().filter(u=>u.team===tm.id).length}</span>`).join('')}</div>`,{full:1,req:1,invalid:e.teams,hint:e.teams}):''}
+    ${f.sendTo==='person'?field('Staff member',staffSel,{full:1,req:1}):f.sendTo==='teams'?field('Teams',`<div class="opt-chips">${TEAM_LIST.map(tm=>`<span class="chip${f.teams.includes(tm.id)?' on':''}" data-action="momTeam" data-t="${tm.id}">${esc(tm.name)} · ${allStaff().filter(u=>u.team===tm.id).length}</span>`).join('')}</div>`,{full:1,req:1,invalid:e.teams,hint:e.teams}):''}
     ${field('Title',inp('title','text','e.g. Team A weekly huddle'),{req:1,invalid:e.title,hint:e.title})}${field('Meeting date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}
     ${field('Summary',ta('summary','Main points discussed'),{full:1,req:1,invalid:e.summary,hint:e.summary})}${field('Action items',ta('actions','Optional'),{full:1})}${files('Optional · slides, documents')}</div>`;
     side=`<div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Track who has read it')}${sw('emailCopy','Email a copy','Official record in Outlook · coming in the real version',true)}</div>
     <div class="card card-pad"><h2>Recipients</h2><div class="exp-summary" style="margin:0"><span style="color:var(--primary)">${ic('users',26)}</span><div><b>${n}</b> <span>staff will receive this</span></div></div></div>`;
   }
-  return `<button class="back" data-action="nav" data-view="${f.amendId?'quality':'create'}">${ic('back',16)} ${f.amendId?'Quality':'Send to staff'}</button>`+(f.amendId?head(`Edit evaluation ${f.amendId}`,`${esc(user(v.staff).name)} will be asked to acknowledge it again`,'',bubble(k,0,1)):head(t.name,t.desc,'',bubble(k,0,1)))+
-   `<form id="recForm" novalidate><div class="grid-2"><div class="card card-pad">${main}<div class="form-actions"><button type="button" class="btn" data-action="nav" data-view="create">Cancel</button><button type="submit" class="btn primary">${ic('check',16)} ${f.amendId?'Save changes':k==='adh'?'Save note':k==='mom'?'Send minutes':k==='vio'?'Send ticket':k==='task'?'Assign task':k==='acc'?'Send note':'Send to staff'}</button></div></div><div class="stack">${side}</div></div></form>`;
+  const backV=f.amendId?'quality':f.returnTo||'create',backL=backV==='quality'?'Performance':backV==='profile'?esc(user(ui.profileId).name):'Send to staff';
+  return `<button class="back" data-action="nav" data-view="${backV}">${ic('back',16)} ${backL}</button>`+(f.editId?head(`Edit ${t.name} ${f.editId}`,k==='adh'||k==='task'?'Changes are saved straight away':'Staff will see it as updated and acknowledge again','',bubble(k,0,1)):f.amendId?head(`Edit evaluation ${f.amendId}`,`${esc(user(v.staff).name)} will be asked to acknowledge it again`,'',bubble(k,0,1)):head(t.name,t.desc,'',bubble(k,0,1)))+
+   `<form id="recForm" novalidate><div class="grid-2"><div class="card card-pad">${main}<div class="form-actions"><button type="button" class="btn" data-action="nav" data-view="${backV}">Cancel</button><button type="submit" class="btn primary">${ic('check',16)} ${f.amendId||f.editId?'Save changes':k==='adh'?'Save note':k==='mom'?'Send minutes':k==='vio'?'Send ticket':k==='task'?'Assign task':k==='acc'?'Send note':'Send to staff'}</button></div></div><div class="stack">${side}</div></div></form>`;
 }
 function momRecipients(f){
-  if(f.sendTo==='all')return staffUsers().map(u=>u.id);
-  if(f.sendTo==='teams')return staffUsers().filter(u=>f.teams.includes(u.team)).map(u=>u.id);
+  if(f.sendTo==='all')return allStaff().map(u=>u.id);
+  if(f.sendTo==='teams')return allStaff().filter(u=>f.teams.includes(u.team)).map(u=>u.id);
   return [f.vals.staff];
 }
 function viewRules(){
@@ -1425,12 +1439,14 @@ function adminUsers(){
 }
 function adminTeams(){
   return `<div class="card card-pad"><h2>Teams</h2><div class="req-list">${TEAM_LIST.map(t=>{const n=USERS.filter(u=>u.team===t.id&&u.active).length;
-    return `<div class="team-row"><input class="input" data-team="${t.id}" value="${esc(t.name)}" aria-label="Team name"><span class="muted team-n">${n} staff</span>
+    const ld=(t.leaders||[]).map(id=>user(id)).filter(u=>u.role==='wfm'&&!u.deleted);
+    return `<div class="team-row"><input class="input" data-team="${t.id}" value="${esc(t.name)}" aria-label="Team name"><span class="muted team-n">${n} staff<br><span style="font-size:11.5px">${ld.length?'TL: '+ld.map(u=>esc(u.name)).join(', '):'No team leader'}</span></span>
+    <button class="btn sm" data-action="teamLeaders" data-id="${t.id}">${ic('lock',14)}<span class="desktop-only">Leaders</span></button>
     <button class="btn sm" data-action="saveTeam" data-id="${t.id}">${ic('check',14)}<span class="desktop-only">Save</span></button><button class="btn sm" data-action="teamMembers" data-id="${t.id}">${ic('users',14)}<span class="desktop-only">Members</span></button>
     <button class="btn sm icon bad" data-action="delTeam" data-id="${t.id}" title="${n?'Move its staff to another team first':'Delete team'}" ${n?'disabled style="opacity:.4"':''}>${ic('trash',15)}</button></div>`}).join('')}</div>
     <div class="team-row add"><input class="input" id="newTeam" placeholder="New team name"><button class="btn primary sm" data-action="addTeam">${ic('plus',14)} Add team</button></div>
     ${USERS.some(u=>u.role==='staff'&&u.active&&(u.team==null||TEAMS[u.team]==null))?`<div class="callout warn" style="margin-top:14px">${ic('alert',18)}<div><b>Staff without a team</b>${USERS.filter(u=>u.role==='staff'&&u.active&&(u.team==null||TEAMS[u.team]==null)).map(u=>esc(u.name)).join(', ')}</div></div>`:''}
-    <div class="flow-note">Tap <b>Members</b> to add or move several people at once. Renaming a team updates it everywhere.</div></div>`;
+    <div class="flow-note">Tap <b>Members</b> to add or move several people at once, and <b>Leaders</b> to assign team leaders (WFM / manager accounts — one person can lead several teams). Renaming a team updates it everywhere.</div></div>`;
 }
 function adminForm(){
   const d=ui.formDraft||(ui.formDraft=JSON.parse(JSON.stringify(EVAL_FORM))),dirty=JSON.stringify(d)!==JSON.stringify(EVAL_FORM),tot=formTotal(d);
@@ -1531,7 +1547,7 @@ function teamDrawer(id){
 function accountDrawer(){
   const u=me();
   return `<div class="sheet-handle"></div><div class="d-head">${avatar(u)}<div><h3>${esc(u.name)}</h3><small>${esc(u.emp)} · ${esc(teamOf(u))}</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div>
-  <div class="d-body"><div class="d-section"><h4>Change password</h4><form id="acctPwForm" novalidate><div class="form-grid" style="grid-template-columns:1fr">
+  <div class="d-body">${u.role==='staff'?`<div class="d-section"><h4>Your team</h4><div class="kv">${kv('Team',esc(teamName(u.team)))+kv('Team leader',tlText(u)||'—')}</div></div>`:myTeams().length?`<div class="d-section"><h4>You lead</h4><div class="kv">${kv('Teams',myTeams().map(t=>esc(teamName(t))).join(', '),1)}</div></div>`:''}<div class="d-section"><h4>Change password</h4><form id="acctPwForm" novalidate><div class="form-grid" style="grid-template-columns:1fr">
    ${field('Current password','<input type="password" name="old" autocomplete="current-password">')}
    ${field('New password','<input type="password" name="new1" autocomplete="new-password">',{hint:'At least 6 characters'})}
    ${field('Repeat new password','<input type="password" name="new2" autocomplete="new-password">')}
@@ -1618,8 +1634,8 @@ function seriesChart(pts,o={}){
   const every=Math.max(1,Math.ceil(pts.length/6));g+=pts.map((p,i)=>i%every===0||i===pts.length-1?`<text x="${x(i)}" y="${H-6}" text-anchor="${pts.length===1?'middle':i===0?'start':i===pts.length-1?'end':'middle'}">${esc(p.label)}</text>`:'').join('');
   return `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label||'Trend')}">${g}</svg></div>`;
 }
-function qTabs(){const t=ui.qTab||'calls';return `<div class="tabs">${[['calls','Call quality'],['perf','Daily performance']].map(([k,l])=>`<button class="${k===t?'on':''}" data-action="qTab" data-t="${k}">${l}</button>`).join('')}</div>`}
-function viewQuality(){return (ui.qTab||'calls')==='perf'?head('Quality','Daily performance scores uploaded by WFM.',`<button class="btn" data-action="exportCycle">${ic('download',16)} Cycle summary</button>`)+qTabs()+viewPerfAdmin():viewCallQuality()}
+function qTabs(){const t=ui.qTab||'calls';return `<div class="tabs">${[['calls','Call quality'],['perf','Daily performance'],['acc','Accuracy'],['vio','Violations']].map(([k,l])=>`<button class="${k===t?'on':''}" data-action="qTab" data-t="${k}">${l}</button>`).join('')}</div>`}
+function viewQuality(){const t=ui.qTab||'calls';if(t==='acc')return head('Performance','Accuracy notes and scores by month.')+qTabs()+viewAccAdmin();if(t==='vio')return head('Performance','Violation tickets by month.')+qTabs()+viewVioAdmin();return t==='perf'?head('Performance','Daily performance from the monthly AD_PER file.',`<button class="btn" data-action="exportCycle">${ic('download',16)} Cycle summary</button>`)+qTabs()+viewPerfAdmin():viewCallQuality()}
 function viewCallQuality(){
   const Q=qScope(),tgt=S.rules.qualityTarget,star=mostImproved(Q.ids);
   const curAvg=avgOf(Q.cur.map(r=>evScore(r))),prevAvg=avgOf(Q.prev.map(r=>evScore(r)));
@@ -1647,7 +1663,7 @@ function viewCallQuality(){
   const weeks={};Q.cur.forEach(r=>{const d=parse(r.data.date);const ws=iso(addDays(d,-d.getDay()));(weeks[ws]=weeks[ws]||[]).push(evScore(r))});
   const wk=Object.keys(weeks).sort().map(k=>({v:avgOf(weeks[k]),label:fmt(k),title:`Week of ${fmt(k)} · ${avgOf(weeks[k])}% · ${weeks[k].length} call(s)`}));
   const evList=[...Q.cur].sort((a,b)=>evalTime(b)-evalTime(a));
-  return head('Quality',`Call evaluations · ${label}`,`<button class="btn" data-action="exportCycle">${ic('download',16)} Cycle summary</button>`)+qTabs()+
+  return head('Performance',`Call evaluations · ${label}`,`<button class="btn" data-action="exportCycle">${ic('download',16)} Cycle summary</button>`)+qTabs()+
   `<div class="card card-pad q-filter-card"><div class="q-filters">
    <select class="input" data-q="preset">${[['30','Last 30 days'],['90','Last 90 days'],['month','This month'],['lastmonth','Last month'],['year','This year'],['custom','Custom dates…']].map(([k,l])=>opt(k,l,(ui.q.preset||'90')===k)).join('')}</select>
    ${(ui.q.preset||'90')==='custom'?`<input type="date" class="input" data-q="from" value="${ui.q.from||iso(Q.a)}"><input type="date" class="input" data-q="to" value="${ui.q.to||iso(Q.b)}">`:''}
@@ -1677,24 +1693,6 @@ function viewCallQuality(){
   <div class="card" style="margin-top:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Evaluations <span class="muted" style="font-weight:500">· ${evList.length} in this view</span></h2></div>
    ${evList.length?`<div class="table-wrap"><table class="mini-table"><thead><tr><th>Date</th><th>Staff</th><th>Call type</th><th>Evaluator</th><th class="num-cell">Score</th></tr></thead><tbody>
    ${evList.slice(0,100).map(r=>{const sc=evScore(r);return `<tr data-action="openRec" data-id="${r.id}"><td style="white-space:nowrap">${fmt(r.data.date)}</td><td style="white-space:nowrap">${esc(user(r.recipients[0]).name)}</td><td>${esc(r.data.callType||'—')}</td><td style="white-space:nowrap">${esc(user(r.createdBy).name)}</td><td class="num-cell"><span class="score-cell${sc<tgt?' below':''}">${sc}%</span></td></tr>`}).join('')}</tbody></table></div>${evList.length>100?'<div class="flow-note" style="padding:0 16px 14px">Showing the latest 100 — narrow the filters to see others.</div>':''}`:'<div class="empty-mini" style="padding:0 16px 16px">No evaluations match these filters.</div>'}</div>`;
-}
-function staffDrawer(uid){
-  const u=user(uid),q=staffQuality(uid),tgt=S.rules.qualityTarget,star=mostImproved(staffUsers().map(x=>x.id));
-  const vio=S.records.filter(r=>r.kind==='vio'&&r.recipients.includes(uid)).length,adh=S.records.filter(r=>r.kind==='adh'&&r.recipients.includes(uid)).length;
-  const kpi=S.requests.filter(r=>r.type==='kpi'&&r.userId===uid&&r.status==='approved').length;
-  const y=today().getFullYear(),leave=S.requests.filter(r=>r.type==='leave'&&r.userId===uid&&r.status==='approved'&&r.data.start.slice(0,4)==String(y)).reduce((a,r)=>a+daysBetween(r.data.start,r.data.end),0);
-  const list=[...q.all].reverse().map(r=>{const sc=evScore(r);return `<div class="req-card" data-action="openRec" data-id="${r.id}" role="button" tabindex="0"><div class="req-main"><div class="req-title"><span class="score-cell${sc<tgt?' below':''}">${sc}%</span> <small>${fmt(r.data.date)} · ${esc(r.data.callType||'—')} · by ${esc(user(r.createdBy).name)}</small></div><div class="req-sub" style="white-space:normal">${esc(r.data.feedback)}</div></div><div class="req-side">${r.requireAck?ackPill(!!r.acks[uid]):''}</div></div>`}).join('');
-  const fl=flagsHtml(q,uid,star);
-  return `<div class="sheet-handle"></div><div class="d-head">${avatar(u)}<div><h3>${esc(u.name)}</h3><small>${u.emp} · ${esc(teamName(u.team))}</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div>
-  <div class="d-body">
-   <div class="score-box"><div class="score-num" style="color:${q.recent==null?'var(--faint)':q.recent>=tgt?'var(--ok)':'var(--bad)'}">${q.recent!=null?q.recent+'%':'—'}</div><div><b>${q.sc.length===1?'Last call':`Average of last ${Math.min(6,q.sc.length)} calls`}</b><span style="display:block">Target ${tgt}% · ${q.sc.length} evaluation(s) in total</span><div style="margin-top:6px">${trendBadge(q.trend)}</div></div></div>
-   ${fl?`<div class="d-section">${fl}</div>`:''}
-   <div class="d-section"><h4>Daily performance</h4>${monthResultHtml(uid)}${perfSummaryHtml(uid,1)}${(()=>{const ds=perfOf(uid).slice(-7).reverse();return ds.length?`<div class="mini-days">${ds.map(p=>`<button class="chip" data-action="openDay" data-u="${uid}" data-d="${p.date}">${fmt(p.date)} · <b>${fmtScore(p.score)}</b></button>`).join('')}</div>`:''})()}${perfOf(uid).length>1?perfChart(perfOf(uid).slice(-30)):''}</div>
-   <div class="d-section"><h4>Call quality analysis</h4>${evalAnalysisHtml(uid,false)}</div>
-   ${q.strong!=null?`<div class="d-section"><h4>Strengths &amp; focus</h4><div class="ins"><div><span>Strongest</span><b>${critNames()[q.strong]} · ${q.crit[q.strong]}%</b></div><div><span>Focus area</span><b>${critNames()[q.weak]} · ${q.crit[q.weak]}%</b></div></div></div>`:''}
-   <div class="d-section"><h4>Other records · ${y}</h4><div class="ins"><div><span>Violations</span><b>${vio}</b></div><div><span>Adherence notes</span><b>${adh}</b></div><div><span>KPI requests accepted</span><b>${kpi}</b></div><div><span>Leave days taken</span><b>${leave}</b></div></div></div>
-   <div class="d-section"><h4>Feedback history</h4>${list?`<div class="req-list">${list}</div>`:'<div class="empty-mini">No evaluations yet.</div>'}</div>
-  </div><div class="d-foot"><button class="btn primary" data-action="newEvalFor" data-id="${uid}">${ic('plus',16)} New call evaluation</button></div>`;
 }
 function exportCycle(){
   const Q=qScope(),from=Q.from,fromIso=iso(new Date(from)),star=mostImproved(Q.ids),trendTxt={up:'Improving',down:'Slipping',flat:'Steady',new:'Too few calls'};
@@ -2037,8 +2035,8 @@ function evalAnalysisHtml(uid,staffView,list){
   ${types.length?`<h4 class="mini-h">By call type</h4><div class="bars">${types.map(([t,a,n])=>`<div class="bar-row" style="grid-template-columns:120px 1fr 70px"><span>${esc(t)}</span><div class="bar-track"><div class="bar-fill" style="width:${a}%;--c:var(--primary)"></div></div><b>${a}% <span class="muted" style="font-weight:500">· ${n}</span></b></div>`).join('')}</div>`:''}
   ${all.length>1?`<div class="ins" style="margin-top:14px"><div data-action="openRec" data-id="${best.id}" style="cursor:pointer"><span>Best call</span><b>${evScore(best)}% · ${fmt(best.data.date)}</b></div><div data-action="openRec" data-id="${worst.id}" style="cursor:pointer"><span>Lowest call</span><b>${evScore(worst)}% · ${fmt(worst.data.date)}</b></div></div>`:''}`;
 }
-function myRange(){
-  const T=today(),p=ui.my.period;let a,b=T,label;
+function myRange(p=ui.my.period){
+  const T=today();let a,b=T,label;
   if(p==='month'){a=new Date(T.getFullYear(),T.getMonth(),1);label='This month'}
   else if(p==='lastmonth'){a=new Date(T.getFullYear(),T.getMonth()-1,1);b=new Date(T.getFullYear(),T.getMonth(),0);label='Last month'}
   else if(p==='ytd'){a=new Date(T.getFullYear(),0,1);label='Year to date'}
@@ -2047,46 +2045,28 @@ function myRange(){
   return {a:iso(a),b:iso(b),from:a.getTime(),to:b.getTime()+86399999,label};
 }
 function viewMyPerf(){
-  const uid=S.current,ps=perfOf(uid),q=staffQuality(uid),tgt=S.rules.qualityTarget,R=myRange();
-  const evAll=q.all,months=[...new Set([...ps.map(p=>p.date.slice(0,7)),...evAll.map(r=>r.data.date.slice(0,7))])].sort().reverse();
-  const T=today(),cur=iso(T).slice(0,7),last=iso(new Date(T.getFullYear(),T.getMonth()-1,1)).slice(0,7),extra=months.filter(m=>m!==cur&&m!==last);
-  const plist=ps.filter(p=>p.date>=R.a&&p.date<=R.b),ytd=perfStats(ps);
-  const pavg=plist.length?Math.round(plist.reduce((x,p)=>x+p.score,0)/plist.length*10)/10:null;
-  const evs=evAll.filter(r=>r.data.date>=R.a&&r.data.date<=R.b&&(ui.my.type==='all'||r.data.callType===ui.my.type));
-  const inP=t=>t>=R.from&&t<=R.to;
-  const recs=S.records.filter(r=>r.recipients.includes(uid)&&r.kind!=='adh'&&inP(r.createdAt));
-  const reqs=S.requests.filter(r=>r.userId===uid&&r.type!=='dispute'&&inP(r.createdAt));
-  const tasks=S.records.filter(r=>r.kind==='task'&&r.recipients.includes(uid)&&inP(r.createdAt));
-  const tile=(l,v,sub,col)=>`<div class="card stat"><span>${l}</span><b${col?` style="color:${col}"`:''}>${v}</b><small>${sub||''}</small></div>`;
-  const dayRows=[...plist].reverse().map(p=>{const prev=ps[ps.indexOf(p)-1],d=prev?Math.round((p.score-prev.score)*10)/10:null,dp=openDispute(uid,p.date);
-    const ex=p.data&&Array.isArray(p.data.xc)&&p.data.xc.some(Boolean);
-    return `<tr class="day-row" data-action="openDay" data-u="${uid}" data-d="${p.date}"><td style="white-space:nowrap"><span class="link">${fmt(p.date)}</span> <span class="muted" style="font-size:12px">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][parse(p.date).getDay()]}</span>${ex?' <span class="pill sm need" title="An item was adjusted by exception">adj.</span>':''}</td><td class="num-cell"><span class="score-cell">${fmtScore(p.score)}</span></td>
-    <td>${d==null?'<span class="muted">—</span>':`<span class="delta ${d>=0?'up':'down'}">${d>=0?'▲':'▼'} ${Math.abs(d)}</span>`}</td>
-    <td style="text-align:right">${dp?`<button class="btn sm" data-action="openReq" data-id="${dp.id}">${pill(dp.status).replace('class="pill','class="pill sm')}</button>`:`<button class="btn sm" data-action="disputeNew" data-date="${p.date}">${ic('alert',13)} Dispute</button>`}</td></tr>`}).join('');
-  const evAvg=avgOf(evs.map(r=>evScore(r))),nFilters=(ui.my.type!=='all'?1:0);
-  return head('My performance',`Showing ${R.label.toLowerCase()}${ui.my.type!=='all'?` · ${esc(ui.my.type)} calls`:''}.`)+
-  `<div class="card card-pad q-filter-card"><div class="q-filters">
-    <select class="input" data-my="period">${opt('month','This month',ui.my.period==='month')}${opt('lastmonth','Last month',ui.my.period==='lastmonth')}${opt('ytd','Year to date',ui.my.period==='ytd')}${opt('all','All time',ui.my.period==='all')}${extra.length?`<optgroup label="Specific month">${extra.map(m=>opt(m,`${MONL[+m.slice(5)-1]} ${m.slice(0,4)}`,ui.my.period===m)).join('')}</optgroup>`:''}</select>
-    <select class="input" data-my="type">${opt('all','All call types',ui.my.type==='all')}${LISTS.call_types.map(t=>opt(t,t,ui.my.type===t)).join('')}</select>
-    ${nFilters||ui.my.period!=='month'?`<button class="btn sm" data-action="myClear">${ic('x',14)} Reset</button>`:''}</div></div>
-  <div class="card card-pad" style="margin-bottom:18px"><h2>Daily performance</h2>
-   ${monthResultHtml(uid,R.a.slice(0,7)===R.b.slice(0,7)?R.a.slice(0,7):null,true)}
-   ${ps.length?`<div class="stats" style="margin-bottom:14px">${tile(R.label+' average',fmtScore(pavg),`${plist.length} day(s)`,'var(--primary)')}${tile('Latest',fmtScore(ytd.latest.score),'on '+fmt(ytd.latest.date))}${tile('Month to date',fmtScore(ytd.mtd),ytd.mtdN+' days')}${tile('Year to date',fmtScore(ytd.ytd),ytd.ytdN+' days')}</div>
-   ${plist.length?`<div class="grid-2 perf-grid"><div>${perfChart(plist)}</div><div class="table-wrap day-table"><table class="mini-table"><thead><tr><th>Date</th><th class="num-cell">Score</th><th>Change</th><th></th></tr></thead><tbody>${dayRows}</tbody></table></div></div>
-   <div class="flow-note">Tap a day to see item by item what you met. Think a score is wrong? Tap <b>Dispute</b> and explain why — WFM will review it.</div>`:`<div class="empty-mini">No scores in ${R.label.toLowerCase()}.</div>`}`
-   :'<div class="empty-mini">No daily performance scores yet. They’ll appear here once WFM uploads them.</div>'}</div>
-  <div class="card card-pad" style="margin-bottom:18px"><h2>From WFM / managers <span class="muted" style="font-weight:500">· ${R.label.toLowerCase()}</span></h2>
-   <div class="stats" style="margin-top:14px">${tile('Call evaluations',recs.filter(r=>r.kind==='eval').length,recs.some(r=>r.kind==='eval')?`average ${avgOf(recs.filter(r=>r.kind==='eval').map(r=>evScore(r)))}%`:'none')}
-   ${tile('Violation tickets',recs.filter(r=>r.kind==='vio').length,'',recs.some(r=>r.kind==='vio')?'var(--bad)':'')}
-   ${tile('Minutes of meeting',recs.filter(r=>r.kind==='mom').length,'')}
-   ${tile('Waiting for you',recs.filter(r=>r.requireAck&&!r.acks[uid]).length,'to acknowledge',recs.some(r=>r.requireAck&&!r.acks[uid])?'var(--warn)':'')}
-   ${(()=>{const p=ui.my.period,mm=/^\d{4}-\d{2}$/.test(p)?p:p==='lastmonth'?R.a.slice(0,7):p==='month'?R.a.slice(0,7):iso(today()).slice(0,7),[a,b]=monthBounds(parse(mm+'-01'));return tile(`Accuracy · ${MONL[+mm.slice(5)-1]}`,accScore(uid,a,b)+'%',`${accPoints(uid,a,b)}/${accMax()} pts · ${accNotes(uid,a,b).length} note(s)`,accScored(uid,a,b)?'var(--warn)':'var(--ok)')})()}
-   ${tile('Tasks',tasks.length,`${tasks.filter(r=>tState(r,uid).status==='confirmed').length} completed · ${tasks.filter(r=>tState(r,uid).status==='open').length} to do`)}
-   ${tile('Requests accepted',reqs.filter(r=>r.status==='approved').length,`of ${reqs.filter(r=>['approved','rejected'].includes(r.status)).length} decided`,'var(--ok)')}
-   ${tile('Requests rejected',reqs.filter(r=>r.status==='rejected').length,'')}
-   ${tile('Still open',reqs.filter(r=>['pending','waiting','returned'].includes(r.status)).length,'pending, waiting or returned')}</div></div>
-  <div class="card card-pad"><h2>Call quality <span class="muted" style="font-weight:500">· ${R.label.toLowerCase()}${ui.my.type!=='all'?' · '+esc(ui.my.type):''}</span></h2>${evs.length?`<div class="score-box"><div class="score-num" style="color:${evAvg>=tgt?'var(--ok)':'var(--bad)'}">${evAvg}%</div><div><b>Average of ${evs.length} call${evs.length>1?'s':''}</b><span style="display:block">Target ${tgt}%</span><div style="margin-top:6px">${trendBadge(q.trend)} <span class="muted" style="font-size:11.5px">overall trend</span></div></div></div>`:''}
-   ${evalAnalysisHtml(uid,true,evs)}</div>`;
+  const uid=S.current,u=me(),R=myRange(),tab=ui.my.tab||'overview',m=monthOfRange(R),tl=tlText(u);
+  const inP=t=>t>=R.from&&t<=R.to,recs=S.records.filter(r=>r.recipients.includes(uid)&&r.kind!=='adh'&&inP(r.createdAt));
+  const reqs=S.requests.filter(r=>r.userId===uid&&r.type!=='dispute'&&inP(r.createdAt)),tasks=recs.filter(r=>r.kind==='task');
+  const tile=(l,v,sub,col,act)=>`<div class="card stat"${act?` data-action="nav" data-view="${act}" style="cursor:pointer"`:''}><span>${l}</span><b${col?` style="color:${col}"`:''}>${v}</b><small>${sub||''}</small></div>`;
+  const wait=myInbox(uid).filter(r=>r.requireAck&&!r.acks[uid]).length;
+  let body='';
+  if(tab==='overview')body=`<div class="card card-pad" style="margin-bottom:18px"><h2>Where you stand · ${monLong(m)}</h2>${scorecardHtml(uid,m,'myTab')}<div class="flow-note" style="margin:10px 0 0">Tap a box for the details.</div></div>
+   <div class="grid-2 perf-grid"><div class="card card-pad"><h2>Last 6 months</h2>${historyHtml(uid,'myMonth',m)}</div>
+   <div class="card card-pad"><h2>Your activity <span class="muted" style="font-weight:500">· ${lbl(R)}</span></h2><div class="stats stats-2">
+    ${tile('Waiting for you',wait,'to acknowledge',wait?'var(--warn)':'var(--ok)',wait?'inbox':'')}
+    ${tile('Tasks',tasks.length,`${tasks.filter(r=>tState(r,uid).status==='confirmed').length} completed · ${tasks.filter(r=>tState(r,uid).status==='open').length} to do`,'',tasks.length?'tasks':'')}
+    ${tile('Requests accepted',reqs.filter(r=>r.status==='approved').length,`of ${reqs.filter(r=>['approved','rejected'].includes(r.status)).length} decided`,'var(--ok)')}
+    ${tile('Still open',reqs.filter(r=>['pending','waiting','returned'].includes(r.status)).length,'pending, waiting or returned','',reqs.length?'mine':'')}
+    ${tile('Minutes of meeting',recs.filter(r=>r.kind==='mom').length,'received')}
+    ${tile('Call evaluations',recs.filter(r=>r.kind==='eval').length,'received')}</div></div></div>`;
+  else if(tab==='daily')body=`<div class="card card-pad">${dailySection(uid,R,true)}</div>`;
+  else if(tab==='calls')body=`<div class="card card-pad">${callsSection(uid,R,ui.my.type,true)}</div>`;
+  else body=conductSection(uid,R,true);
+  return head('My performance',`${esc(teamName(u.team))}${tl?` · Team leader: ${tl}`:''} · ${R.label}`)+
+  `<div class="q-filters" style="margin-bottom:12px">${periodSelect('data-my="period"',ui.my.period,dataMonths(uid))}${tab==='calls'?`<select class="input" data-my="type">${opt('all','All call types',ui.my.type==='all')}${LISTS.call_types.map(t=>opt(t,t,ui.my.type===t)).join('')}</select>`:''}
+   ${ui.my.type!=='all'||ui.my.period!=='month'?`<button class="btn sm" data-action="myClear">${ic('x',14)} Reset</button>`:''}</div>`+
+  tabBar('myTab',tab,[['overview','Overview'],['daily','Daily performance'],['calls','Call quality'],['conduct','Accuracy & conduct']])+body;
 }
 function disputeDrawer(date){
   const p=S.perf.find(x=>x.userId===S.current&&x.date===date);
@@ -2142,11 +2122,11 @@ function openDrawer(kind,id){ui.drawer={kind,id};
 function closeDrawer(silent){ui.drawer=null;$('#overlay').classList.remove('open');$('#drawer').classList.remove('open');$('#drawer').setAttribute('aria-hidden','true');if(!silent)render()}
 function renderDrawer(){
   const d=ui.drawer,el=$('#drawer');
-  if(d.kind==='staff'){el.innerHTML=staffDrawer(d.id);return}
   if(d.kind==='user'){el.innerHTML=userDrawer(d.id);return}
   if(d.kind==='pw'){el.innerHTML=pwDrawer(d.id);return}
   if(d.kind==='account'){el.innerHTML=accountDrawer();return}
   if(d.kind==='team'){el.innerHTML=teamDrawer(d.id);return}
+  if(d.kind==='leaders'){el.innerHTML=leadersDrawer(d.id);return}
   if(d.kind==='dispute'){el.innerHTML=disputeDrawer(d.id);return}
   if(d.kind==='day'){el.innerHTML=dayDrawer(d.id);return}
   if(d.kind==='req'){const r=S.requests.find(x=>x.id===d.id);if(!r)return closeDrawer();el.innerHTML=reqDrawer(r)}
@@ -2275,8 +2255,183 @@ function recDrawer(r){
     if(a)foot=`<div class="d-foot"><div class="ack-done">${ic('check',16)} You acknowledged this on ${fmtTs(a.at)}</div>${a.reply?`<div class="note-box">Your reply: ${esc(a.reply)}</div>`:''}</div>`;
     else foot=`<div class="d-foot"><textarea class="input" id="ackReply" rows="2" placeholder="Reply (optional)"></textarea><div class="row"><button class="btn ok" data-action="ack" data-id="${r.id}">${ic('check',16)} I’ve read this · Acknowledge</button></div></div>`;
   }
-  if(wfm&&r.kind==='eval'&&x.result)foot=`<div class="d-foot"><div class="row"><button class="btn" data-action="amendEval" data-id="${r.id}">${ic('edit',16)} Edit evaluation</button></div></div>`;
+  if(wfm)foot=`<div class="d-foot"><div class="row"><button class="btn bad" data-action="delRec" data-id="${r.id}">${ic('trash',16)} Delete</button>${r.kind==='eval'?(x.result?`<button class="btn" data-action="amendEval" data-id="${r.id}">${ic('edit',16)} Edit evaluation</button>`:''):`<button class="btn" data-action="editRec" data-id="${r.id}">${ic('edit',16)} Edit</button>`}</div></div>`;
+  const edits=[...(x.edited||[]),...(x.amended||[])].sort((a,b)=>a.at-b.at);
+  if(edits.length)body=`<div class="callout info" style="margin-bottom:14px">${ic('edit',18)}<div><b>Updated by ${esc(user(edits.at(-1).by).name)}</b>${fmtTs(edits.at(-1).at)}${edits.length>1?` · edited ${edits.length} times`:''}${!wfm&&r.requireAck?' · please read it again':''}</div></div>`+body;
   return `<div class="sheet-handle"></div><div class="d-head">${bubble(r.kind,1,1)}<div><h3>${RECS[r.kind].name}</h3><small>${r.id} · ${fmtTs(r.createdAt)}</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div><div class="d-body">${body}</div>${foot}`;
+}
+
+/* ================= Shared: where a staff member stands ================= */
+const lbl=R=>/^[A-Z][a-z]+ \d{4}$/.test(R.label)?R.label:R.label.toLowerCase();
+const prevMonth=m=>iso(new Date(+m.slice(0,4),+m.slice(5)-2,1)).slice(0,7);
+const monShort=m=>MONL[+m.slice(5)-1].slice(0,3);
+function monthOfRange(R){return R.a.slice(0,7)===R.b.slice(0,7)?R.a.slice(0,7):iso(today()).slice(0,7)}
+const vioOf=(uid,a,b)=>S.records.filter(r=>r.kind==='vio'&&r.recipients.includes(uid)&&(!a||(r.data.date||'')>=a)&&(!b||(r.data.date||'')<=b)).sort((x,y)=>(y.data.date||'').localeCompare(x.data.date||''));
+function standing(uid,m){
+  const [a,b]=monthBounds(parse(m+'-01')),future=a>iso(today());
+  const pm=S.perfMonths.find(x=>x.userId===uid&&x.month===m),ds=S.perf.filter(p=>p.userId===uid&&p.date>=a&&p.date<=b);
+  const daily=pm?pm.final:(ds.length?Math.round(ds.reduce((t,p)=>t+p.score,0)/ds.length*10)/10:null);
+  const evs=S.records.filter(r=>r.kind==='eval'&&r.recipients[0]===uid&&r.data.countInScore!==false&&r.data.date>=a&&r.data.date<=b);
+  return {m,a,b,pm,daily,dailyN:ds.length,cq:evs.length?avgOf(evs.map(r=>evScore(r))):null,cqN:evs.length,
+    acc:future?null:accScore(uid,a,b),accPts:accPoints(uid,a,b),accN:accScored(uid,a,b),accC:accCounters(uid,a,b),vio:future?null:vioOf(uid,a,b).length};
+}
+function scorecardHtml(uid,m,act){
+  const s=standing(uid,m),p=standing(uid,prevMonth(m)),tgt=S.rules.qualityTarget;
+  const dl=(a,b,unit,invert)=>{if(a==null||b==null)return '';const d=Math.round((a-b)*100)/100;if(!d)return `<span class="muted">same as ${monShort(p.m)}</span>`;const good=invert?d<0:d>0;return `<span class="delta ${good?'up':'down'}">${d>0?'▲':'▼'} ${Math.abs(d)}${unit||''}</span> <span class="muted">vs ${monShort(p.m)}</span>`};
+  const card=(tab,label,val,col,sub,d)=>`<button class="sc-card" data-action="${act}" data-t="${tab}"><span>${label}</span><b style="color:${col}">${val}</b><small>${sub}</small><div class="sc-d">${d||'&nbsp;'}</div></button>`;
+  return `<div class="scorecard">
+   ${card('daily','Daily performance',s.daily!=null?s.daily+'%':'—',s.daily==null?'var(--faint)':'var(--primary)',s.pm?`Perf ${s.pm.perf}/50 · Ready ${s.pm.ready}/50`:s.dailyN?`${s.dailyN} scored day${s.dailyN>1?'s':''}`:'no scores yet',dl(s.daily,p.daily))}
+   ${card('calls','Call quality',s.cq!=null?s.cq+'%':'—',s.cq==null?'var(--faint)':s.cq>=tgt?'var(--ok)':'var(--bad)',s.cqN?`${s.cqN} call${s.cqN>1?'s':''} · target ${tgt}%`:`no calls · target ${tgt}%`,dl(s.cq,p.cq))}
+   ${card('conduct','Accuracy',s.acc!=null?s.acc+'%':'—',s.accN?'var(--warn)':'var(--ok)',`${s.accPts}/${accMax()} pts · ${s.accN} note${s.accN===1?'':'s'}`,dl(s.acc,p.acc,'%'))}
+   ${card('conduct','Violations',s.vio??'—',s.vio?'var(--bad)':'var(--ok)',s.vio?`ticket${s.vio>1?'s':''} this month`:'none this month',p.vio!=null?`<span class="muted">${p.vio} in ${monShort(p.m)}</span>`:'')}</div>`;
+}
+function historyHtml(uid,act,sel){
+  const T=today(),tgt=S.rules.qualityTarget,ms=[];for(let i=5;i>=0;i--)ms.push(iso(new Date(T.getFullYear(),T.getMonth()-i,1)).slice(0,7));
+  const rows=ms.map(m=>standing(uid,m)),cell=(v,good,unit='%')=>v==null?'<span class="muted">—</span>':`<span class="h-cell ${good==null?'':good?'g':'b'}">${v}${unit}</span>`;
+  return `<div class="table-wrap"><table class="mini-table hist-table"><thead><tr><th>Month</th><th class="num-cell" title="Daily performance">Daily</th><th class="num-cell" title="Call quality">Calls</th><th class="num-cell">Accuracy</th><th class="num-cell" title="Violations">Viol.</th></tr></thead><tbody>
+   ${rows.reverse().map(s=>`<tr class="${s.m===sel?'sel':''}" data-action="${act}" data-m="${s.m}"><td style="white-space:nowrap"><b style="font-weight:600">${monShort(s.m)}</b> <span class="muted" style="font-size:12px">${s.m.slice(0,4)}</span></td><td class="num-cell">${cell(s.daily,null)}</td><td class="num-cell">${cell(s.cq,s.cq==null?null:s.cq>=tgt)}</td><td class="num-cell">${cell(s.acc,s.accN?false:null)}</td><td class="num-cell">${s.vio==null?'<span class="muted">—</span>':`<span class="h-cell ${s.vio?'b':''}">${s.vio}</span>`}</td></tr>`).join('')}</tbody></table></div>
+   <div class="flow-note" style="margin:8px 0 0">Tap a month to look at it.</div>`;
+}
+function periodSelect(attr,cur,months){
+  const T=today(),c=iso(T).slice(0,7),l=iso(new Date(T.getFullYear(),T.getMonth()-1,1)).slice(0,7),extra=[...new Set(months)].filter(m=>m!==c&&m!==l&&m<c).sort().reverse();
+  return `<select class="input" ${attr}>${opt('month','This month',cur==='month')}${opt('lastmonth','Last month',cur==='lastmonth')}${opt('ytd','Year to date',cur==='ytd')}${opt('all','All time',cur==='all')}${extra.length||(/^\d{4}-\d{2}$/.test(cur))?`<optgroup label="Specific month">${[...new Set([...extra,...(/^\d{4}-\d{2}$/.test(cur)&&cur!==c&&cur!==l?[cur]:[])])].sort().reverse().map(m=>opt(m,monLong(m),cur===m)).join('')}</optgroup>`:''}</select>`;
+}
+const dataMonths=uid=>[...S.perf.filter(p=>p.userId===uid).map(p=>p.date.slice(0,7)),...S.records.filter(r=>r.recipients.includes(uid)&&r.data&&r.data.date).map(r=>r.data.date.slice(0,7))];
+function dailySection(uid,R,own){
+  const ps=perfOf(uid),plist=ps.filter(p=>p.date>=R.a&&p.date<=R.b),ytd=perfStats(ps);
+  const pavg=plist.length?Math.round(plist.reduce((x,p)=>x+p.score,0)/plist.length*10)/10:null;
+  const tile=(l,v,sub,col)=>`<div class="card stat"><span>${l}</span><b${col?` style="color:${col}"`:''}>${v}</b><small>${sub||''}</small></div>`;
+  const rows=[...plist].reverse().map(p=>{const prev=ps[ps.indexOf(p)-1],d=prev?Math.round((p.score-prev.score)*10)/10:null,dp=openDispute(uid,p.date),ex=p.data&&Array.isArray(p.data.xc)&&p.data.xc.some(Boolean);
+    return `<tr class="day-row" data-action="openDay" data-u="${uid}" data-d="${p.date}"><td style="white-space:nowrap"><span class="link">${fmt(p.date)}</span> <span class="muted" style="font-size:12px">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][parse(p.date).getDay()]}</span>${ex?' <span class="pill sm need" title="An item was adjusted by exception">adj.</span>':''}${p.data&&p.data.manual?' <span class="pill sm approved" title="Corrected after a dispute">fixed</span>':''}</td><td class="num-cell"><span class="score-cell">${fmtScore(p.score)}</span></td>
+    <td>${d==null?'<span class="muted">—</span>':`<span class="delta ${d>=0?'up':'down'}">${d>=0?'▲':'▼'} ${Math.abs(d)}</span>`}</td>
+    <td style="text-align:right">${dp?`<button class="btn sm" data-action="openReq" data-id="${dp.id}">${pill(dp.status).replace('class="pill','class="pill sm')}</button>`:own?`<button class="btn sm" data-action="disputeNew" data-date="${p.date}">${ic('alert',13)} Dispute</button>`:''}</td></tr>`}).join('');
+  return `${monthResultHtml(uid,R.a.slice(0,7)===R.b.slice(0,7)?R.a.slice(0,7):null,true)}
+   ${ps.length?`<div class="stats" style="margin-bottom:14px">${tile(R.label+' average',fmtScore(pavg),`${plist.length} day(s)`,'var(--primary)')}${tile('Latest',fmtScore(ytd.latest.score),'on '+fmt(ytd.latest.date))}${tile('Month to date',fmtScore(ytd.mtd),ytd.mtdN+' days')}${tile('Year to date',fmtScore(ytd.ytd),ytd.ytdN+' days')}</div>
+   ${plist.length?`<div class="grid-2 perf-grid"><div>${perfChart(plist)}</div><div class="table-wrap day-table"><table class="mini-table"><thead><tr><th>Date</th><th class="num-cell">Score</th><th>Change</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>
+   <div class="flow-note">${own?'Tap a day to see item by item what you met. Think a score is wrong? Tap <b>Dispute</b> and explain why — WFM will review it.':'Tap a day to see the item-by-item breakdown.'}</div>`:`<div class="empty-mini">No scores in ${lbl(R)}.</div>`}`
+   :`<div class="empty-mini">No daily performance scores yet.${own?' They’ll appear here once WFM uploads them.':''}</div>`}`;
+}
+function callsSection(uid,R,type,own){
+  const q=staffQuality(uid),tgt=S.rules.qualityTarget,evs=q.all.filter(r=>r.data.date>=R.a&&r.data.date<=R.b&&(type==='all'||r.data.callType===type)),evAvg=avgOf(evs.map(r=>evScore(r)));
+  return `${evs.length?`<div class="score-box"><div class="score-num" style="color:${evAvg>=tgt?'var(--ok)':'var(--bad)'}">${evAvg}%</div><div><b>Average of ${evs.length} call${evs.length>1?'s':''}</b><span style="display:block">Target ${tgt}% · ${lbl(R)}${type!=='all'?' · '+esc(type):''}</span></div></div>`:''}
+   ${evalAnalysisHtml(uid,own,evs)}`;
+}
+function conductSection(uid,R,own){
+  const months=[];for(let d=parse(R.a);iso(d)<=R.b&&months.length<36;d=new Date(d.getFullYear(),d.getMonth()+1,1))months.push(iso(d).slice(0,7));
+  const one=months.length===1,notes=accNotes(uid,R.a,R.b).sort((a,b)=>a.data.date.localeCompare(b.data.date)),vios=vioOf(uid,R.a,R.b);
+  let run=accMax();
+  const noteRows=notes.map(r=>{const d=noteDeduct(r);if(one)run=r2(run-d);return `<tr data-action="openRec" data-id="${r.id}" style="cursor:pointer"><td style="white-space:nowrap">${fmt(r.data.date)}</td><td>${esc(r.data.reason)}${r.data.edited?' <span class="muted" style="font-size:11px">· edited</span>':''}</td><td class="num-cell">${r.data.counter?'<span class="muted">count</span>':r.data.level?'L'+r.data.level:'—'}</td><td class="num-cell">${r.data.counter?'0':'−'+d}</td>${one?`<td class="num-cell"><b>${Math.max(0,run)}</b></td>`:''}</tr>`}).join('');
+  const [a,b]=one?monthBounds(parse(months[0]+'-01')):[R.a,R.b],pts=one?accPoints(uid,a,b):null,pc=pts!=null?Math.round(pts/accMax()*100):null;
+  const reasons={};notes.filter(r=>!r.data.counter).forEach(r=>{reasons[r.data.reason]=(reasons[r.data.reason]||0)+noteDeduct(r)});const topR=Object.entries(reasons).sort((x,y)=>y[1]-x[1]);
+  const byCat={};vios.forEach(r=>{const k=r.data.category||r.data.vtype||'Other';byCat[k]=(byCat[k]||0)+1});
+  return `<div class="grid-2 perf-grid"><div class="card card-pad"><h2>Accuracy <span class="muted" style="font-weight:500">· ${lbl(R)}</span></h2>
+    ${one?`<div class="score-box"><div class="score-num" style="color:${pts<accMax()?'var(--warn)':'var(--ok)'}">${accPct(pts)}%</div><div><b>${pts} of ${accMax()} points</b><span style="display:block">Accuracy is worth ${accW()}% · ${notes.filter(r=>!r.data.counter).length} note(s)${accCounters(uid,a,b)?` · ${accCounters(uid,a,b)} counted only`:''}</span></div></div>
+     <div class="it-track" style="height:10px;margin:0 0 12px"><i style="width:${pc}%;background:${pc>=90?'var(--ok)':pc>=70?'var(--warn)':'var(--bad)'}"></i></div>`
+    :`<div class="table-wrap" style="margin-bottom:12px"><table class="mini-table"><thead><tr><th>Month</th><th class="num-cell">Points</th><th class="num-cell">Accuracy</th><th class="num-cell">Notes</th></tr></thead><tbody>${months.filter(m=>m<=iso(today()).slice(0,7)).reverse().map(m=>{const [x,y]=monthBounds(parse(m+'-01'));return `<tr><td>${monLong(m)}</td><td class="num-cell">${accPoints(uid,x,y)}/${accMax()}</td><td class="num-cell"><b>${accScore(uid,x,y)}%</b></td><td class="num-cell">${accScored(uid,x,y)}</td></tr>`}).join('')}</tbody></table></div>`}
+    ${notes.length?`<div class="table-wrap"><table class="mini-table"><thead><tr><th>Date</th><th>Reason</th><th class="num-cell">Level</th><th class="num-cell">Points</th>${one?'<th class="num-cell">Left</th>':''}</tr></thead><tbody>${noteRows}</tbody></table></div>
+     ${topR.length?`<div class="flow-note" style="margin:10px 0 0">Most points lost to: <b>${esc(topR[0][0])}</b> (−${topR[0][1]}).</div>`:''}`:`<div class="empty-mini">${own?'No accuracy notes — full marks.':'No accuracy notes in this period.'}</div>`}</div>
+   <div class="card card-pad"><h2>Violations <span class="muted" style="font-weight:500">· ${lbl(R)}</span></h2>
+    ${vios.length?`<div class="opt-chips" style="margin-bottom:12px">${Object.entries(byCat).map(([k,n])=>`<span class="chip on" style="cursor:default">${esc(k)} · ${n}</span>`).join('')}</div>
+     <div class="req-list">${vios.map(r=>`<div class="req-card" data-action="openRec" data-id="${r.id}" role="button" tabindex="0">${bubble('vio',1,1)}<div class="req-main"><div class="req-title">${esc(r.data.category||'Violation')} <small>${r.id}</small></div><div class="req-sub">${esc(recSummary(r))}</div><div class="req-meta">${fmt(r.data.date)}${r.data.edited?' · edited':''}</div></div><div class="req-side">${r.requireAck?ackPill(!!r.acks[uid]):''}</div></div>`).join('')}</div>`
+    :`<div class="empty-mini">${own?'No violations — keep it up.':'No violations in this period.'}</div>`}</div></div>`;
+}
+const tabBar=(act,cur,list)=>`<div class="tabs">${list.map(([k,l,n])=>`<button class="${k===cur?'on':''}" data-action="${act}" data-t="${k}">${l}${n?` <span class="tab-badge">${n}</span>`:''}</button>`).join('')}</div>`;
+const leadersOf=tid=>((TEAM_LIST.find(t=>t.id===tid)||{}).leaders||[]).map(id=>user(id)).filter(u=>u.role==='wfm'&&!u.deleted);
+const tlText=u=>{const l=leadersOf(u.team);return l.length?l.map(x=>esc(x.name)).join(', '):''};
+
+/* ================= WFM: staff list + profile ================= */
+function viewStaff(){
+  const m=ui.staffMonth||iso(today()).slice(0,7),qq=(ui.staffQ||'').trim().toLowerCase(),tgt=S.rules.qualityTarget;
+  const list=staffUsers().filter(u=>(ui.q.team==='all'||String(u.team)===ui.q.team)&&(!qq||[u.name,u.emp,teamName(u.team)].join(' ').toLowerCase().includes(qq)));
+  const months=[];for(let i=0;i<12;i++)months.push(iso(new Date(today().getFullYear(),today().getMonth()-i,1)).slice(0,7));
+  const rows=list.map(u=>{const s=standing(u.id,m),wait=S.records.filter(r=>r.recipients.includes(u.id)&&r.requireAck&&!r.acks[u.id]).length,open=S.requests.filter(r=>r.userId===u.id&&['pending','waiting','returned'].includes(r.status)).length;
+    return `<tr data-action="openStaff" data-id="${u.id}"><td style="white-space:nowrap"><span class="av">${initials(u.name)}</span><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:12px;margin-left:36px">${esc(u.emp)} · ${esc(teamName(u.team))}</div></td>
+     <td class="num-cell">${s.daily!=null?`<b>${s.daily}%</b>`:'<span class="muted">—</span>'}</td><td class="num-cell">${s.cq!=null?`<span class="score-cell${s.cq<tgt?' below':''}">${s.cq}%</span>`:'<span class="muted">—</span>'}</td>
+     <td class="num-cell">${s.acc!=null?`<span style="color:${s.accN?'var(--warn)':'inherit'}">${s.acc}%</span>`:'—'}</td><td class="num-cell">${s.vio?`<b style="color:var(--bad)">${s.vio}</b>`:'<span class="muted">0</span>'}</td>
+     <td class="num-cell">${wait?`<span class="pill need">${wait}</span>`:'<span class="muted">—</span>'}</td><td class="num-cell">${open||'<span class="muted">—</span>'}</td></tr>`}).join('');
+  return head('Staff',`${list.length} staff${scoped()?' in your teams':''} · ${monLong(m)}`)+
+  `<div class="q-filters" style="margin-bottom:14px"><input class="input" data-staffq="1" value="${esc(ui.staffQ||'')}" placeholder="Search name, staff ID or team" style="flex:1;min-width:180px">
+   <select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.filter(t=>!scoped()||myTeams().includes(t.id)).map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select>
+   <select class="input" data-staffm="1">${months.map(x=>opt(x,monLong(x),x===m)).join('')}</select></div>
+  <div class="card"><div class="table-wrap"><table class="mini-table staff-table"><thead><tr><th>Staff</th><th class="num-cell">Daily perf.</th><th class="num-cell">Call quality</th><th class="num-cell">Accuracy</th><th class="num-cell">Violations</th><th class="num-cell">To acknowledge</th><th class="num-cell">Open requests</th></tr></thead>
+  <tbody id="staffRows">${rows||'<tr><td colspan="7" class="muted">No staff match.</td></tr>'}</tbody></table></div></div>
+  <div class="flow-note">Tap a person to open their full profile.</div>`;
+}
+function profRange(){return myRange(ui.prof.period||'month')}
+function viewProfile(){
+  const uid=ui.profileId,u=user(uid);if(!u||u.role!=='staff'){ui.view='staff';return viewStaff()}
+  const R=profRange(),tab=ui.prof.tab||'overview',m=monthOfRange(R),q=staffQuality(uid),star=mostImproved(staffUsers().map(x=>x.id));
+  const recs=S.records.filter(r=>r.recipients.includes(uid)).sort((a,b)=>b.createdAt-a.createdAt),reqs=S.requests.filter(r=>r.userId===uid).sort((a,b)=>b.createdAt-a.createdAt);
+  const y=today().getFullYear(),leave=reqs.filter(r=>r.type==='leave'&&r.status==='approved'&&r.data.start.slice(0,4)==String(y)).reduce((a,r)=>a+daysBetween(r.data.start,r.data.end),0);
+  const acts=[['eval','Call evaluation'],['acc','Accuracy note'],['vio','Violation'],['task','Task']];
+  let body='';
+  if(tab==='overview'){const fl=flagsHtml(q,uid,star);
+    body=`<div class="card card-pad" style="margin-bottom:18px"><h2>Where ${esc(u.name.split(' ')[0])} stands · ${monLong(m)}</h2>${scorecardHtml(uid,m,'profTab')}${fl?`<div style="margin-top:12px">${fl}</div>`:''}</div>
+    <div class="grid-2 perf-grid"><div class="card card-pad"><h2>Last 6 months</h2>${historyHtml(uid,'profMonth',m)}</div>
+    <div class="card card-pad"><h2>This year</h2><div class="ins"><div><span>Leave days taken</span><b>${leave}</b></div><div><span>KPI requests accepted</span><b>${reqs.filter(r=>r.type==='kpi'&&r.status==='approved'&&new Date(r.createdAt).getFullYear()===y).length}</b></div><div><span>Adherence notes</span><b>${recs.filter(r=>r.kind==='adh'&&new Date(r.createdAt).getFullYear()===y).length}</b></div><div><span>Waiting to acknowledge</span><b>${recs.filter(r=>r.requireAck&&!r.acks[uid]).length}</b></div><div><span>Open tasks</span><b>${recs.filter(r=>r.kind==='task'&&tState(r,uid).status==='open').length}</b></div><div><span>Open requests</span><b>${reqs.filter(r=>['pending','waiting','returned'].includes(r.status)).length}</b></div></div>
+    ${q.strong!=null?`<h3 class="sub-h" style="margin-top:14px">Call quality</h3><div class="ins"><div><span>Strongest</span><b>${critNames()[q.strong]} · ${q.crit[q.strong]}%</b></div><div><span>Focus area</span><b>${critNames()[q.weak]} · ${q.crit[q.weak]}%</b></div></div>`:''}</div></div>`}
+  else if(tab==='daily')body=`<div class="card card-pad">${dailySection(uid,R,false)}</div>`;
+  else if(tab==='calls')body=`<div class="card card-pad">${callsSection(uid,R,'all',false)}</div>`;
+  else if(tab==='conduct')body=conductSection(uid,R,false);
+  else if(tab==='sent'){const inP=recs.filter(r=>{const d=(r.data&&(r.data.date||r.data.due))||iso(new Date(r.createdAt));return d>=R.a&&d<=R.b});
+    body=inP.length?`<div class="req-list">${inP.map(r=>sentCard(r,uid)).join('')}</div>`:`<div class="card empty"><b>Nothing sent in ${lbl(R)}</b>Evaluations, notes, tickets, minutes and tasks for ${esc(u.name)} show here.</div>`}
+  else if(tab==='requests'){const inP=reqs.filter(r=>r.createdAt>=R.from&&r.createdAt<=R.to);body=inP.length?`<div class="req-list">${inP.map(r=>reqCard(r)).join('')}</div>`:`<div class="card empty"><b>No requests in ${lbl(R)}</b></div>`}
+  return `<button class="back" data-action="nav" data-view="staff">${ic('back',16)} Staff</button>`+
+   head(esc(u.name),`${esc(u.emp)} · ${esc(teamName(u.team))}${tlText(u)?` · Team leader: ${tlText(u)}`:''}`,`<div class="prof-acts">${acts.map(([k,l])=>`<button class="btn sm" data-action="newRecFor" data-kind="${k}" data-id="${uid}">${ic('plus',14)} ${l}</button>`).join('')}</div>`,avatar(u,44))+
+   `<div class="q-filters" style="margin-bottom:12px">${periodSelect('data-prof="period"',ui.prof.period||'month',dataMonths(uid))}${(ui.prof.period||'month')!=='month'?`<button class="btn sm" data-action="profClear">${ic('x',14)} This month</button>`:''}</div>`+
+   tabBar('profTab',tab,[['overview','Overview'],['daily','Daily performance'],['calls','Call quality'],['conduct','Accuracy & conduct'],['sent','Sent to them',recs.filter(r=>r.requireAck&&!r.acks[uid]).length],['requests','Requests',reqs.filter(r=>r.status==='pending').length]])+body;
+}
+function sentCard(r,forUid){
+  const n=r.recipients.length,a=Object.keys(r.acks).length,to=n===1?user(r.recipients[0]).name:r.data.sendTo==='all'?'Whole department':r.data.sendTo==='teams'?(r.data.teams||[]).map(t=>teamName(t)).join(', '):n+' staff';
+  const ed=(r.data.edited||[]).length||(r.data.amended||[]).length;
+  const side=r.kind==='task'?(()=>{const d=r.recipients.filter(u=>tState(r,u).status!=='open').length;return `<span class="pill ${d===n?'ack':'need'}">${d}/${n} done</span>`})():r.requireAck?(forUid?ackPill(!!r.acks[forUid]):`<span class="pill ${a===n?'ack':'need'}">${a}/${n} acknowledged</span>`):'<span class="pill cancelled">Internal</span>';
+  return `<div class="req-card" data-action="openRec" data-id="${r.id}" role="button" tabindex="0">${bubble(r.kind,1,1)}<div class="req-main"><div class="req-title">${RECS[r.kind].name} <small>${r.id}</small></div><div class="req-sub">${esc(recSummary(r))}</div><div class="req-meta">${forUid?'':`To ${esc(to)} · `}by ${esc(user(r.createdBy).name)} · ${ago(r.createdAt)}${ed?' · edited':''}</div></div><div class="req-side">${side}</div></div>`;
+}
+function viewSent(){
+  const k=ui.sent.kind,m=ui.sent.month,qq=(ui.sent.q||'').trim().toLowerCase();
+  const list=S.records.filter(r=>(k==='all'||r.kind===k)&&r.recipients.some(inScope)&&(m==='all'||iso(new Date(r.createdAt)).slice(0,7)===m||((r.data&&r.data.date)||'').slice(0,7)===m)&&(!qq||[r.id,recSummary(r),...r.recipients.map(id=>user(id).name+' '+user(id).emp)].join(' ').toLowerCase().includes(qq))).sort((a,b)=>b.createdAt-a.createdAt);
+  const months=[...new Set(S.records.map(r=>iso(new Date(r.createdAt)).slice(0,7)))].sort().reverse();
+  return `<div class="q-filters" style="margin-bottom:14px"><input class="input" data-sentq="1" value="${esc(ui.sent.q||'')}" placeholder="Search staff, ID or text" style="flex:1;min-width:180px">
+   <select class="input" data-sent="kind">${opt('all','Everything',k==='all')}${Object.entries(RECS).map(([x,t])=>opt(x,t.name,k===x)).join('')}</select>
+   <select class="input" data-sent="month">${opt('all','All months',m==='all')}${months.map(x=>opt(x,monLong(x),m===x)).join('')}</select></div>
+   <div id="sentList">${list.length?`<div class="req-list">${list.slice(0,200).map(r=>sentCard(r)).join('')}</div>`:'<div class="card empty"><b>Nothing found</b>Try another filter.</div>'}</div>
+   <div class="flow-note">Open an item to edit or delete it. Staff see edited items as updated and are asked to acknowledge again.</div>`;
+}
+
+/* ================= WFM: accuracy + violations overview ================= */
+function monthPick(attr,cur){const ms=[];for(let i=0;i<12;i++)ms.push(iso(new Date(today().getFullYear(),today().getMonth()-i,1)).slice(0,7));return `<select class="input" ${attr}>${ms.map(x=>opt(x,monLong(x),x===cur)).join('')}</select>`}
+function viewAccAdmin(){
+  const m=ui.pMonth||iso(today()).slice(0,7),[a,b]=monthBounds(parse(m+'-01')),staff=staffUsers().filter(u=>ui.q.team==='all'||String(u.team)===ui.q.team);
+  const notes=S.records.filter(r=>r.kind==='acc'&&r.data.date>=a&&r.data.date<=b&&staff.some(u=>r.recipients.includes(u.id))).sort((x,y)=>y.data.date.localeCompare(x.data.date));
+  const reasons={};notes.forEach(r=>{const k=r.data.reason;reasons[k]=reasons[k]||{n:0,p:0};reasons[k].n++;reasons[k].p+=noteDeduct(r)});
+  const top=Object.entries(reasons).sort((x,y)=>y[1].n-x[1].n),mx=Math.max(1,...top.map(x=>x[1].n));
+  const rows=staff.map(u=>({u,pts:accPoints(u.id,a,b),n:accScored(u.id,a,b),c:accCounters(u.id,a,b)})).sort((x,y)=>x.pts-y.pts);
+  const avg=rows.length?r2(rows.reduce((t,x)=>t+accPct(x.pts),0)/rows.length):null;
+  return `<div class="q-filters" style="margin-bottom:14px"><select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.filter(t=>!scoped()||myTeams().includes(t.id)).map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select>${monthPick('data-pmonth="1"',m)}<button class="btn primary sm" data-action="pickRec" data-kind="acc">${ic('plus',14)} Accuracy note</button></div>
+  <div class="stats"><div class="card stat"><span>Average accuracy</span><b style="color:var(--primary)">${avg!=null?avg+'%':'—'}</b><small>of ${accW()}% · ${rows.length} staff</small></div><div class="card stat"><span>Notes this month</span><b>${notes.filter(r=>!r.data.counter).length}</b><small>${notes.filter(r=>r.data.counter).length} counted only</small></div><div class="card stat"><span>Full marks</span><b style="color:var(--ok)">${rows.filter(x=>x.pts>=accMax()).length}</b><small>staff with no deductions</small></div></div>
+  <div class="grid-2 perf-grid"><div class="card card-pad"><h2>By staff · lowest first</h2><div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Points</th><th class="num-cell">Accuracy</th><th class="num-cell">Notes</th></tr></thead><tbody>
+   ${rows.map(x=>`<tr data-action="openStaff" data-id="${x.u.id}" data-ptab="conduct"><td><b style="font-weight:600">${esc(x.u.name)}</b><div class="muted" style="font-size:12px">${esc(teamName(x.u.team))}</div></td><td class="num-cell">${x.pts}/${accMax()}</td><td class="num-cell"><b style="color:${x.n?'var(--warn)':'var(--ok)'}">${accPct(x.pts)}%</b></td><td class="num-cell">${x.n}${x.c?` <span class="muted" style="font-size:12px">+${x.c}</span>`:''}</td></tr>`).join('')}</tbody></table></div></div>
+   <div class="card card-pad"><h2>Most common reasons</h2>${top.length?top.map(([k,v])=>`<div class="it-bar"><div class="it-top"><span>${esc(k)}</span><b>${v.n}</b></div><div class="it-track"><i style="width:${Math.round(v.n/mx*100)}%;background:var(--warn)"></i></div><small>${v.p?`−${v.p} points in total`:'counted only'}</small></div>`).join(''):'<div class="empty-mini">No accuracy notes this month.</div>'}</div></div>
+  <h2 class="section-title">Notes · ${monLong(m)}</h2>${notes.length?`<div class="req-list">${notes.map(r=>sentCard(r)).join('')}</div>`:'<div class="card empty"><b>No notes this month</b></div>'}`;
+}
+function viewVioAdmin(){
+  const m=ui.pMonth||iso(today()).slice(0,7),[a,b]=monthBounds(parse(m+'-01')),staff=staffUsers().filter(u=>ui.q.team==='all'||String(u.team)===ui.q.team);
+  const vios=S.records.filter(r=>r.kind==='vio'&&(r.data.date||'')>=a&&(r.data.date||'')<=b&&staff.some(u=>r.recipients.includes(u.id))).sort((x,y)=>(y.data.date||'').localeCompare(x.data.date||''));
+  const byCat={},byType={},byStaff={};vios.forEach(r=>{const c=r.data.category||'Other';byCat[c]=(byCat[c]||0)+1;(r.data.types||[]).forEach(t=>{byType[t]=(byType[t]||0)+1});byStaff[r.recipients[0]]=(byStaff[r.recipients[0]]||0)+1});
+  const cats=Object.entries(byCat).sort((x,y)=>y[1]-x[1]),mx=Math.max(1,...cats.map(x=>x[1])),types=Object.entries(byType).sort((x,y)=>y[1]-x[1]).slice(0,6);
+  const unack=vios.filter(r=>r.requireAck&&!r.acks[r.recipients[0]]).length;
+  return `<div class="q-filters" style="margin-bottom:14px"><select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.filter(t=>!scoped()||myTeams().includes(t.id)).map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select>${monthPick('data-pmonth="1"',m)}<button class="btn primary sm" data-action="pickRec" data-kind="vio">${ic('plus',14)} Violation ticket</button></div>
+  <div class="stats"><div class="card stat"><span>Tickets</span><b style="color:${vios.length?'var(--bad)':'var(--ok)'}">${vios.length}</b><small>${Object.keys(byStaff).length} staff involved</small></div><div class="card stat"><span>Not acknowledged</span><b style="color:${unack?'var(--warn)':'var(--ok)'}">${unack}</b><small>waiting for staff</small></div><div class="card stat"><span>Clean record</span><b style="color:var(--ok)">${staff.filter(u=>!byStaff[u.id]).length}</b><small>staff with no tickets</small></div></div>
+  <div class="grid-2 perf-grid"><div class="card card-pad"><h2>By category</h2>${cats.length?cats.map(([k,n])=>`<div class="it-bar"><div class="it-top"><span>${esc(k)}</span><b>${n}</b></div><div class="it-track"><i style="width:${Math.round(n/mx*100)}%;background:var(--bad)"></i></div></div>`).join('')+(types.length?`<h3 class="sub-h" style="margin-top:12px">Most common</h3>${types.map(([k,n])=>`<div class="kv-line"><span>${esc(k)}</span><b>${n}</b></div>`).join('')}`:''):'<div class="empty-mini">No violations this month.</div>'}</div>
+   <div class="card card-pad"><h2>By staff</h2>${Object.keys(byStaff).length?`<div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">This month</th><th class="num-cell">This year</th></tr></thead><tbody>${Object.entries(byStaff).sort((x,y)=>y[1]-x[1]).map(([id,n])=>{const u=user(id);return `<tr data-action="openStaff" data-id="${id}" data-ptab="conduct"><td><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:12px">${esc(teamName(u.team))}</div></td><td class="num-cell"><b>${n}</b></td><td class="num-cell">${vioOf(id,`${m.slice(0,4)}-01-01`,`${m.slice(0,4)}-12-31`).length}</td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty-mini">Nobody this month.</div>'}</div></div>
+  <h2 class="section-title">Tickets · ${monLong(m)}</h2>${vios.length?`<div class="req-list">${vios.map(r=>sentCard(r)).join('')}</div>`:'<div class="card empty"><b>No tickets this month</b></div>'}`;
+}
+function leadersDrawer(id){
+  const tid=+id,sel=ui.leadSel,wfm=USERS.filter(u=>u.role==='wfm'&&u.active&&!u.deleted).sort((a,b)=>a.name.localeCompare(b.name));
+  return `<div class="sheet-handle"></div><div class="d-head"><span class="bubble sm" style="--c:var(--primary)">${ic('users',17)}</span><div><h3>Team leaders · ${esc(teamName(tid))}</h3><small>${sel.size} selected</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div>
+  <div class="d-body"><div class="flow-note" style="margin:0 0 12px">Pick one or more WFM / manager accounts. A team leader can lead several teams; their pages open on “My teams”.</div>
+  <div class="member-list">${wfm.map(u=>{const other=TEAM_LIST.filter(t=>t.id!==tid&&(t.leaders||[]).includes(u.id)).map(t=>t.name);return `<label class="member"><input type="checkbox" data-leader="${u.id}" ${sel.has(u.id)?'checked':''}><span class="av">${initials(u.name)}</span><span>${esc(u.name)}<small>${esc(u.emp)}${other.length?' · also leads '+esc(other.join(', ')):''}</small></span></label>`}).join('')||'<div class="empty-mini">No WFM / manager accounts yet.</div>'}</div></div>
+  <div class="d-foot"><div class="row"><button class="btn" data-action="closeDrawer">Cancel</button><button class="btn primary" data-action="leadersSave" data-id="${tid}">${ic('check',16)} Save team leaders</button></div></div>`;
 }
 
 /* ================= Actions ================= */
@@ -2338,12 +2493,12 @@ function submitRecord(){
   if(f.kind==='task'){recipients=momRecipients(f);if(f.sendTo==='teams'&&!f.teams.length)e.teams='Pick at least one team';if(!recipients.length)e.teams='Nobody to assign to';if(!(v.title||'').trim())e.title='Describe the task';if(!v.due)e.due='Pick a due date';data={title:(v.title||'').trim(),details:v.details||'',due:v.due,sendTo:f.sendTo,teams:[...f.teams]}}
   if(f.kind==='mom'){recipients=momRecipients(f);if(f.sendTo==='teams'&&!f.teams.length)e.teams='Pick at least one team';if(!(v.title||'').trim())e.title='Title is required';if(!v.date)e.date='Pick the date';if(!(v.summary||'').trim())e.summary='Summary is required';data={title:v.title,date:v.date,summary:v.summary||'',actions:v.actions||'',sendTo:f.sendTo,teams:[...f.teams]}}
   f.errors=e;if(Object.keys(e).length){render();toast('Please fix the highlighted fields',true);return}
+  if(f.editId){const id=f.editId;busy(async()=>{await rpc('edit_record',{p_id:id,p_by:S.current,p_recipients:recipients,p_require_ack:f.kind==='adh'||f.kind==='task'?false:!!v.requireAck,p_data:data,p_files:f.files});await fetchAll();const back=f.returnTo||'create';if(back==='create')ui.createTab='sent';go(back);toast(f.kind==='adh'||f.kind==='task'?`${id} updated`:`${id} updated · staff will be asked to acknowledge again`)});return}
   if(f.amendId){const id=f.amendId;busy(async()=>{await rpc('amend_eval',{p_id:id,p_data:data,p_by:S.current});await fetchAll();go('quality');toast(`${id} updated · ${user(recipients[0]).name} will be asked to acknowledge again`)});return}
   const r={kind:f.kind,createdBy:S.current,recipients,requireAck:f.kind==='adh'||f.kind==='task'?false:!!v.requireAck,data,files:f.files};
   busy(async()=>{
     const rows=await api('records',{method:'POST',prefer:'return=representation',body:recToDb(r)});const id=rows[0].id;
-    await fetchAll();go('create');
-    if(f.kind==='task')ui.createTab='tasks';
+    await fetchAll();if(f.returnTo){go(f.returnTo)}else{if(f.kind==='task')ui.createTab='tasks';go('create')}
     toast(f.kind==='adh'?`${id} saved`:f.kind==='task'?`${id} assigned to ${recipients.length===1?user(recipients[0]).name:recipients.length+' staff'}`:`${id} sent to ${recipients.length===1?user(recipients[0]).name:recipients.length+' staff'}`);
   });
 }
@@ -2512,7 +2667,25 @@ document.addEventListener('click',ev=>{
     case 'openDay':openDrawer('day',el.dataset.u+'|'+el.dataset.d);break;
     case 'pmMonth':break;
     case 'openRec':openDrawer('rec',id);break;
-    case 'openStaff':openDrawer('staff',id);break;
+    case 'openStaff':ui.profileId=id;ui.prof={tab:el.dataset.ptab||'overview',period:'month'};closeDrawer(true);ui.view='profile';render();window.scrollTo(0,0);break;
+    case 'profTab':ui.prof.tab=el.dataset.t;render();break;
+    case 'profMonth':ui.prof.period=el.dataset.m;render();break;
+    case 'profClear':ui.prof.period='month';render();break;
+    case 'myTab':ui.my.tab=el.dataset.t;render();break;
+    case 'myMonth':ui.my.period=el.dataset.m;render();break;
+    case 'scope':ui.scope=el.dataset.s;ui.q.team='all';render();break;
+    case 'newRecFor':{const f=newRecForm(el.dataset.kind);f.vals.staff=el.dataset.id;if(el.dataset.kind==='task')f.sendTo='person';f.returnTo='profile';ui.form=f;closeDrawer(true);ui.view='createForm';render();window.scrollTo(0,0);break}
+    case 'teamLeaders':ui.leadSel=new Set((TEAM_LIST.find(t=>t.id===+id)||{}).leaders||[]);openDrawer('leaders',id);break;
+    case 'leadersSave':{const tid=+id,ids=[...ui.leadSel];busy(async()=>{await api(`teams?id=eq.${tid}`,{method:'PATCH',body:{leaders:ids}});await fetchAll();closeDrawer();render();toast(`${teamName(tid)} · ${ids.length?ids.length+' team leader'+(ids.length>1?'s':''):'no team leader'}`)});break}
+    case 'editRec':{const r=S.records.find(x=>x.id===id);if(!r)break;const f=newRecForm(r.kind),x=r.data;f.editId=r.id;f.files=clone(r.files||[]);Object.assign(f.vals,{staff:r.recipients[0],requireAck:r.requireAck});
+      if(r.kind==='vio'){const c=vioCat(x.category);if(c){f.vals.vcat=c.name;f.vals.vtype=c.multi?'':((x.types||[])[0]||c.types[0]||'');f.vio=c.multi?[...(x.types||[])]:[]}f.vals.vmonth=x.month||f.vals.vmonth;f.vals.date=x.date;f.vals.details=x.details||''}
+      if(r.kind==='acc')Object.assign(f.vals,{reason:x.reason,level:String(x.level||1),date:x.date,details:x.details||''});
+      if(r.kind==='adh')Object.assign(f.vals,{reason:x.reason,date:x.date||x.from,note:x.note||''});
+      if(r.kind==='mom'||r.kind==='task'){Object.assign(f.vals,r.kind==='mom'?{title:x.title,date:x.date,summary:x.summary||'',actions:x.actions||''}:{title:x.title,details:x.details||'',due:x.due});f.sendTo=x.sendTo||(r.recipients.length===1?'person':'all');f.teams=[...(x.teams||[])]}
+      f.returnTo=ui.view==='profile'?'profile':null;ui.form=f;closeDrawer(true);ui.view='createForm';render();window.scrollTo(0,0);break}
+    case 'delRec':{const r=S.records.find(x=>x.id===id);if(!r)break;const who=r.recipients.length===1?user(r.recipients[0]).name:r.recipients.length+' staff';
+      if(!confirm(`Delete ${RECS[r.kind].name} ${r.id}?\n\n${r.kind==='adh'?'It will be removed from the records.':`${who} will no longer see it`}${r.kind==='acc'?' and their accuracy score goes back up':''}. This can’t be undone.`))break;
+      busy(async()=>{await rpc('delete_record',{p_id:r.id,p_by:S.current});await fetchAll();closeDrawer();render();toast(`${r.id} deleted`)});break}
     case 'newEvalFor':ui.form=newRecForm('eval');ui.form.vals.staff=id;go('createForm');break;
     case 'exportCycle':exportCycle();break;
     case 'closeDrawer':closeDrawer();break;
@@ -2585,6 +2758,7 @@ document.addEventListener('input',ev=>{
   if(t.dataset.accv){setPath(ui.accDraft,t.dataset.accv,t.type==='checkbox'?t.checked:t.type==='number'?(t.value===''?0:+t.value):t.value);liveDirty();return}
   if(t.dataset.ef&&t.type!=='checkbox'){setPath(ui.formDraft,t.dataset.ef,t.type==='number'?(t.value===''?0:+t.value):t.value);liveDirty();return}
   if(t.dataset.pd){ui.perfDate=t.value;return}
+  if(t.dataset.staffq||t.dataset.sentq){if(t.dataset.staffq)ui.staffQ=t.value;else ui.sent.q=t.value;const box=$('#main'),sel=t.dataset.staffq?'[data-staffq]':'[data-sentq]',pos=t.selectionStart;if(box){box.innerHTML=renderView();const n=$(sel);if(n){n.focus();n.setSelectionRange(pos,pos)}}return}
   if(t.dataset.us){ui.userSearch=t.value;const box=$('#main');if(box){const pos=t.selectionStart;box.innerHTML=renderView();const n=$('[data-us]');if(n){n.focus();n.setSelectionRange(pos,pos)}}return}
   if(t.id==='tmpPw'){ui.tmpPw=t.value;return}
   if(ui.userForm&&t.name&&t.closest('#userForm')){ui.userForm[t.name]=t.value;return}
@@ -2601,6 +2775,11 @@ document.addEventListener('change',ev=>{
   if(t.dataset.accv){if(t.type==='checkbox')setPath(ui.accDraft,t.dataset.accv,t.checked);softRender();return}
   if(t.dataset.member){t.checked?ui.teamSel.add(t.dataset.member):ui.teamSel.delete(t.dataset.member);renderDrawer();return}
   if(t.dataset.my){ui.my[t.dataset.my]=t.value;render();return}
+  if(t.dataset.prof){ui.prof[t.dataset.prof]=t.value;render();return}
+  if(t.dataset.staffm){ui.staffMonth=t.value;render();return}
+  if(t.dataset.pmonth){ui.pMonth=t.value;render();return}
+  if(t.dataset.sent){ui.sent[t.dataset.sent]=t.value;render();return}
+  if(t.dataset.leader){t.checked?ui.leadSel.add(t.dataset.leader):ui.leadSel.delete(t.dataset.leader);renderDrawer();return}
   if(t.dataset.pmmonth){ui.pmMonth=t.value;render();return}
   if(t.dataset.perfm){const f=t.files[0],m=t.dataset.perfm;t.value='';if(f)handlePerfMonthFile(f,m);return}
   if(t.matches('[data-perf]')){const f=t.files[0];t.value='';if(f)handlePerfFile(f);return}
