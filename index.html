@@ -893,10 +893,10 @@ const testPw=()=>{try{return JSON.parse(localStorage.getItem(TPW))||{}}catch(e){
 const rememberPw=(emp,pw)=>{try{const m=testPw();m[String(emp).toLowerCase()]=pw;localStorage.setItem(TPW,JSON.stringify(m))}catch(e){}};
 function testUsersCard(){
   const known=testPw(),list=[...USERS].filter(u=>u.active).sort((a,b)=>(a.role===b.role?0:a.role==='wfm'?-1:1)||a.name.localeCompare(b.name));
-  const pwOf=u=>known[u.emp.toLowerCase()]||(u.mustChange?'Wfm@2026':null);
+  const pwOf=u=>known[u.emp.toLowerCase()]||(Object.entries(known).find(([k])=>k.replace(/\D/g,'')===u.emp)||[])[1]||(u.mustChange?'Wfm@2026':null);
   return `<div class="card test-card"><div class="test-head"><b>Test users</b><span class="pill need">Testing only</span></div>
   <div class="flow-note" style="margin:0 0 10px">Tap <b>Use</b> to sign in. Passwords you set on this device are remembered here.</div>
-  <div class="table-wrap"><table class="mini-table test-table"><thead><tr><th>Name</th><th>Employee ID</th><th>Password</th><th></th></tr></thead><tbody>
+  <div class="table-wrap"><table class="mini-table test-table"><thead><tr><th>Name</th><th>Staff ID</th><th>Password</th><th></th></tr></thead><tbody>
   ${list.map(u=>{const pw=pwOf(u);return `<tr><td><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:11.5px">${u.role==='wfm'?'WFM / Manager':esc(teamName(u.team))}</div></td>
    <td style="font-variant-numeric:tabular-nums">${esc(u.emp)}</td><td>${pw?`<code>${esc(pw)}</code>`:'<span class="muted" style="font-size:12px">Changed elsewhere</span>'}</td>
    <td style="text-align:right"><button class="btn sm${pw?' primary':''}" data-action="useTest" data-emp="${esc(u.emp)}" data-pw="${esc(pw||'')}">Use</button></td></tr>`}).join('')}</tbody></table></div></div>`;
@@ -1022,8 +1022,8 @@ function renderSignin(){
   if(ui.pending)return `<div class="signin-page"><div class="card"><div class="logo">${ic('lock',24)}</div><h1>Choose a new password</h1><p>Hi ${esc(user(ui.pending.id).name.split(' ')[0])} — please replace your temporary password before you continue.</p>
    <form id="newPwForm" class="login-form" novalidate>${field('New password','<input type="password" name="new1" autocomplete="new-password" autofocus>',{hint:'At least 6 characters'})}${field('Repeat new password','<input type="password" name="new2" autocomplete="new-password">')}
    <button type="submit" class="btn primary">${ic('check',16)} Save and continue</button><button type="button" class="btn" data-action="cancelPending">Back to sign in</button></form></div></div>`;
-  return `<div class="signin-page"><div class="signin-wrap"><div class="card"><div class="logo">${ic('layers',24)}</div><h1>WFM Requests</h1><p>Sign in with your employee ID.</p>
-   <form id="loginForm" class="login-form" novalidate>${field('Employee ID',`<input name="emp" value="${esc(ui.lastEmp||'')}" autocomplete="username" autocapitalize="characters" placeholder="e.g. E1042">`)}${field('Password','<input type="password" name="pw" autocomplete="current-password">')}
+  return `<div class="signin-page"><div class="signin-wrap"><div class="card"><div class="logo">${ic('layers',24)}</div><h1>WFM Requests</h1><p>Sign in with your staff ID.</p>
+   <form id="loginForm" class="login-form" novalidate>${field('Staff ID',`<input name="emp" value="${esc(ui.lastEmp||'')}" autocomplete="username" inputmode="numeric" pattern="[0-9]*" placeholder="e.g. 1042">`)}${field('Password','<input type="password" name="pw" autocomplete="current-password">')}
    <button type="submit" class="btn primary">${ic('next',16)} Sign in</button></form>
    <div class="side-foot" style="border:0;margin-top:10px;text-align:center">Forgot your password? Ask WFM to reset it.<br>Test version · use dummy information only.</div></div>${testUsersCard()}</div></div>`;
 }
@@ -1123,7 +1123,7 @@ function viewForm(){
     const others=staffUsers().filter(x=>x.id!==uid),p=v.partnerId,pn=(user(p).name||'').split(' ')[0]||'Their';
     body=callout('info','info','How a swap works',`<div class="flow" style="margin-top:6px"><span class="flow-step">You submit</span><span class="flow-arrow">${ic('arrow',14)}</span><span class="flow-step">Colleague accepts</span><span class="flow-arrow">${ic('arrow',14)}</span><span class="flow-step">WFM decides</span></div><div style="margin-top:6px">You can also swap a working shift with a colleague’s day off.</div>`)+
     `<div class="form-grid">${field('From date',inp('start','date'),{req:1,invalid:e.start,hint:e.start})}${field('To date',inp('end','date'),{invalid:e.end,hint:e.end||'Leave empty for one day'})}
-    ${field('Swap with',combo('partnerId',others,p,'Type a name or employee ID…'),{req:1,full:1})}
+    ${field('Swap with',combo('partnerId',others,p,'Type a name or staff ID…'),{req:1,full:1})}
     ${shiftCell(f,'Your shift (you give)','myShift','myOffDate','Which day off of yours?',shiftOpts())}
     ${shiftCell(f,`${esc(pn)}’s shift (you take)`,'theirShift','theirOffDate',`Which day off of ${esc(pn)}’s?`,shiftOpts())}
     ${field('Reason',ta('reason','Why do you need the swap? (optional)'),{full:1})}
@@ -1504,7 +1504,7 @@ function userDrawer(id){
   return `<div class="sheet-handle"></div><div class="d-head">${isNew?`<span class="bubble sm" style="--c:var(--primary)">${ic('users',17)}</span>`:avatar(user(f.id))}<div><h3>${isNew?'Add user':'Edit user'}</h3><small>${isNew?'They’ll set their own password at first sign-in':esc(user(f.id).name)}</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div>
   <div class="d-body"><form id="userForm" novalidate><div class="form-grid" style="grid-template-columns:1fr">
    ${field('Full name',`<input name="name" value="${esc(f.name)}" placeholder="e.g. Sara Ahmed">`,{req:1})}
-   ${field('Employee ID',`<input name="emp" value="${esc(f.emp)}" placeholder="e.g. E1042" autocapitalize="characters">`,{req:1,hint:'Used to sign in'})}
+   ${field('Staff ID',`<input name="emp" value="${esc(f.emp)}" placeholder="e.g. 1042" inputmode="numeric" pattern="[0-9]*">`,{req:1,hint:'Used to sign in'})}
    ${field('Role',`<select name="role" ${self?'disabled':''}>${opt('staff','Staff',f.role==='staff')}${opt('wfm','WFM / Manager',f.role==='wfm')}</select>`,{req:1,hint:self?'You can’t change your own role':''})}
    ${f.role==='staff'?field('Team',`<select name="team">${TEAM_LIST.map(t=>opt(String(t.id),t.name,String(f.team)===String(t.id))).join('')}</select>`,{req:1}):field('Job title',`<input name="title" value="${esc(f.title||'')}" placeholder="e.g. WFM, Supervisor">`)}
    ${isNew?field('Temporary password',`<input name="pw" value="${esc(f.pw)}" autocomplete="off">`,{req:1,hint:'At least 6 characters. They must change it at first sign-in.'}):''}
@@ -1698,7 +1698,7 @@ function staffDrawer(uid){
 }
 function exportCycle(){
   const Q=qScope(),from=Q.from,fromIso=iso(new Date(from)),star=mostImproved(Q.ids),trendTxt={up:'Improving',down:'Slipping',flat:'Steady',new:'Too few calls'};
-  const head=['Employee','Employee ID','Team','Evaluations','Avg call score %','Trend','Flags','Latest daily performance %','Avg daily performance % (period)','Accuracy notes (period)','Accuracy points deducted (period)','KPI requests accepted','Violations','Adherence notes'];
+  const head=['Employee','Staff ID','Team','Evaluations','Avg call score %','Trend','Flags','Latest daily performance %','Avg daily performance % (period)','Accuracy notes (period)','Accuracy points deducted (period)','KPI requests accepted','Violations','Adherence notes'];
   const rows=Q.staff.map(u=>{const e=Q.cur.filter(r=>r.recipients[0]===u.id),q=staffQuality(u.id),ps=perfOf(u.id),pp=ps.filter(p=>p.date>=fromIso);
     const fl=[q.coaching?'Needs coaching':'',...q.repeat.map(c=>'Repeat issue: '+c),star===u.id?'Most improved':''].filter(Boolean).join('; ');
     return [u.name,u.emp,teamName(u.team),e.length,avgOf(e.map(r=>evScore(r)))??'',trendTxt[q.trend],fl,ps.length?ps.at(-1).score:'',pp.length?Math.round(pp.reduce((a,p)=>a+p.score,0)/pp.length*10)/10:'',accNotes(u.id,fromIso,iso(new Date(Q.to))).length,r2(accNotes(u.id,fromIso,iso(new Date(Q.to))).reduce((t,r)=>t+noteDeduct(r),0)),
@@ -1706,7 +1706,7 @@ function exportCycle(){
       S.records.filter(r=>r.kind==='vio'&&r.recipients.includes(u.id)&&r.createdAt>=from).length,
       S.records.filter(r=>r.kind==='adh'&&r.recipients.includes(u.id)&&r.createdAt>=from).length]});
   const secN=EVAL_FORM.sections.map(x=>x.name);
-  const evRows=[['Date','Employee','Employee ID','Team','Call type','Call ID','Evaluator',...secN.map(n=>n+' %'),'Bonus %','Monitor score %','Tag deductions %','Overall score %','Quality tags not achieved','Feedback','Acknowledged']];
+  const evRows=[['Date','Employee','Staff ID','Team','Call type','Call ID','Evaluator',...secN.map(n=>n+' %'),'Bonus %','Monitor score %','Tag deductions %','Overall score %','Quality tags not achieved','Feedback','Acknowledged']];
   Q.cur.slice().sort((a,b)=>evalTime(a)-evalTime(b)).forEach(r=>{const u=user(r.recipients[0]);const R=r.data.result;evRows.push([{d:r.data.date},u.name,u.emp,teamName(u.team),r.data.callType||'',r.data.callId||'',user(r.createdBy).name,...secN.map(n=>{const x=R&&R.sec.find(z=>z.name===n);return x?x.pct:''}),R?R.bonus:'',R?R.monitor:'',R?R.pen:'',evScore(r),R?R.tags.filter(t=>t.a==='no').map(t=>t.name).join('; '):'',r.data.feedback||'',r.acks[u.id]?'Yes':'No'])});
   downloadXlsx(`cycle-summary-${iso(today())}.xlsx`,[{name:'Cycle summary',rows:[head,...rows],widths:[22,13,24,12,15,14,40,18,20,14,16,14,11,14]},{name:'Call evaluations',rows:evRows,widths:[12,22,13,24,16,16,18,...secN.map(()=>16),10,14,14,14,34,50,13]}]);
   toast(`Cycle summary exported · ${rows.length} staff`);
@@ -2119,14 +2119,14 @@ async function handlePerfFile(file){
     const hdr=rows[0].map(h=>String(h).trim().toLowerCase());
     const find=(...keys)=>hdr.findIndex(h=>keys.some(k=>h===k||h.includes(k)));
     const ci=find('employee id','emp id','employee','emp','id'),si=find('daily performance','performance','score'),di=find('date');
-    if(ci<0||si<0)throw new Error('Couldn’t find the “Employee ID” and “Score” columns');
+    if(ci<0||si<0)throw new Error('Couldn’t find the “Staff ID” and “Score” columns');
     const toIso=v=>{if(v===''||v==null)return null;if(typeof v==='number'&&v>20000){const d=new Date(Date.UTC(1899,11,30)+v*86400000);return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`}
       const s=String(v).trim();let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return `${m[1]}-${pad(+m[2])}-${pad(+m[3])}`;m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/);if(m)return `${m[3]}-${pad(+m[2])}-${pad(+m[1])}`;return 'bad'};
     const def=ui.perfDate||iso(today()),seen=new Set();
     const out=rows.slice(1).map(r=>{const emp=String(r[ci]??'').trim();let sc=r[si];sc=typeof sc==='number'?sc:parseFloat(String(sc).replace('%','').replace(',','.'));
       if(typeof r[si]==='number'&&sc>0&&sc<=1.5)sc=sc*100;sc=isFinite(sc)?Math.round(sc*10)/10:null;
       const dd=di>=0?toIso(r[di])||def:def,u=USERS.find(x=>x.emp.toLowerCase()===emp.toLowerCase()&&x.role==='staff');
-      let msg='';if(!emp)msg='No employee ID';else if(!u)msg='Employee not found';else if(sc==null)msg='Score missing';else if(dd==='bad')msg='Date not readable';else if(seen.has(u.id+dd))msg='Duplicate row';
+      let msg='';if(!emp)msg='No staff ID';else if(!u)msg='Employee not found';else if(sc==null)msg='Score missing';else if(dd==='bad')msg='Date not readable';else if(seen.has(u.id+dd))msg='Duplicate row';
       if(!msg&&u)seen.add(u.id+dd);
       return {emp,user:u,score:sc,date:dd==='bad'?null:dd,ok:!msg,msg}}).filter(r=>r.emp||r.score!=null);
     ui.perfPreview={file:file.name,rows:out};render();
@@ -2190,7 +2190,7 @@ function reqDrawer(r){
   }
   return `<div class="sheet-handle"></div><div class="d-head">${bubble(r.type,1)}<div><h3>${TYPES[r.type].name}</h3><small>${r.id}</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div>
   <div class="d-body"><div class="d-section" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${pill(r.status)}<span class="muted" style="font-size:12.5px">Submitted ${fmtTs(r.createdAt)}</span></div>${extra}
-  <div class="d-section"><h4>Employee</h4><div class="kv">${kv('Name',esc(u.name))+kv('Employee ID',u.emp)+kv('Team',esc(teamName(u.team)),1)}</div></div>
+  <div class="d-section"><h4>Employee</h4><div class="kv">${kv('Name',esc(u.name))+kv('Staff ID',u.emp)+kv('Team',esc(teamName(u.team)),1)}</div></div>
   <div class="d-section"><h4>Request details</h4><div class="kv">${reqDetails(r)}</div></div>${reqNotes(r)}
   ${r.files.length?`<div class="d-section"><h4>Attachments</h4>${fileList(r.files)}</div>`:''}
   <div class="d-section"><h4>History</h4>${timeline(r)}</div></div>${foot}`;
@@ -2368,7 +2368,7 @@ function readFiles(list){
 }
 function exportCsv(){
   const list=filteredRequests();
-  const head=['ID','Type','Status','Employee','Employee ID','Team','Submitted','Start date','End date','Days','Date','Swap with','Current / own shift','Requested / other shift','KPI','Schedule','Preferences','Notes / reason','Attachments','Last decision by','Decision date','Comment'];
+  const head=['ID','Type','Status','Employee','Staff ID','Team','Submitted','Start date','End date','Days','Date','Swap with','Current / own shift','Requested / other shift','KPI','Schedule','Preferences','Notes / reason','Attachments','Last decision by','Decision date','Comment'];
   const rows=list.map(r=>{const u=user(r.userId),d=lastDecision(r),x=r.data;return [r.id,TYPES[r.type].name,STATUS[r.status],u.name,u.emp,teamName(u.team),{dt:r.createdAt},
     x.start?{d:x.start}:'',x.end?{d:x.end}:'',x.start?daysBetween(x.start,x.end):'',x.date?{d:x.date}:'',r.partnerId?user(r.partnerId).name:'',x.myShift?shiftTxt(x.myShift,x.myOffDate):x.current?shiftTxt(x.current,x.currentOffDate):'',x.theirShift?shiftTxt(x.theirShift,x.theirOffDate):x.requested?shiftTxt(x.requested,x.requestedOffDate):'',x.kpi||'',x.schedule||'',(x.prefs||[]).join(', '),
     x.notes||x.reason||x.details||x.justification||'',r.files.map(f=>f.name).join('; '),d?user(d.by).name:'',d?{dt:d.at}:'',d?d.comment:'']});
@@ -2376,7 +2376,7 @@ function exportCsv(){
   toast(`Exported ${list.length} request(s) to Excel`);
 }
 function perfTemplate(){
-  const rows=[['Employee ID','Name','Team','Score','Date'],...staffUsers().map(u=>[u.emp,u.name,teamName(u.team),'',{d:ui.perfDate||iso(today())}])];
+  const rows=[['Staff ID','Name','Team','Score','Date'],...staffUsers().map(u=>[u.emp,u.name,teamName(u.team),'',{d:ui.perfDate||iso(today())}])];
   downloadXlsx('daily-performance-template.xlsx',[{name:'Daily performance',rows,widths:[14,24,26,10,13]}]);
 }
 
@@ -2463,9 +2463,9 @@ document.addEventListener('click',ev=>{
     case 'userEdit':{const u=user(id);ui.userForm={id:u.id,name:u.name,emp:u.emp,role:u.role,team:String(u.team??(TEAM_LIST[0]||{}).id??''),title:u.title||'',active:u.active};openDrawer('user',id);break}
     case 'ufActive':ui.userForm.active=!ui.userForm.active;renderDrawer();break;
     case 'userSave':{const f=ui.userForm,e=[];
-      if(!f.name.trim())e.push('name');if(!f.emp.trim())e.push('employee ID');if(f.role==='staff'&&(f.team===''||f.team==null))e.push('team');if(!f.id&&String(f.pw||'').length<6)e.push('a password of 6+ characters');
+      if(!f.name.trim())e.push('name');if(!f.emp.trim())e.push('staff ID');else if(!/^\d+$/.test(f.emp.trim()))e.push('a staff ID made of numbers only');if(f.role==='staff'&&(f.team===''||f.team==null))e.push('team');if(!f.id&&String(f.pw||'').length<6)e.push('a password of 6+ characters');
       if(e.length){toast('Please add '+e.join(', '),true);break}
-      if(USERS.some(u=>u.emp.toLowerCase()===f.emp.trim().toLowerCase()&&u.id!==f.id)){toast('That employee ID is already used',true);break}
+      if(USERS.some(u=>u.emp.toLowerCase()===f.emp.trim().toLowerCase()&&u.id!==f.id)){toast('That staff ID is already used',true);break}
       busy(async()=>{await rpc('admin_save_user',{p_id:f.id||null,p_emp:f.emp,p_name:f.name,p_role:f.role,p_title:f.role==='wfm'?(f.title||null):null,p_team:f.role==='staff'?+f.team:null,p_active:f.active,p_pw:f.id?null:f.pw});
         if(!f.id)rememberPw(f.emp.trim(),f.pw);await fetchAll();closeDrawer();toast(f.id?'User updated':`${f.name.trim()} created · temporary password: ${f.pw}`)});break}
     case 'userPw':ui.tmpPw=genPw();openDrawer('pw',id);break;
@@ -2614,8 +2614,8 @@ document.addEventListener('change',ev=>{
 });
 document.addEventListener('submit',ev=>{ev.preventDefault();const f=ev.target;
   if(f.id==='reqForm')submitRequest();if(f.id==='recForm')submitRecord();
-  if(f.id==='loginForm'){const emp=f.emp.value.trim(),pw=f.pw.value;ui.lastEmp=emp;if(!emp||!pw){toast('Enter your employee ID and password',true);return}
-    busy(async()=>{const r=await rpc('login',{p_emp:emp,p_pw:pw});if(!r){toast('Wrong employee ID or password',true);return}rememberPw(emp,pw);await fetchAll();
+  if(f.id==='loginForm'){const emp=f.emp.value.replace(/\D/g,''),pw=f.pw.value;ui.lastEmp=emp;if(!emp||!pw){toast('Enter your staff ID and password',true);return}
+    busy(async()=>{const r=await rpc('login',{p_emp:emp,p_pw:pw});if(!r){toast('Wrong staff ID or password',true);return}rememberPw(emp,pw);await fetchAll();
       if(r.must_change){ui.pending={id:r.id,old:pw};render();return}signIn(r.id)})}
   if(f.id==='newPwForm'){const a=f.new1.value,b=f.new2.value;if(a.length<6){toast('Use at least 6 characters',true);return}if(a!==b){toast('The two passwords don’t match',true);return}
     if(a===ui.pending.old){toast('Choose a password different from the temporary one',true);return}
