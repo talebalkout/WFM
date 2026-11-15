@@ -622,6 +622,9 @@ body:has(.ef-row.dragging){user-select:none}
 .kpi-table{font-size:13px}.kpi-table th,.kpi-table td{padding:9px 7px}.kpi-table th{white-space:normal;line-height:1.25;vertical-align:bottom}.kpi-table th small{display:block}
 .kpi-table th:first-child,.kpi-table td:first-child{position:sticky;left:0;background:var(--surface);z-index:1;min-width:150px}.kpi-total td:first-child{background:var(--surface-2)}
 .kpi-table td:first-child b{white-space:normal}.kpi-table td:first-child{white-space:normal!important}
+.dash-tiles{grid-template-columns:repeat(4,1fr)}.stat.dual .dual-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 4px}.stat.dual .dual-row small{display:block;font-size:11.5px;color:var(--muted)}.stat.dual .dual-row b{font-size:26px;margin:0}.stat.dual .dual-row>div+div{border-left:1px solid var(--border);padding-left:10px}
+@media (max-width:1000px){.dash-tiles{grid-template-columns:1fr 1fr}}@media (max-width:560px){.dash-tiles{grid-template-columns:1fr}}
+.team-table th,.team-table td{padding:9px 8px}.team-table .grp,.staff-table .grp{border-left:1px solid var(--border)}.staff-table th,.staff-table td{padding:9px 7px}.staff-table th{white-space:normal;line-height:1.25;vertical-align:bottom}.staff-table td:first-child{white-space:normal!important;min-width:170px}.staff-table td:first-child,.staff-table th:first-child,.team-table td:first-child,.team-table th:first-child{position:sticky;left:0;background:var(--surface);z-index:1}.team-table .kpi-total td:first-child{background:var(--surface-2)}
 .pm-list{display:flex;flex-direction:column}.pm-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}.pm-row:last-child{border-bottom:0}
 .acc-cnt{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .combo{position:relative}
@@ -1233,10 +1236,27 @@ function viewDash(){
   const avgP=l=>l.length?Math.round(l.reduce((t,p)=>t+p.score,0)/l.length*10)/10:null;
   const staff=staffUsers(),latestVals=staff.map(u=>perfOf(u.id).at(-1)).filter(Boolean),latestAvg=avgP(latestVals);
   const tile=(l,v,sub,col)=>`<div class="card stat"><span>${l}</span><b${col?` style="color:${col}"`:''}>${v}</b><small>${sub}</small></div>`;
-  const tgt=S.rules.qualityTarget,qm=avgEv(evIn(evs,mStart)),qy=avgEv(evIn(evs,yStart)),pm=avgP(pf(mStart)),py=avgP(pf(yStart));
-  const teamRows=TEAM_LIST.filter(t=>!scoped()||myTeams().includes(t.id)).map(t=>{const ids=staff.filter(u=>u.team===t.id).map(u=>u.id);if(!ids.length)return '';const te=evs.filter(r=>ids.includes(r.recipients[0]));
-    const am=ids.length?r2(ids.reduce((x,u)=>x+accScore(u,ma,mb),0)/ids.length):null,a1=avgEv(evIn(te,mStart)),a2=avgEv(evIn(te,yStart));
-    return `<tr><td><b style="font-weight:600">${esc(t.name)}</b><div class="muted" style="font-size:12px">${ids.length} staff</div></td><td class="num-cell"><span class="score-cell${a1!=null&&a1<tgt?' below':''}">${a1!=null?a1+'%':'—'}</span></td><td class="num-cell"><span class="score-cell${a2!=null&&a2<tgt?' below':''}">${a2!=null?a2+'%':'—'}</span></td><td class="num-cell">${fmtScore(avgP(pf(mStart,ids)))}</td><td class="num-cell">${fmtScore(avgP(pf(yStart,ids)))}</td><td class="num-cell">${am!=null?am+'%':'—'}</td></tr>`}).join('');
+  const tgt=S.rules.qualityTarget;
+  const met=uids=>{const inU=id=>uids.includes(id),rng=(d,a)=>d&&d>=a&&d<=tIso;
+    const ev=evs.filter(r=>inU(r.recipients[0])),acc=S.records.filter(r=>r.kind==='acc'&&inU(r.recipients[0])),vio=S.records.filter(r=>r.kind==='vio'&&inU(r.recipients[0]));
+    return {qm:avgEv(ev.filter(r=>rng(r.data.date,mStart))),qy:avgEv(ev.filter(r=>rng(r.data.date,yStart))),qmN:ev.filter(r=>rng(r.data.date,mStart)).length,qyN:ev.filter(r=>rng(r.data.date,yStart)).length,
+      pm:avgP(pf(mStart,uids)),py:avgP(pf(yStart,uids)),am:acc.filter(r=>rng(r.data.date,mStart)).length,ay:acc.filter(r=>rng(r.data.date,yStart)).length,
+      amC:acc.filter(r=>rng(r.data.date,mStart)&&r.data.counter).length,vm:vio.filter(r=>rng(r.data.date,mStart)).length,vy:vio.filter(r=>rng(r.data.date,yStart)).length}};
+  const all=met(staff.map(u=>u.id)),lastDay=pf(mStart,staff.map(u=>u.id)).reduce((a,p)=>p.date>a?p.date:a,'');
+  const qc=v=>v==null?'var(--faint)':v>=tgt?'var(--ok)':'var(--bad)',cc=(v,c)=>v?c:'var(--ok)';
+  const dual=(l,m,yv,mc,yc,sub)=>`<div class="card stat dual"><span>${l}</span><div class="dual-row"><div><small>Month to date</small><b style="color:${mc}">${m}</b></div><div><small>Year to date</small><b style="color:${yc}">${yv}</b></div></div><small>${sub}</small></div>`;
+  const tiles=`<div class="stats dash-tiles">
+   ${dual('Monitoring score',all.qm!=null?all.qm+'%':'—',all.qy!=null?all.qy+'%':'—',qc(all.qm),qc(all.qy),`${all.qmN} / ${all.qyN} evaluations · target ${tgt}%`)}
+   ${dual('Daily performance',fmtScore(all.pm),fmtScore(all.py),'var(--primary)','var(--primary)',lastDay?`month to date updated to <span style="font-weight:650;color:var(--text)">${fmtL(lastDay)}</span>`:'no scores uploaded this month')}
+   ${dual('Accuracy tickets',all.am,all.ay,cc(all.am,'var(--warn)'),cc(all.ay,'var(--warn)'),all.amC?`${all.amC} this month counted only`:'accuracy notes issued')}
+   ${dual('Violations',all.vm,all.vy,cc(all.vm,'var(--bad)'),cc(all.vy,'var(--bad)'),'violation tickets issued')}</div>`;
+  const trow=(name,sub,m,cls)=>`<tr${cls?` class="${cls}"`:''}><td><b style="font-weight:600">${esc(name)}</b><div class="muted" style="font-size:12px">${esc(sub)}</div></td>
+    <td class="num-cell grp">${m.qm!=null?`<span class="score-cell${m.qm<tgt?' below':''}">${m.qm}%</span>`:'—'}</td><td class="num-cell">${m.qy!=null?`<span class="score-cell${m.qy<tgt?' below':''}">${m.qy}%</span>`:'—'}</td>
+    <td class="num-cell grp">${fmtScore(m.pm)}</td><td class="num-cell">${fmtScore(m.py)}</td>
+    <td class="num-cell grp">${m.am?`<b style="color:var(--warn)">${m.am}</b>`:'0'}</td><td class="num-cell">${m.ay}</td>
+    <td class="num-cell grp">${m.vm?`<b style="color:var(--bad)">${m.vm}</b>`:'0'}</td><td class="num-cell">${m.vy}</td></tr>`;
+  const teamRows=TEAM_LIST.filter(t=>!scoped()||myTeams().includes(t.id)).map(t=>{const ids=staff.filter(u=>u.team===t.id).map(u=>u.id);if(!ids.length)return '';const ld=leadersOf(t.id);
+    return trow(t.name,`${ids.length} staff${ld.length?' · TL '+ld.map(x=>x.name).join(', '):''}`,met(ids))}).join('')+(staff.length?trow(scoped()?'Your teams':'Department',`${staff.length} staff`,all,'kpi-total'):'');
   // leave capacity: rest of the year, grouped by month
   let capHtml='';const end=new Date(y,11,31);
   for(let m=new Date(T.getFullYear(),T.getMonth(),1);m<=end;m=new Date(m.getFullYear(),m.getMonth()+1,1)){
@@ -1249,27 +1269,14 @@ function viewDash(){
   }
   const monthReqs=S.requests.filter(r=>iso(new Date(r.createdAt))>=mStart&&inScope(r.userId));
   const byType=Object.keys(TYPES).map(k=>[k,monthReqs.filter(r=>r.type===k).length]);const mx=Math.max(1,...byType.map(x=>x[1]));
-  const ytd=staff.map(u=>{
-    const leave=S.requests.filter(r=>r.type==='leave'&&r.userId===u.id&&r.status==='approved'&&r.data.start.slice(0,4)==String(y)).reduce((a,r)=>a+daysBetween(r.data.start,r.data.end),0);
-    const adh=S.records.filter(r=>r.kind==='adh'&&r.recipients.includes(u.id)).length;
-    const vio=S.records.filter(r=>r.kind==='vio'&&r.recipients.includes(u.id)).length;
-    const ev=S.records.filter(r=>r.kind==='eval'&&r.recipients.includes(u.id)&&r.data.countInScore);
-    const avg=ev.length?Math.round(ev.reduce((a,r)=>a+evScore(r),0)/ev.length)+'%':'—';
-    const kpi=S.requests.filter(r=>r.type==='kpi'&&r.userId===u.id&&r.status==='approved').length;
-    return `<tr><td style="white-space:nowrap"><span class="av">${initials(u.name)}</span><b style="font-weight:600">${esc(u.name)}</b> <span class="muted" style="font-size:12px">· ${teamName(u.team)}</span></td><td class="num-cell">${leave}</td><td class="num-cell">${adh}</td><td class="num-cell">${vio}</td><td class="num-cell">${avg}</td><td class="num-cell">${accScore(u.id,ma,mb)}%</td><td class="num-cell">${kpi}</td></tr>`;
-  }).join('');
   return head('Dashboard',`${scoped()?'Your teams':'Department overview'} · ${MONL[T.getMonth()]} ${y}`,`<button class="btn primary" data-action="nav" data-view="create">${ic('upload',16)} Send to staff</button>`)+
-  `<div class="stats">${tile('Call quality · this month',qm!=null?qm+'%':'—',`${evIn(evs,mStart).length} evaluation(s) · target ${tgt}%`,qm!=null?(qm>=tgt?'var(--ok)':'var(--bad)'):'')}
-  ${tile('Call quality · year to date',qy!=null?qy+'%':'—',`${evIn(evs,yStart).length} evaluation(s)`,qy!=null?(qy>=tgt?'var(--ok)':'var(--bad)'):'')}
-  ${tile('Daily performance · this month',fmtScore(pm),latestAvg!=null?`latest day average ${fmtScore(latestAvg)}`:'no scores yet','var(--primary)')}
-  ${tile('Daily performance · year to date',fmtScore(py),`${pf(yStart).length} score(s) uploaded`,'var(--primary)')}
-  ${(()=>{const lm=latestPerfMonth();if(!lm)return '';const st=monthStats(staff.map(u=>u.id),lm),fin=st.pm.map(x=>x.final).filter(v=>v!=null);return tile(`Month result · ${monLong(lm)}`,fin.length?Math.round(fin.reduce((a,b)=>a+b,0)/fin.length*10)/10+'%':'—',`ready-time gap ${st.gap>0?'−'+st.gap+' h':'none'}${st.worst?` · most missed: ${st.worst.n}`:''}`,'var(--primary)')})()}</div>
-  <div class="card" style="margin-bottom:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">By team</h2></div><div class="table-wrap"><table class="mini-table"><thead><tr><th>Team</th><th class="num-cell">Call quality · month</th><th class="num-cell">Call quality · YTD</th><th class="num-cell">Daily perf. · month</th><th class="num-cell">Daily perf. · YTD</th><th class="num-cell">Accuracy · month</th></tr></thead><tbody>${teamRows||'<tr><td colspan="6" class="muted">No teams with staff yet.</td></tr>'}</tbody></table></div></div>
+  tiles+
+  `<div class="card" style="margin-bottom:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">By team</h2></div><div class="table-wrap"><table class="mini-table team-table"><thead><tr><th rowspan="2">Team</th><th colspan="2" class="num-cell grp">Monitoring score</th><th colspan="2" class="num-cell grp">Daily performance</th><th colspan="2" class="num-cell grp">Accuracy tickets</th><th colspan="2" class="num-cell grp">Violations</th></tr>
+  <tr>${'<th class="num-cell grp">MTD</th><th class="num-cell">YTD</th>'.repeat(4)}</tr></thead><tbody>${teamRows||'<tr><td colspan="9" class="muted">No teams with staff yet.</td></tr>'}</tbody></table></div></div>
   <div class="grid-2"><div class="card card-pad"><h2>Needs your action <span class="muted" style="font-weight:500">· ${pend.length} · oldest first</span></h2>
   ${pend.length?`<div class="req-list">${pend.map(r=>reqCard(r,quick(r.id))).join('')}</div>`:'<div class="empty"><b>All caught up</b>No pending requests.</div>'}</div>
   <div class="stack"><div class="card card-pad"><h2>Leave capacity · rest of ${y}</h2><div class="cap-scroll">${capHtml||'<div class="empty-mini">No days left this year.</div>'}</div><div class="flow-note">Limit: ${S.rules.leaveLimit} staff per day (managers excluded). Red days are greyed out for staff. Hover a day for details.</div></div>
-  <div class="card card-pad"><h2>By request type <span class="muted" style="font-weight:500">· this month</span></h2><div class="bars">${byType.map(([k,n])=>`<div class="bar-row"><span>${TYPES[k].name}</span><div class="bar-track"><div class="bar-fill" style="width:${n/mx*100}%;--c:${TYPES[k].c}"></div></div><b>${n}</b></div>`).join('')}</div></div></div></div>
-  <div class="card" style="margin-top:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Year to date by staff</h2></div><div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Leave days</th><th class="num-cell">Adherence notes</th><th class="num-cell">Violations</th><th class="num-cell">Avg call score</th><th class="num-cell">Accuracy · month</th><th class="num-cell">KPI accepted</th></tr></thead><tbody>${ytd}</tbody></table></div></div>`;
+  <div class="card card-pad"><h2>By request type <span class="muted" style="font-weight:500">· this month</span></h2><div class="bars">${byType.map(([k,n])=>`<div class="bar-row"><span>${TYPES[k].name}</span><div class="bar-track"><div class="bar-fill" style="width:${n/mx*100}%;--c:${TYPES[k].c}"></div></div><b>${n}</b></div>`).join('')}</div></div></div></div>`;
 }
 function filteredRequests(){
   const f=ui.filters,q=f.q.trim().toLowerCase();
@@ -2396,17 +2403,19 @@ function viewStaff(){
   const m=ui.staffMonth||iso(today()).slice(0,7),qq=(ui.staffQ||'').trim().toLowerCase(),tgt=S.rules.qualityTarget;
   const list=staffUsers().filter(u=>(ui.q.team==='all'||String(u.team)===ui.q.team)&&(!qq||[u.name,u.emp,teamName(u.team)].join(' ').toLowerCase().includes(qq)));
   const months=[];for(let i=0;i<12;i++)months.push(iso(new Date(today().getFullYear(),today().getMonth()-i,1)).slice(0,7));
-  const rows=list.map(u=>{const s=standing(u.id,m),wait=S.records.filter(r=>r.recipients.includes(u.id)&&r.requireAck&&!r.acks[u.id]).length,open=S.requests.filter(r=>r.userId===u.id&&['pending','waiting','returned'].includes(r.status)).length;
+  const yr=m.slice(0,4),yearOf=u=>({leave:S.requests.filter(r=>r.type==='leave'&&r.userId===u.id&&r.status==='approved'&&r.data.start.slice(0,4)===yr).reduce((a,r)=>a+daysBetween(r.data.start,r.data.end),0),adh:S.records.filter(r=>r.kind==='adh'&&r.recipients.includes(u.id)&&((r.data.date||r.data.from||'').slice(0,4)===yr)).length,kpi:S.requests.filter(r=>r.type==='kpi'&&r.userId===u.id&&r.status==='approved'&&new Date(r.createdAt).getFullYear()===+yr).length});
+  const rows=list.map(u=>{const yv=yearOf(u),s=standing(u.id,m),wait=S.records.filter(r=>r.recipients.includes(u.id)&&r.requireAck&&!r.acks[u.id]).length,open=S.requests.filter(r=>r.userId===u.id&&['pending','waiting','returned'].includes(r.status)).length;
     return `<tr data-action="openStaff" data-id="${u.id}"><td style="white-space:nowrap"><span class="av">${initials(u.name)}</span><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:12px;margin-left:36px">${esc(u.emp)} · ${esc(teamName(u.team))}</div></td>
      <td class="num-cell">${s.daily!=null?`<b>${s.daily}%</b>`:'<span class="muted">—</span>'}</td><td class="num-cell">${s.cq!=null?`<span class="score-cell${s.cq<tgt?' below':''}">${s.cq}%</span>`:'<span class="muted">—</span>'}</td>
      <td class="num-cell">${s.acc!=null?`<span style="color:${s.accN?'var(--warn)':'inherit'}">${s.acc}%</span>`:'—'}</td><td class="num-cell">${s.vio?`<b style="color:var(--bad)">${s.vio}</b>`:'<span class="muted">0</span>'}</td>
-     <td class="num-cell">${wait?`<span class="pill need">${wait}</span>`:'<span class="muted">—</span>'}</td><td class="num-cell">${open||'<span class="muted">—</span>'}</td></tr>`}).join('');
+     <td class="num-cell">${wait?`<span class="pill need">${wait}</span>`:'<span class="muted">—</span>'}</td><td class="num-cell">${open||'<span class="muted">—</span>'}</td>
+     <td class="num-cell yr">${yv.leave}</td><td class="num-cell">${yv.adh}</td><td class="num-cell">${yv.kpi}</td></tr>`}).join('');
   return head('Staff',`${list.length} staff${scoped()?' in your teams':''} · ${monLong(m)}`)+
   `<div class="q-filters" style="margin-bottom:14px"><input class="input" data-staffq="1" value="${esc(ui.staffQ||'')}" placeholder="Search name, staff ID or team" style="flex:1;min-width:180px">
    <select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.filter(t=>!scoped()||myTeams().includes(t.id)).map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select>
    <select class="input" data-staffm="1">${months.map(x=>opt(x,monLong(x),x===m)).join('')}</select></div>
-  <div class="card"><div class="table-wrap"><table class="mini-table staff-table"><thead><tr><th>Staff</th><th class="num-cell">Daily perf.</th><th class="num-cell">Call quality</th><th class="num-cell">Accuracy</th><th class="num-cell">Violations</th><th class="num-cell">To acknowledge</th><th class="num-cell">Open requests</th></tr></thead>
-  <tbody id="staffRows">${rows||'<tr><td colspan="7" class="muted">No staff match.</td></tr>'}</tbody></table></div></div>
+  <div class="card"><div class="table-wrap"><table class="mini-table staff-table"><thead><tr><th rowspan="2">Staff</th><th colspan="6" class="num-cell grp">${monLong(m)}</th><th colspan="3" class="num-cell grp yr">Year ${yr}</th></tr><tr><th class="num-cell grp">Daily perf.</th><th class="num-cell">Monitor&shy;ing</th><th class="num-cell">Accu&shy;racy</th><th class="num-cell">Viola&shy;tions</th><th class="num-cell">To ack.</th><th class="num-cell">Open req.</th><th class="num-cell grp yr">Leave days</th><th class="num-cell">Adher&shy;ence</th><th class="num-cell">KPI acc.</th></tr></thead>
+  <tbody id="staffRows">${rows||'<tr><td colspan="10" class="muted">No staff match.</td></tr>'}</tbody></table></div></div>
   <div class="flow-note">Tap a person to open their full profile.</div>`;
 }
 function profRange(){return myRange(ui.prof.period||'month')}
