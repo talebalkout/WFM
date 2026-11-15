@@ -573,6 +573,42 @@ main{min-width:0}
 .ef-na input{width:18px;height:18px;accent-color:var(--primary)}
 .ef-row.dragging{opacity:.9;background:var(--surface);box-shadow:0 6px 18px rgba(0,0,0,.15);border-radius:10px;position:relative;z-index:2}
 body:has(.ef-row.dragging){user-select:none}
+.cap-scroll{max-height:440px;overflow:auto;padding-right:4px;display:flex;flex-direction:column;gap:14px}
+.cap-mname{font-weight:700;font-size:13px;margin-bottom:6px}
+.cap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cap-dow{font-size:10.5px;color:var(--faint);text-align:center;font-weight:600}
+.cap-grid .cap{padding:5px 2px;font-size:10.5px;line-height:1.2}
+.cap-grid .cap b{font-size:12.5px}
+.cap.past{background:none}
+.cap.blk{outline:2px dashed var(--bad);outline-offset:-2px}
+.amend-log{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ret);margin-bottom:10px}
+.amend-log div{display:flex;align-items:center;gap:6px}
+.comments{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.cmt{display:flex;gap:10px;align-items:flex-start}
+.cmt .av{margin:0;flex:none}
+.cmt>div{background:var(--surface-2);border-radius:12px;padding:8px 12px;font-size:13px;flex:1}
+.cmt.wfm>div{background:var(--primary-soft)}
+.cmt p{margin:4px 0 0;white-space:pre-wrap}
+.cmt .muted{font-size:11.5px}
+.cmt-new{display:flex;gap:8px;align-items:flex-end}
+.cmt-new textarea{flex:1}
+.acc-row{grid-template-columns:28px 1fr auto 34px}
+.combo{position:relative}
+.combo-input{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:0 12px;background:var(--surface)}
+.combo-input svg{color:var(--faint);flex:none}
+.combo-input input{border:0!important;outline:0;padding:10px 0!important;flex:1;min-width:0;background:transparent;box-shadow:none!important}
+.combo-input:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+.combo-list{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.14);max-height:280px;overflow:auto;z-index:30;padding:4px}
+.combo-opt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:8px;font-size:13.5px}
+.combo-opt:hover,.combo-opt.on{background:var(--primary-soft)}
+.combo-opt small{display:block;color:var(--faint);font-size:11.5px}
+.combo-opt .av{margin:0;flex:none}
+.combo-empty{padding:12px;color:var(--muted);font-size:13px}
+.off-date{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--surface-2);display:flex;flex-direction:column;gap:6px}
+.off-date label{font-size:12.5px;font-weight:600}
+.off-date.invalid input{border-color:var(--bad)}
+.chip.more{border-style:dashed;color:var(--primary)}
+.sp-cal{max-width:420px}
 .tab-badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--primary);color:#fff;font-size:11px;margin-left:4px}
 .req-card.overdue{border-color:color-mix(in srgb,var(--bad) 45%,var(--border))}
 .who-off{display:flex;gap:10px;align-items:flex-start;margin-top:10px;padding:11px 13px;border-radius:10px;background:var(--surface-2);font-size:13px}
@@ -692,7 +728,8 @@ const RECS={
   vio:{name:'Violation Ticket',desc:'Log a violation for a staff member',c:'#ef4444',i:'alert',pre:'VT'},
   eval:{name:'Call Evaluation',desc:'Score a monitored call and give feedback',c:'#6366f1',i:'headset',pre:'EV'},
   mom:{name:'Minutes of Meeting',desc:'Send minutes to a person or a group',c:'#0891b2',i:'file',pre:'MOM'},
-  task:{name:'Task',desc:'A simple to-do — they mark it done, you confirm',c:'#f97316',i:'check',pre:'TK'}
+  task:{name:'Task',desc:'A simple to-do — they mark it done, you confirm',c:'#f97316',i:'check',pre:'TK'},
+  acc:{name:'Accuracy Note',desc:'Deducts from the staff member’s accuracy score',c:'#a855f7',i:'target',pre:'AC'}
 };
 const DEFAULT_LISTS={
   shifts:['Morning · 07:00–15:00','Mid · 11:00–19:00','Evening · 15:00–23:00','Night · 23:00–07:00'],
@@ -709,7 +746,6 @@ const LIST_META={
   adh_reasons:{name:'Adherence note reasons',hint:'Used on adherence notes'},
   kpis:{name:'KPI types',hint:'Shown to staff on KPI requests'},
   call_types:{name:'Call types',hint:'Used on call evaluations'},
-  prefs:{name:'Schedule preferences',hint:'Shown to staff on schedule special requests'},
   shifts:{name:'Shifts',hint:'Used on shift swap and shift change requests'}
 };
 let LISTS=JSON.parse(JSON.stringify(DEFAULT_LISTS));
@@ -717,6 +753,13 @@ let TEAMS={},TEAM_LIST=[],USERS=[];
 const DEFAULT_CRIT=DEFAULT_LISTS.criteria;
 const DEFAULT_FORM={"sections": [{"name": "Opening & Soft Skills", "items": [{"name": "Ready for the call", "ar": "الاستعداد لاستلام المكالمة", "good": 3, "avg": 1, "na": false}, {"name": "Greeting", "ar": "التحية", "good": 3, "avg": 1, "na": false}, {"name": "Mention Warba bank", "ar": "ذكر اسم البنك", "good": 3, "avg": 1, "na": false}, {"name": "Mention your name", "ar": "ذكر اسمك (الموظف) بشكل واضح", "good": 3, "avg": 1, "na": false}, {"name": "Tone of voice (Welcoming, active, warm)", "ar": "نبرة الصوت ترحيبية ,متفاعلة ,دافئة", "good": 3, "avg": 1, "na": false}, {"name": "Volume of voice (balanced \"Not loud or Low\")", "ar": "مستوى الصوت يكون (ليس عالي ولا منخفض)", "good": 3, "avg": 1, "na": false}, {"name": "Use appropriate pace", "ar": "استخدام الرتم(السرعة) المناسب", "good": 3, "avg": 1, "na": false}, {"name": "Voice Quality (Staff & Headset)", "ar": "جودة الصوت سواء من قبل الموظف أو السماعة", "good": 3, "avg": 1, "na": false}, {"name": "Use customer name & title (Beginning, During, End)", "ar": "استخدام اسم العميل مع اللقب في بداية ووسط ونهاية المكالمة", "good": 3, "avg": 1, "na": false}, {"name": "Friendliness & Attitude", "ar": "حسن التصرف والودية", "good": 4, "avg": 2, "na": false}, {"name": "Caring & Patient", "ar": "الاهتمام بالعميل وان تكون صبور", "good": 3, "avg": 1, "na": false}, {"name": "Follow hold protocol (Permission, Duration 45 Sec & Mute 20 Sec)", "ar": "اتباع بروتكول الانتظار والصامت", "good": 4, "avg": 2, "na": true}, {"name": "Avoid interrupting customer", "ar": "تجنب مقاطعة العميل", "good": 4, "avg": 2, "na": false}, {"name": "Ask security questions", "ar": "سؤال العميل الأسئلة الأمنية", "good": 3, "avg": 1, "na": false}, {"name": "Use professional terms", "ar": "استخدام مصطلحات احترافيه - استخدام مصطلحات بنكية / بنكية تقليدية (قرض / فوائد)", "good": 3, "avg": 1, "na": false}, {"name": "Avoid using slang terms", "ar": "تجنب استخدام المصطلحات العاميه", "good": 3, "avg": 1, "na": false}]}, {"name": "Selling Skills & Product Knowledge", "items": [{"name": "Probing further into customer request", "ar": "فهم طلب العميل ( الأسئلة المناسبة )", "good": 5, "avg": 3, "na": false}, {"name": "Listen actively (don't ask the customer to repeat himself)", "ar": "الأستماع الفعال و التركيز مع العميل", "good": 4, "avg": 2, "na": false}, {"name": "Provide accurate information", "ar": "توفير معلومات دقيقة وصحيحه", "good": 5, "avg": 3, "na": false}, {"name": "Explain product/service benefit related to the inquiry (Benefits)", "ar": "شرح كامل لأستفسار العميل / (المميزات)", "good": 6, "avg": 3, "na": false}, {"name": "Mention a direct channel (App, Social Media, Branches, WhatsApp)", "ar": "ذكر القنوات المباشرة", "good": 5, "avg": 3, "na": true}, {"name": "Mention current promotion and/ or cross sell other product", "ar": "ذكر العروض الحالية /او عرض منتج او خدمة", "good": 5, "avg": 3, "na": false}, {"name": "Mentioning documents (when needed)", "ar": "ذكر المستندات المطلوبة", "good": 4, "avg": 2, "na": true}, {"name": "Issue or Problem handled properly (if applicable)", "ar": "معالجة المشكلة او المسألة / توجيه الطلب للجهة المعنية", "good": 4, "avg": 2, "na": true}]}, {"name": "Closure", "items": [{"name": "Call Summary (if applicable)", "ar": "تلخيص المكالمه", "good": 4, "avg": 2, "na": true}, {"name": "Offer additional assistance", "ar": "سؤال العميل عن اي خدمة أخرى", "good": 4, "avg": 2, "na": false}, {"name": "Thank customer and goodbye", "ar": "شكر العميل وتوديعه", "good": 3, "avg": 1, "na": false}]}], "bonus": [{"name": "Mention the notice (Lets be aware)", "ar": "ذكر التنويه ( لنكن على دراية )", "value": 1}], "tags": [{"name": "Voice Quality", "ar": "مستوى الصوت - النشاط - الرتم - التنفس", "penalty": 3}, {"name": "Step Explaining", "ar": "سبب السؤال - توضيح ما سيتم", "penalty": 3}, {"name": "Info Timing", "ar": "اختيار الوقت المناسب", "penalty": 3}, {"name": "Language & Clarity", "ar": "ماسك الحسابات vs مسؤول عن الحسابات", "penalty": 3}, {"name": "Personal Remarks", "ar": "ابداء رأي بخصوص ارصدة العملاء", "penalty": 3}, {"name": "Hold Protocol", "ar": "المدة - السبب - المتابعة", "penalty": 3}, {"name": "Explain Requirements", "ar": "شرح المطلوب حسب حاجة العميل وليس بشكل عام", "penalty": 3}, {"name": "Offer an Action", "ar": "طلب أو تصحيح", "penalty": 3}, {"name": "Engagement", "ar": "التواصل المستمر خلالتنفيذ الطلب", "penalty": 3}, {"name": "Probing Questions", "ar": "أسئلة إضافية للتأكد من طلب العميل", "penalty": 3}]};
 let EVAL_FORM=JSON.parse(JSON.stringify(DEFAULT_FORM));
+const DEFAULT_ACC={base:5,perStaff:{},reasons:[{name:'Wrong information given',impact:0.4},{name:'Missing or wrong documentation',impact:0.4},{name:'Wrong transaction processed',impact:0.5},{name:'Missed follow-up',impact:0.3}]};
+let ACC=JSON.parse(JSON.stringify(DEFAULT_ACC));
+const r2=v=>Math.round(v*100)/100;
+const accBase=uid=>{const v=ACC.perStaff&&ACC.perStaff[uid];return v===''||v==null||!isFinite(+v)?+ACC.base:+v};
+const accNotes=(uid,a,b)=>S.records.filter(r=>r.kind==='acc'&&r.recipients.includes(uid)&&(!a||r.data.date>=a)&&(!b||r.data.date<=b));
+const accScore=(uid,a,b)=>Math.max(0,r2(accBase(uid)-accNotes(uid,a,b).reduce((t,r)=>t+(+r.data.impact||0),0)));
+const monthBounds=d=>[iso(new Date(d.getFullYear(),d.getMonth(),1)),iso(new Date(d.getFullYear(),d.getMonth()+1,0))];
 const ANS={good:'Good',avg:'Avg',below:'Below',na:'N/A'};
 function calcEval(form,ans){
   const items=[],sec=form.sections.map((s,si)=>{let e=0,m=0;s.items.forEach((it,ii)=>{const a=(ans.items||{})[si+'_'+ii]||'good';const pts=a==='good'||a==='na'?it.good:a==='avg'?it.avg:0;e+=pts;m+=it.good;items.push({s:s.name,name:it.name,a,pts,max:it.good})});return {name:s.name,earned:e,max:m,pct:m?Math.round(e/m*100):null}});
@@ -759,7 +802,7 @@ const shiftFor=(uid,date)=>{let h=7;for(const c of uid+date)h=(h*31+c.charCodeAt
 const fmtSize=b=>b>1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB';
 const ext=n=>(n.split('.').pop()||'FILE').toUpperCase().slice(0,4);
 const scoreOf=r=>Math.round(r.reduce((a,b)=>a+b,0)/r.length/5*100);
-const nextMonths=()=>{const t=today();return [1,2].map(k=>{const d=new Date(t.getFullYear(),t.getMonth()+k,1);return `${MONL[d.getMonth()]} ${d.getFullYear()}`})};
+const nextMonths=()=>{const t=today();return [1,2,3].map(k=>{const d=new Date(t.getFullYear(),t.getMonth()+k,1);return `${MONL[d.getMonth()]} ${d.getFullYear()}`})};
 
 /* ================= State ================= */
 let S; // persisted
@@ -778,7 +821,7 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const mkH=(action,comment)=>({at:Date.now(),by:S.current,action,comment:comment||''});
 const reqFromDb=r=>({id:r.id,type:r.type,userId:r.user_id,partnerId:r.partner_id,status:r.status,createdAt:+r.created_at,data:r.data,files:r.files||[],history:r.history||[]});
 const reqToDb=r=>({type:r.type,user_id:r.userId,partner_id:r.partnerId||null,status:r.status,data:r.data,files:r.files,history:r.history});
-const recFromDb=r=>({id:r.id,kind:r.kind,createdBy:r.created_by,createdAt:+r.created_at,recipients:r.recipients||[],requireAck:r.require_ack,acks:r.acks||{},reads:r.reads||{},taskState:r.task_state||{},data:r.data,files:r.files||[]});
+const recFromDb=r=>({id:r.id,kind:r.kind,createdBy:r.created_by,createdAt:+r.created_at,recipients:r.recipients||[],requireAck:r.require_ack,acks:r.acks||{},reads:r.reads||{},taskState:r.task_state||{},comments:r.comments||[],data:r.data,files:r.files||[]});
 const recToDb=r=>({kind:r.kind,created_by:r.createdBy,recipients:r.recipients,require_ack:r.requireAck,data:r.data,files:r.files});
 const blockFromDb=b=>({id:b.id,scope:b.scope,target:b.target,type:b.type,from:b.from_date,to:b.to_date,reason:b.reason});
 let lastSig='';
@@ -788,6 +831,7 @@ async function fetchAll(){
   USERS=us.map(u=>({id:u.id,emp:u.emp,name:u.name,role:u.role,title:u.title,team:u.team,active:u.active&&!u.deleted,deleted:!!u.deleted,mustChange:u.must_change}));
   TEAM_LIST=tm.map(t=>({id:t.id,name:t.name,sort:t.sort}));TEAMS=Object.fromEntries(TEAM_LIST.map(t=>[t.id,t.name]));
   LISTS=JSON.parse(JSON.stringify(DEFAULT_LISTS));st.forEach(x=>{if(Array.isArray(x.value)&&x.value.length)LISTS[x.key]=x.value});
+  {const ac=st.find(x=>x.key==='accuracy');ACC=ac&&ac.value&&Array.isArray(ac.value.reasons)?{base:5,perStaff:{},...ac.value}:JSON.parse(JSON.stringify(DEFAULT_ACC))}
   {const ef=st.find(x=>x.key==='eval_form');EVAL_FORM=ef&&ef.value&&Array.isArray(ef.value.sections)&&ef.value.sections.length?ef.value:JSON.parse(JSON.stringify(DEFAULT_FORM))}
   S.perf=pf.map(x=>({userId:x.user_id,date:x.date,score:+x.score,at:+x.uploaded_at}));
   const r0=ru[0]||{leave_limit:2,count_pending:true};
@@ -867,7 +911,7 @@ function summary(r){
     case 'swap':return `${rng(x)} · ${shiftTxt(x.myShift,x.myOffDate)} ⇄ ${shiftTxt(x.theirShift,x.theirOffDate)} with ${user(r.partnerId).name}`;
     case 'change':return `${rng(x)} · ${shiftTxt(x.current,x.currentOffDate)} → ${shiftTxt(x.requested,x.requestedOffDate)}`;
     case 'dispute':return `${fmt(x.date)} · score ${fmtScore(x.score)}${x.corrected!=null?` → ${fmtScore(x.corrected)}`:''}`;
-    case 'special':return `${x.schedule} · ${(x.prefs||[]).join(', ')}`;
+    case 'special':return `${x.schedule}${x.period==='Specific dates'&&(x.days||[]).length?` · ${x.days.length} day(s)`:''} · ${(x.prefs||[]).map(shortShift).join(', ')}`;
     case 'kpi':return `${x.kpi} · ${fmt(x.date)}${r.files.length?` · ${r.files.length} attachment(s)`:''}`;
   }
 }
@@ -877,6 +921,7 @@ function recSummary(r){
     case 'eval':return `Score ${evScore(r)}% · Call on ${fmt(x.date)} · by ${user(r.createdBy).name}`;
     case 'mom':return `${x.title}${r.files.length?` · ${r.files.length} attachment(s)`:''}`;
     case 'task':return `${x.title}${x.due?` · due ${fmt(x.due)}`:''}`;
+    case 'acc':return `${x.reason} · −${x.impact}% · ${fmt(x.date)}`;
     case 'vio':return `${x.vtype} · ${fmt(x.date)}`;
     case 'adh':return `${x.reason} · ${fmt(x.date||x.from)}`;
   }
@@ -966,7 +1011,7 @@ function viewNew(){
 function newForm(type,editing){
   const T=today(),f={type,editingId:editing?editing.id:null,vals:{},files:[],prefs:[],errors:{},cal:{month:new Date(T.getFullYear(),T.getMonth(),1),start:null,end:null}};
   if(editing){
-    Object.assign(f.vals,editing.data);f.files=editing.files.map(x=>({...x}));f.prefs=[...(editing.data.prefs||[])];
+    Object.assign(f.vals,editing.data);f.files=editing.files.map(x=>({...x}));f.prefs=[...(editing.data.prefs||[])];f.days=[...(editing.data.days||[])];if(type==='kpi')f.kpis=[editing.data.kpi];
     if(type==='leave'){f.cal.start=editing.data.start;f.cal.end=editing.data.end;const s=parse(editing.data.start);f.cal.month=new Date(s.getFullYear(),s.getMonth(),1);if(f.cal.month<new Date(T.getFullYear(),T.getMonth(),1))f.cal.month=new Date(T.getFullYear(),T.getMonth(),1)}
     if(type==='swap')f.vals.partnerId=editing.partnerId;
     if(editing.data.date&&!editing.data.start){f.vals.start=editing.data.date;f.vals.end=editing.data.date}
@@ -974,7 +1019,8 @@ function newForm(type,editing){
     if(type==='swap'){f.vals.partnerId=(staffUsers().find(u=>u.id!==S.current)||{}).id;f.vals.myShift=LISTS.shifts[0];f.vals.theirShift=OFF}
     if(type==='change'){f.vals.current=LISTS.shifts[0];f.vals.requested=''}
     if(type==='special'){f.vals.schedule=nextMonths()[0];f.vals.period='Whole schedule'}
-    if(type==='kpi')f.vals.kpi=LISTS.kpis[0];
+    if(type==='kpi')f.kpis=[];
+    if(type==='special')f.days=[];
   }
   return f;
 }
@@ -1005,6 +1051,29 @@ function calendarHtml(f){
   h+=f.cal.info?whoOffHtml(f.cal.info):`<div class="flow-note" style="margin-top:8px">Tip: tap a full day to see who is on leave.</div>`;
   return h;
 }
+function comboItems(name,list,q,val){
+  const qq=String(q||'').trim().toLowerCase(),m=list.filter(o=>!qq||[o.name,o.emp,teamName(o.team)].join(' ').toLowerCase().includes(qq));
+  return m.length?m.map(o=>`<button type="button" class="combo-opt${o.id===val?' on':''}" data-action="comboPick" data-n="${name}" data-id="${o.id}"><span class="av">${initials(o.name)}</span><span><b>${esc(o.name)}</b><small>${esc(o.emp)} · ${esc(teamName(o.team))}</small></span></button>`).join(''):'<div class="combo-empty">No one matches</div>';
+}
+function combo(name,list,val,ph){
+  const sel=list.find(o=>o.id===val);
+  return `<div class="combo"><div class="combo-input">${ic('search',15)}<input type="text" data-cq="${name}" value="${esc(sel?`${sel.name} · ${sel.emp}`:'')}" placeholder="${esc(ph)}" autocomplete="off"></div><div class="combo-list" hidden>${comboItems(name,list,'',val)}</div></div>`;
+}
+function shiftCell(f,label,name,offName,offLabel,opts,choose){
+  const v=f.vals,e=f.errors,val=v[name];
+  return `<div class="field${e[name]?' invalid':''}"><label>${label} <span class="req">*</span></label><select name="${name}">${choose?'<option value="">Choose…</option>':''}${opts.map(o=>opt(o,o,o===val)).join('')}</select>${e[name]?`<span class="hint">${e[name]}</span>`:''}
+   ${val===OFF?`<div class="off-date${e[offName]?' invalid':''}"><label>${offLabel} <span class="req">*</span></label><input name="${offName}" type="date" value="${esc(v[offName]||'')}" min="${iso(addDays(today(),1))}"><span class="hint">${e[offName]||'The date of that day off'}</span></div>`:''}</div>`;
+}
+function spCalendar(f){
+  const [a]=monthRange(f.vals.schedule),m=parse(a),first=new Date(m.getFullYear(),m.getMonth(),1),dim=new Date(m.getFullYear(),m.getMonth()+1,0).getDate(),tIso=iso(today());
+  let h='<div class="cal sp-cal">'+['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="dow">${d}</div>`).join('');
+  for(let i=0;i<first.getDay();i++)h+='<div class="day blank"></div>';
+  for(let d=1;d<=dim;d++){const s=iso(new Date(m.getFullYear(),m.getMonth(),d)),bk=blockOn(S.current,'special',s);
+    if(s<=tIso){h+=`<div class="day past">${d}</div>`;continue}
+    if(bk){h+=`<div class="day full" title="Blocked by WFM${bk.reason?': '+esc(bk.reason):''}">${d}<small>Blocked</small></div>`;continue}
+    h+=`<button type="button" class="day${(f.days||[]).includes(s)?' sel':''}" data-action="spDay" data-d="${s}">${d}</button>`}
+  return h+'</div>';
+}
 function viewForm(){
   const f=ui.form,t=TYPES[f.type],v=f.vals,e=f.errors,uid=S.current,u=me();
   const requester=`<div class="requester">${avatar(u)}<div><b>${esc(u.name)}</b> · ${u.emp}<small>${esc(teamOf(u))} · filled in automatically from your login</small></div></div>`;
@@ -1019,33 +1088,29 @@ function viewForm(){
       ${files(false,'Optional · PDF or image')}</div></div>`;
   }else if(f.type==='swap'){
     const others=staffUsers().filter(x=>x.id!==uid),p=v.partnerId,pn=(user(p).name||'').split(' ')[0]||'Their';
-    const so=(name,val)=>`<select name="${name}">${shiftOpts().map(s=>opt(s,s,s===val)).join('')}</select>`;
     body=callout('info','info','How a swap works',`<div class="flow" style="margin-top:6px"><span class="flow-step">You submit</span><span class="flow-arrow">${ic('arrow',14)}</span><span class="flow-step">Colleague accepts</span><span class="flow-arrow">${ic('arrow',14)}</span><span class="flow-step">WFM decides</span></div><div style="margin-top:6px">You can also swap a working shift with a colleague’s day off.</div>`)+
     `<div class="form-grid">${field('From date',inp('start','date'),{req:1,invalid:e.start,hint:e.start})}${field('To date',inp('end','date'),{invalid:e.end,hint:e.end||'Leave empty for one day'})}
-    ${field('Swap with',`<select name="partnerId">${others.map(o=>opt(o.id,`${o.name} · ${teamName(o.team)}`,o.id===p)).join('')}</select>`,{req:1,full:1})}
-    ${field('Your shift (you give)',so('myShift',v.myShift),{req:1,invalid:e.myShift,hint:e.myShift})}
-    ${field(`${esc(pn)}’s shift (you take)`,so('theirShift',v.theirShift),{req:1})}
-    ${v.myShift===OFF?field('Which day off of yours?',inp('myOffDate','date'),{req:1,invalid:e.myOffDate,hint:e.myOffDate||'The date of your day off you’re giving'}):''}
-    ${v.theirShift===OFF?field(`Which day off of ${esc(pn)}’s?`,inp('theirOffDate','date'),{req:1,invalid:e.theirOffDate,hint:e.theirOffDate||'The date of their day off you’re taking'}):''}
+    ${field('Swap with',combo('partnerId',others,p,'Type a name or employee ID…'),{req:1,full:1})}
+    ${shiftCell(f,'Your shift (you give)','myShift','myOffDate','Which day off of yours?',shiftOpts())}
+    ${shiftCell(f,`${esc(pn)}’s shift (you take)`,'theirShift','theirOffDate',`Which day off of ${esc(pn)}’s?`,shiftOpts())}
     ${field('Reason',ta('reason','Why do you need the swap? (optional)'),{full:1})}
     ${files(false,'Optional')}</div>`;
   }else if(f.type==='change'){
     body=`<div class="form-grid">${field('From date',inp('start','date'),{req:1,invalid:e.start,hint:e.start})}${field('To date',inp('end','date'),{invalid:e.end,hint:e.end||'Leave empty for one day'})}
-    ${field('Current shift',`<select name="current">${shiftOpts().map(s=>opt(s,s,s===v.current)).join('')}</select>`,{req:1})}
-    ${field('Requested shift',`<select name="requested"><option value="">Choose…</option>${shiftOpts().filter(s=>s!==v.current).map(s=>opt(s,s,s===v.requested)).join('')}</select>`,{req:1,invalid:e.requested,hint:e.requested})}
-    ${v.current===OFF?field('Which day off?',inp('currentOffDate','date'),{req:1,invalid:e.currentOffDate,hint:e.currentOffDate||'The date of your current day off'}):''}
-    ${v.requested===OFF?field('Day off on which date?',inp('requestedOffDate','date'),{req:1,invalid:e.requestedOffDate,hint:e.requestedOffDate||'The date you want as your day off'}):''}
+    ${shiftCell(f,'Current shift','current','currentOffDate','Which day off?',shiftOpts())}
+    ${shiftCell(f,'Requested shift','requested','requestedOffDate','Day off on which date?',shiftOpts().filter(x=>x!==v.current),true)}
     ${field('Reason',ta('reason','Why do you need this change?'),{full:1,req:1,invalid:e.reason,hint:e.reason})}
     ${files(false,'Optional')}</div>`;
   }else if(f.type==='special'){
-    body=`<div class="form-grid">${field('For schedule',`<select name="schedule">${nextMonths().map(s=>opt(s,s,s===v.schedule)).join('')}</select>`,{req:1,invalid:e.schedule,hint:e.schedule})}
+    const chips=shiftOpts(),LIM=6,showAll=f.prefMore||chips.length<=LIM||chips.slice(LIM).some(c=>f.prefs.includes(c)),shown=showAll?chips:chips.slice(0,LIM);
+    body=`<div class="form-grid">${field('For schedule',`<select name="schedule">${nextMonths().map(s=>opt(s,s,s===v.schedule)).join('')}</select>`,{req:1,invalid:e.schedule,hint:e.schedule||'Up to 3 months ahead'})}
     ${field('Period',`<select name="period">${['Whole schedule','Specific dates'].map(s=>opt(s,s,s===v.period)).join('')}</select>`)}
-    ${v.period==='Specific dates'?field('Which dates',inp('dates','text','e.g. 3–10 and 20–24'),{full:1,req:1,invalid:e.dates,hint:e.dates}):''}
-    ${field('Preference',`<div class="opt-chips">${LISTS.prefs.map(p=>`<span class="chip${f.prefs.includes(p)?' on':''}" data-action="togglePref" data-p="${esc(p)}">${p}</span>`).join('')}</div>`,{full:1,req:1,invalid:e.prefs,hint:e.prefs||'Pick one or more'})}
+    ${v.period==='Specific dates'?field(`Pick the days in ${esc(v.schedule)}`,spCalendar(f),{full:1,req:1,invalid:e.days,hint:e.days||`${(f.days||[]).length} day(s) selected · tap a day to add or remove it`}):''}
+    ${field('Preferred shift(s)',`<div class="opt-chips">${shown.map(p=>`<span class="chip${f.prefs.includes(p)?' on':''}" data-action="togglePref" data-p="${esc(p)}">${esc(p)}</span>`).join('')}${showAll?'':`<span class="chip more" data-action="prefMore">+${chips.length-LIM} more</span>`}</div>`,{full:1,req:1,invalid:e.prefs,hint:e.prefs||'Pick one or more · the shifts set up by WFM'})}
     ${field('Details',ta('details','Explain your request'),{full:1,req:1,invalid:e.details,hint:e.details})}
     ${files(false,'Optional · supporting document')}</div>`;
   }else if(f.type==='kpi'){
-    body=`<div class="form-grid">${field('KPI affected',`<select name="kpi">${LISTS.kpis.map(s=>opt(s,s,s===v.kpi)).join('')}</select>`,{req:1})}
+    body=`<div class="form-grid">${field(f.editingId?'KPI affected':'KPI(s) affected',`<div class="opt-chips">${LISTS.kpis.map(k=>`<span class="chip${(f.kpis||[]).includes(k)?' on':''}" data-action="toggleKpi" data-k="${esc(k)}">${esc(k)}</span>`).join('')}</div>`,{req:1,full:1,invalid:e.kpis,hint:e.kpis||(f.editingId?'One KPI per request':'Pick one or more — each KPI is sent as its own request so WFM can decide on each separately')})}
     ${field('Date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}
     ${field('Justification',ta('justification','What happened and why it affected your KPI'),{full:1,req:1,invalid:e.justification,hint:e.justification})}
     ${files(true,'Required for KPI requests')}</div>`;
@@ -1091,7 +1156,7 @@ function viewInbox(){
   const cnt=k=>all.filter(r=>match(r,k)).length;
   const list=all.filter(r=>match(r,ui.inboxFilter));
   const cards=list.map(r=>{const un=isUnread(r,uid);return `<div class="req-card${un?' unread':''}" data-action="openRec" data-id="${r.id}" role="button" tabindex="0">${un?'<span class="unread-dot"></span>':'<span class="read-gap"></span>'}${bubble(r.kind,1,1)}
-    <div class="req-main"><div class="req-title">${RECS[r.kind].name} <small>${r.id}</small></div><div class="req-sub">${esc(recSummary(r))}</div><div class="req-meta">${esc(user(r.createdBy).name)} · ${ago(r.createdAt)}</div></div>
+    <div class="req-main"><div class="req-title">${RECS[r.kind].name} <small>${r.id}</small></div><div class="req-sub">${esc(recSummary(r))}</div><div class="req-meta">${esc(user(r.createdBy).name)} · ${ago(r.createdAt)}${(r.comments||[]).length?` · ${r.comments.length} comment${r.comments.length>1?'s':''}`:''}${(r.data.amended||[]).length?' · amended':''}</div></div>
     <div class="req-side">${r.requireAck?ackPill(!!r.acks[uid]):''}</div></div>`}).join('');
   return head('From WFM','Minutes, evaluations and tickets sent to you.')+
     `<div class="chips">${groups.filter(([k])=>k==='all'||cnt(k)).map(([k,l])=>`<button class="chip${ui.inboxFilter===k?' on':''}" data-action="inboxFilter" data-f="${k}">${l}<span class="n">${cnt(k)}</span></button>`).join('')}</div>`+
@@ -1100,34 +1165,51 @@ function viewInbox(){
 
 /* ================= WFM views ================= */
 function viewDash(){
-  const T=today(),tIso=iso(T),y=T.getFullYear(),mStart=iso(new Date(y,T.getMonth(),1));
+  const T=today(),tIso=iso(T),y=T.getFullYear(),mStart=iso(new Date(y,T.getMonth(),1)),yStart=iso(new Date(y,0,1)),[ma,mb]=monthBounds(T);
   const pend=S.requests.filter(r=>r.status==='pending').sort((a,b)=>a.createdAt-b.createdAt);
-  const waiting=S.requests.filter(r=>r.status==='waiting').length;
-  let unack=0;S.records.forEach(r=>{if(r.requireAck)r.recipients.forEach(u=>{if(!r.acks[u])unack++})});
-  const decidedThisMonth=S.requests.filter(r=>{const d=lastDecision(r);return d&&d.action!=='Returned'&&iso(new Date(d.at))>=mStart});
-  const acc=decidedThisMonth.filter(r=>r.status==='approved').length;
-  const caps=[];for(let i=1;i<=14;i++){const d=addDays(T,i),s=iso(d),u=leaveUsage(s);caps.push(`<div class="cap l${Math.min(2,u>=S.rules.leaveLimit?2:u?1:0)}"><b>${d.getDate()}</b>${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]}<br>${u}/${S.rules.leaveLimit}</div>`)}
+  const evs=S.records.filter(r=>r.kind==='eval'&&r.data.countInScore!==false);
+  const evIn=(list,a)=>list.filter(r=>r.data.date>=a&&r.data.date<=tIso);
+  const avgEv=l=>l.length?Math.round(l.reduce((t,r)=>t+evScore(r),0)/l.length*10)/10:null;
+  const pf=(a,uids)=>S.perf.filter(p=>p.date>=a&&p.date<=tIso&&(!uids||uids.includes(p.userId)));
+  const avgP=l=>l.length?Math.round(l.reduce((t,p)=>t+p.score,0)/l.length*10)/10:null;
+  const staff=staffUsers(),latestVals=staff.map(u=>perfOf(u.id).at(-1)).filter(Boolean),latestAvg=avgP(latestVals);
+  const tile=(l,v,sub,col)=>`<div class="card stat"><span>${l}</span><b${col?` style="color:${col}"`:''}>${v}</b><small>${sub}</small></div>`;
+  const tgt=S.rules.qualityTarget,qm=avgEv(evIn(evs,mStart)),qy=avgEv(evIn(evs,yStart)),pm=avgP(pf(mStart)),py=avgP(pf(yStart));
+  const teamRows=TEAM_LIST.map(t=>{const ids=staff.filter(u=>u.team===t.id).map(u=>u.id);if(!ids.length)return '';const te=evs.filter(r=>ids.includes(r.recipients[0]));
+    const am=ids.length?r2(ids.reduce((x,u)=>x+accScore(u,ma,mb),0)/ids.length):null,a1=avgEv(evIn(te,mStart)),a2=avgEv(evIn(te,yStart));
+    return `<tr><td><b style="font-weight:600">${esc(t.name)}</b><div class="muted" style="font-size:12px">${ids.length} staff</div></td><td class="num-cell"><span class="score-cell${a1!=null&&a1<tgt?' below':''}">${a1!=null?a1+'%':'—'}</span></td><td class="num-cell"><span class="score-cell${a2!=null&&a2<tgt?' below':''}">${a2!=null?a2+'%':'—'}</span></td><td class="num-cell">${fmtScore(avgP(pf(mStart,ids)))}</td><td class="num-cell">${fmtScore(avgP(pf(yStart,ids)))}</td><td class="num-cell">${am!=null?am+'%':'—'}</td></tr>`}).join('');
+  // leave capacity: rest of the year, grouped by month
+  let capHtml='';const end=new Date(y,11,31);
+  for(let m=new Date(T.getFullYear(),T.getMonth(),1);m<=end;m=new Date(m.getFullYear(),m.getMonth()+1,1)){
+    const first=new Date(m),dim=new Date(m.getFullYear(),m.getMonth()+1,0).getDate();let g='';let any=false;
+    for(let i=0;i<first.getDay();i++)g+='<div></div>';
+    for(let d=1;d<=dim;d++){const dt=new Date(m.getFullYear(),m.getMonth(),d),s=iso(dt);if(s<=tIso){g+='<div class="cap past"></div>';continue}any=true;
+      const u=leaveUsage(s),bk=S.rules.blocks.some(b=>b.type==='leave'&&b.scope==='all'&&b.from<=s&&s<=b.to);
+      g+=`<div class="cap l${u>=S.rules.leaveLimit?2:u?1:0}${bk?' blk':''}" title="${fmtL(s)} · ${u} of ${S.rules.leaveLimit} on leave${bk?' · blocked for everyone':''}"><b>${d}</b>${u}/${S.rules.leaveLimit}</div>`}
+    if(any)capHtml+=`<div class="cap-month"><div class="cap-mname">${MONL[m.getMonth()]}</div><div class="cap-grid">${['S','M','T','W','T','F','S'].map(x=>`<div class="cap-dow">${x}</div>`).join('')}${g}</div></div>`;
+  }
   const monthReqs=S.requests.filter(r=>iso(new Date(r.createdAt))>=mStart);
   const byType=Object.keys(TYPES).map(k=>[k,monthReqs.filter(r=>r.type===k).length]);const mx=Math.max(1,...byType.map(x=>x[1]));
-  const ytd=staffUsers().map(u=>{
+  const ytd=staff.map(u=>{
     const leave=S.requests.filter(r=>r.type==='leave'&&r.userId===u.id&&r.status==='approved'&&r.data.start.slice(0,4)==String(y)).reduce((a,r)=>a+daysBetween(r.data.start,r.data.end),0);
     const adh=S.records.filter(r=>r.kind==='adh'&&r.recipients.includes(u.id)).length;
     const vio=S.records.filter(r=>r.kind==='vio'&&r.recipients.includes(u.id)).length;
     const ev=S.records.filter(r=>r.kind==='eval'&&r.recipients.includes(u.id)&&r.data.countInScore);
     const avg=ev.length?Math.round(ev.reduce((a,r)=>a+evScore(r),0)/ev.length)+'%':'—';
     const kpi=S.requests.filter(r=>r.type==='kpi'&&r.userId===u.id&&r.status==='approved').length;
-    return `<tr><td style="white-space:nowrap"><span class="av">${initials(u.name)}</span><b style="font-weight:600">${esc(u.name)}</b> <span class="muted" style="font-size:12px">· ${teamName(u.team)}</span></td><td class="num-cell">${leave}</td><td class="num-cell">${adh}</td><td class="num-cell">${vio}</td><td class="num-cell">${avg}</td><td class="num-cell">${kpi}</td></tr>`;
+    return `<tr><td style="white-space:nowrap"><span class="av">${initials(u.name)}</span><b style="font-weight:600">${esc(u.name)}</b> <span class="muted" style="font-size:12px">· ${teamName(u.team)}</span></td><td class="num-cell">${leave}</td><td class="num-cell">${adh}</td><td class="num-cell">${vio}</td><td class="num-cell">${avg}</td><td class="num-cell">${accScore(u.id,ma,mb)}%</td><td class="num-cell">${kpi}</td></tr>`;
   }).join('');
-  return head('Dashboard',`Department overview · ${y} year to date`,`<button class="btn primary" data-action="nav" data-view="create">${ic('upload',16)} Send to staff</button>`)+
-  `<div class="stats"><div class="card stat"><span>Needs your decision</span><b style="color:var(--warn)">${pend.length}</b><small>${pend.length?'oldest '+ago(pend[0].createdAt):'all clear'}</small></div>
-  <div class="card stat"><span>Waiting for colleague</span><b style="color:var(--primary)">${waiting}</b><small>shift swaps</small></div>
-  <div class="card stat"><span>Not yet acknowledged</span><b style="color:var(--ret)">${unack}</b><small>evaluations, tickets, minutes</small></div>
-  <div class="card stat"><span>Accepted this month</span><b style="color:var(--ok)">${acc}</b><small>of ${decidedThisMonth.length} decided</small></div></div>
-  <div class="grid-2"><div class="card card-pad"><h2>Needs your action <span class="muted" style="font-weight:500">· oldest first</span></h2>
+  return head('Dashboard',`Department overview · ${MONL[T.getMonth()]} ${y}`,`<button class="btn primary" data-action="nav" data-view="create">${ic('upload',16)} Send to staff</button>`)+
+  `<div class="stats">${tile('Call quality · this month',qm!=null?qm+'%':'—',`${evIn(evs,mStart).length} evaluation(s) · target ${tgt}%`,qm!=null?(qm>=tgt?'var(--ok)':'var(--bad)'):'')}
+  ${tile('Call quality · year to date',qy!=null?qy+'%':'—',`${evIn(evs,yStart).length} evaluation(s)`,qy!=null?(qy>=tgt?'var(--ok)':'var(--bad)'):'')}
+  ${tile('Daily performance · this month',fmtScore(pm),latestAvg!=null?`latest day average ${fmtScore(latestAvg)}`:'no scores yet','var(--primary)')}
+  ${tile('Daily performance · year to date',fmtScore(py),`${pf(yStart).length} score(s) uploaded`,'var(--primary)')}</div>
+  <div class="card" style="margin-bottom:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">By team</h2></div><div class="table-wrap"><table class="mini-table"><thead><tr><th>Team</th><th class="num-cell">Call quality · month</th><th class="num-cell">Call quality · YTD</th><th class="num-cell">Daily perf. · month</th><th class="num-cell">Daily perf. · YTD</th><th class="num-cell">Accuracy · month</th></tr></thead><tbody>${teamRows||'<tr><td colspan="6" class="muted">No teams with staff yet.</td></tr>'}</tbody></table></div></div>
+  <div class="grid-2"><div class="card card-pad"><h2>Needs your action <span class="muted" style="font-weight:500">· ${pend.length} · oldest first</span></h2>
   ${pend.length?`<div class="req-list">${pend.map(r=>reqCard(r,quick(r.id))).join('')}</div>`:'<div class="empty"><b>All caught up</b>No pending requests.</div>'}</div>
-  <div class="stack"><div class="card card-pad"><h2>Leave capacity · next 14 days</h2><div class="cap-strip">${caps.join('')}</div><div class="flow-note">Limit: ${S.rules.leaveLimit} staff per day (managers excluded). Red days are greyed out for staff.</div></div>
+  <div class="stack"><div class="card card-pad"><h2>Leave capacity · rest of ${y}</h2><div class="cap-scroll">${capHtml||'<div class="empty-mini">No days left this year.</div>'}</div><div class="flow-note">Limit: ${S.rules.leaveLimit} staff per day (managers excluded). Red days are greyed out for staff. Hover a day for details.</div></div>
   <div class="card card-pad"><h2>By request type <span class="muted" style="font-weight:500">· this month</span></h2><div class="bars">${byType.map(([k,n])=>`<div class="bar-row"><span>${TYPES[k].name}</span><div class="bar-track"><div class="bar-fill" style="width:${n/mx*100}%;--c:${TYPES[k].c}"></div></div><b>${n}</b></div>`).join('')}</div></div></div></div>
-  <div class="card" style="margin-top:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Year to date by staff</h2></div><div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Leave days</th><th class="num-cell">Adherence notes</th><th class="num-cell">Violations</th><th class="num-cell">Avg call score</th><th class="num-cell">KPI accepted</th></tr></thead><tbody>${ytd}</tbody></table></div></div>`;
+  <div class="card" style="margin-top:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Year to date by staff</h2></div><div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Leave days</th><th class="num-cell">Adherence notes</th><th class="num-cell">Violations</th><th class="num-cell">Avg call score</th><th class="num-cell">Accuracy · month</th><th class="num-cell">KPI accepted</th></tr></thead><tbody>${ytd}</tbody></table></div></div>`;
 }
 function filteredRequests(){
   const f=ui.filters,q=f.q.trim().toLowerCase();
@@ -1191,6 +1273,7 @@ function newRecForm(kind){
   if(kind==='eval'){f.vals.date=iso(T);f.vals.callType=LISTS.call_types[0]}
   if(kind==='mom'){f.vals.date=iso(T)}
   if(kind==='task'){f.vals.due=iso(addDays(T,1));f.sendTo='person'}
+  if(kind==='acc'){f.vals.date=iso(T);f.vals.reason=(ACC.reasons[0]||{}).name||''}
   return f;
 }
 function viewCreateForm(){
@@ -1202,21 +1285,30 @@ function viewCreateForm(){
   const sw=(name,title,sub,disabled)=>`<div class="switch-row"><div><b>${title}</b><span>${sub}</span></div><button type="button" class="switch${v[name]?'':' off'}" ${disabled?'disabled style="opacity:.5;cursor:not-allowed"':`data-action="toggleVal" data-name="${name}"`} aria-label="${title}"></button></div>`;
   let main='',side='';
   if(k==='eval'){
-    const R=calcEval(EVAL_FORM,f.ans),tgt=S.rules.qualityTarget;
+    const FORM=f.evalForm||EVAL_FORM;
+    const R=calcEval(FORM,f.ans),tgt=S.rules.qualityTarget;
     const seg=(key,val,opts)=>`<div class="ans">${opts.map(([v2,l,pts])=>`<button type="button" class="${v2}${val===v2?' on':''}" data-action="evAns" data-k="${key}" data-v="${v2}">${l}${pts!=null?`<small>${pts}</small>`:''}</button>`).join('')}</div>`;
-    const secHtml=EVAL_FORM.sections.map((sec,si)=>{const sr=R.sec[si];return `<div class="ev-sec"><div class="ev-sec-head"><b>${esc(sec.name)}</b><span><b>${sr.earned}</b> / ${sr.max}% <button type="button" class="btn sm" data-action="evAllGood" data-s="${si}" title="Set every item in this section to Good">All good</button></span></div>
+    const secHtml=FORM.sections.map((sec,si)=>{const sr=R.sec[si];return `<div class="ev-sec"><div class="ev-sec-head"><b>${esc(sec.name)}</b><span><b>${sr.earned}</b> / ${sr.max}% <button type="button" class="btn sm" data-action="evAllGood" data-s="${si}" title="Set every item in this section to Good">All good</button></span></div>
       ${sec.items.map((it,ii)=>{const key=`items.${si}_${ii}`,val=f.ans.items[si+'_'+ii]||'good';return `<div class="ev-row ${val}"><div><span class="ev-name">${esc(it.name)}</span>${it.ar?`<span class="ar" dir="rtl">${esc(it.ar)}</span>`:''}</div>${seg(key,val,[['good','Good',it.good],['avg','Avg',it.avg],['below','Below',0],...(it.na?[['na','N/A',null]]:[])])}</div>`}).join('')}</div>`}).join('');
-    const bonusHtml=(EVAL_FORM.bonus||[]).length?`<div class="ev-sec"><div class="ev-sec-head"><b>Bonus</b><span>+${R.bonus}%</span></div>${EVAL_FORM.bonus.map((b2,i)=>{const val=f.ans.bonus[i]||'no';return `<div class="ev-row ${val==='yes'?'good':''}"><div><span class="ev-name">${esc(b2.name)}</span>${b2.ar?`<span class="ar" dir="rtl">${esc(b2.ar)}</span>`:''}</div>${seg(`bonus.${i}`,val,[['yes',`Yes +${b2.value}%`,null],['no','No',null]])}</div>`}).join('')}</div>`:'';
-    const tagsHtml=(EVAL_FORM.tags||[]).length?`<div class="ev-sec"><div class="ev-sec-head"><b>Quality tags <span class="muted" style="font-weight:500">· achieved?</span></b><span class="${R.pen?'neg':''}">${R.pen?'−'+R.pen+'%':'no deductions'}</span></div>${EVAL_FORM.tags.map((g,i)=>{const val=f.ans.tags[i]||'yes';return `<div class="ev-row ${val==='no'?'below':''}"><div><span class="ev-name">${esc(g.name)}</span>${g.ar?`<span class="ar" dir="rtl">${esc(g.ar)}</span>`:''}</div>${seg(`tags.${i}`,val,[['yes','Yes',null],['no',`No −${g.penalty}%`,null]])}</div>`}).join('')}</div>`:'';
-    main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Call date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}${field('Call time',inp('time','time'))}${field('Call ID',inp('callId','text','e.g. CL-77219034'))}${field('Call type',`<select name="callType">${LISTS.call_types.map(c=>opt(c,c,c===v.callType)).join('')}</select>`,{req:1})}</div>
+    const bonusHtml=(FORM.bonus||[]).length?`<div class="ev-sec"><div class="ev-sec-head"><b>Bonus</b><span>+${R.bonus}%</span></div>${FORM.bonus.map((b2,i)=>{const val=f.ans.bonus[i]||'no';return `<div class="ev-row ${val==='yes'?'good':''}"><div><span class="ev-name">${esc(b2.name)}</span>${b2.ar?`<span class="ar" dir="rtl">${esc(b2.ar)}</span>`:''}</div>${seg(`bonus.${i}`,val,[['yes',`Yes +${b2.value}%`,null],['no','No',null]])}</div>`}).join('')}</div>`:'';
+    const tagsHtml=(FORM.tags||[]).length?`<div class="ev-sec"><div class="ev-sec-head"><b>Quality tags <span class="muted" style="font-weight:500">· achieved?</span></b><span class="${R.pen?'neg':''}">${R.pen?'−'+R.pen+'%':'no deductions'}</span></div>${FORM.tags.map((g,i)=>{const val=f.ans.tags[i]||'yes';return `<div class="ev-row ${val==='no'?'below':''}"><div><span class="ev-name">${esc(g.name)}</span>${g.ar?`<span class="ar" dir="rtl">${esc(g.ar)}</span>`:''}</div>${seg(`tags.${i}`,val,[['yes','Yes',null],['no',`No −${g.penalty}%`,null]])}</div>`}).join('')}</div>`:'';
+    main=`<div class="form-grid">${field('Staff member',f.amendId?`<input value="${esc(user(v.staff).name)}" disabled>`:staffSel,{req:1})}${field('Call date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}${field('Call time',inp('time','time'))}${field('Call ID',inp('callId','text','e.g. CL-77219034'))}${field('Call type',`<select name="callType">${LISTS.call_types.map(c=>opt(c,c,c===v.callType)).join('')}</select>`,{req:1})}</div>
     <div class="flow-note" style="margin:18px 0 6px">Every item starts at <b>Good</b> — just change the ones that weren’t.</div><div class="ev-mscore mobile-only"><span>Overall <b style="color:${R.overall>=tgt?'var(--ok)':'var(--bad)'}">${R.overall}%</b></span><span>Monitor ${R.monitor}%</span><span>Tags ${R.pen?'−'+R.pen:'0'}</span></div>${secHtml}${bonusHtml}${tagsHtml}
-    <div class="form-grid" style="margin-top:18px">${field('Feedback',ta('feedback','What went well, and what to improve'),{full:1,req:1,invalid:e.feedback,hint:e.feedback})}${files('e.g. evaluation form or call notes')}</div>`;
+    <div class="form-grid" style="margin-top:18px">${field('Feedback',ta('feedback','What went well, and what to improve'),{full:1,req:1,invalid:e.feedback,hint:e.feedback})}${f.amendId?'':files('e.g. evaluation form or call notes')}</div>`;
     side=`<div class="card card-pad ev-score"><div class="score-box" style="margin:0 0 12px"><div class="score-num" style="color:${R.overall>=tgt?'var(--ok)':'var(--bad)'}">${R.overall}%</div><div><b>Overall score</b><span style="display:block">Target ${tgt}%</span></div></div>
       <div class="ev-break">${R.sec.map(x=>`<div><span>${esc(x.name)}</span><b>${x.earned} / ${x.max}</b></div>`).join('')}<div><span>Bonus</span><b>+${R.bonus}</b></div><div class="tot"><span>Monitor score</span><b>${R.monitor}%</b></div><div><span>Quality tag deductions</span><b class="${R.pen?'neg':''}">${R.pen?'−'+R.pen:'0'}</b></div><div class="tot"><span>Overall score</span><b>${R.overall}%</b></div></div></div>
     <div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Staff must tap “I’ve read this”')}${sw('countInScore','Count in end-of-cycle score','Included in the staff member’s average')}</div>`;
   }else if(k==='vio'){
     main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Violation type',`<select name="vtype">${LISTS.vtypes.map(s=>opt(s,s,s===v.vtype)).join('')}</select>`,{req:1})}${field('Date of violation',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}<div></div>${field('Details',ta('details','What happened'),{full:1,req:1,invalid:e.details,hint:e.details})}${files('Optional')}</div>`;
     side=`<div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Staff must tap “I’ve read this”')}</div>`;
+  }else if(k==='acc'){
+    const rs=ACC.reasons.find(x=>x.name===v.reason)||ACC.reasons[0]||{name:'',impact:0},[ma,mb]=monthBounds(v.date?parse(v.date):today());
+    const now=accScore(v.staff,ma,mb),after=Math.max(0,r2(now-(+rs.impact||0)));
+    main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}
+    ${field('Reason',`<select name="reason">${ACC.reasons.map(x=>opt(x.name,`${x.name} · −${x.impact}%`,x.name===v.reason)).join('')}</select>`,{req:1,full:1,invalid:e.reason,hint:e.reason})}
+    ${field('Details',ta('details','What happened (shown to the staff member)'),{full:1,req:1,invalid:e.details,hint:e.details})}${files('Optional')}</div>`;
+    side=`<div class="card card-pad"><h2>Accuracy score · ${MONL[parse(ma).getMonth()]}</h2><div class="ev-break"><div><span>Starting score</span><b>${accBase(v.staff)}%</b></div><div><span>Notes so far (${accNotes(v.staff,ma,mb).length})</span><b class="neg">−${r2(accBase(v.staff)-now)}</b></div><div><span>This note</span><b class="neg">−${rs.impact}</b></div><div class="tot"><span>Score after this note</span><b>${after}%</b></div></div></div>
+    <div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Staff must tap “I’ve read this”')}</div>`;
   }else if(k==='adh'){
     main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Reason',`<select name="reason">${LISTS.adh_reasons.map(s=>opt(s,s,s===v.reason)).join('')}</select>`,{req:1})}${field('Date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}${field('Note',ta('note','e.g. certificate received'),{full:1})}${files('e.g. sick certificate')}</div>`;
     side=callout('info','info','Internal only','Adherence notes are not sent to the staff member. They adjust adherence data and appear in the dashboard.');
@@ -1239,8 +1331,8 @@ function viewCreateForm(){
     side=`<div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Track who has read it')}${sw('emailCopy','Email a copy','Official record in Outlook · coming in the real version',true)}</div>
     <div class="card card-pad"><h2>Recipients</h2><div class="exp-summary" style="margin:0"><span style="color:var(--primary)">${ic('users',26)}</span><div><b>${n}</b> <span>staff will receive this</span></div></div></div>`;
   }
-  return `<button class="back" data-action="nav" data-view="create">${ic('back',16)} Send to staff</button>`+head(t.name,t.desc,'',bubble(k,0,1))+
-   `<form id="recForm" novalidate><div class="grid-2"><div class="card card-pad">${main}<div class="form-actions"><button type="button" class="btn" data-action="nav" data-view="create">Cancel</button><button type="submit" class="btn primary">${ic('check',16)} ${k==='adh'?'Save note':k==='mom'?'Send minutes':k==='vio'?'Send ticket':k==='task'?'Assign task':'Send to staff'}</button></div></div><div class="stack">${side}</div></div></form>`;
+  return `<button class="back" data-action="nav" data-view="${f.amendId?'quality':'create'}">${ic('back',16)} ${f.amendId?'Quality':'Send to staff'}</button>`+(f.amendId?head(`Edit evaluation ${f.amendId}`,`${esc(user(v.staff).name)} will be asked to acknowledge it again`,'',bubble(k,0,1)):head(t.name,t.desc,'',bubble(k,0,1)))+
+   `<form id="recForm" novalidate><div class="grid-2"><div class="card card-pad">${main}<div class="form-actions"><button type="button" class="btn" data-action="nav" data-view="create">Cancel</button><button type="submit" class="btn primary">${ic('check',16)} ${f.amendId?'Save changes':k==='adh'?'Save note':k==='mom'?'Send minutes':k==='vio'?'Send ticket':k==='task'?'Assign task':k==='acc'?'Send note':'Send to staff'}</button></div></div><div class="stack">${side}</div></div></form>`;
 }
 function momRecipients(f){
   if(f.sendTo==='all')return staffUsers().map(u=>u.id);
@@ -1273,9 +1365,9 @@ function viewRules(){
   </div><div class="form-actions">${b.id?`<button class="btn" data-action="cancelBlockEdit">Cancel</button>`:''}<button class="btn primary" data-action="addBlock">${ic(b.id?'check':'lock',16)} ${b.id?'Save changes':'Add block'}</button></div></div></div></div>`;
 }
 function viewAdmin(){
-  const tabs=[['users','Users'],['teams','Teams'],['lists','Lists'],['form','Evaluation form'],['rules','Rules & blocks']];
+  const tabs=[['users','Users'],['teams','Teams'],['lists','Lists'],['form','Evaluation form'],['accuracy','Accuracy'],['rules','Rules & blocks']];
   const tab=ui.adminTab||'users';
-  const body=tab==='teams'?adminTeams():tab==='lists'?adminLists():tab==='form'?adminForm():tab==='rules'?viewRules():adminUsers();
+  const body=tab==='teams'?adminTeams():tab==='lists'?adminLists():tab==='form'?adminForm():tab==='accuracy'?adminAccuracy():tab==='rules'?viewRules():adminUsers();
   return head('Admin','Users, teams, lists and rules.',tab==='users'?`<button class="btn primary" data-action="userNew">${ic('plus',16)} Add user</button>`:'')+
     `<div class="tabs">${tabs.map(([k,l])=>`<button class="${k===tab?'on':''}" data-action="adminTab" data-t="${k}">${l}</button>`).join('')}</div>${body}`;
 }
@@ -1316,6 +1408,19 @@ function adminForm(){
 }
 const getPath=(o,path)=>path.split('.').reduce((a,k)=>a==null?a:a[k],o);
 function setPath(o,path,v){const ks=path.split('.'),last=ks.pop();const t=ks.reduce((a,k)=>a[k],o);t[last]=v}
+function adminAccuracy(){
+  const d=ui.accDraft||(ui.accDraft=JSON.parse(JSON.stringify(ACC))),dirty=JSON.stringify(d)!==JSON.stringify(ACC);
+  const grip=`<span class="grip" title="Drag to reorder" aria-label="Drag to reorder"><i></i><i></i><i></i></span>`;
+  const [ma,mb]=monthBounds(today());
+  return `<div class="ef-top card card-pad"><div><b>Accuracy score</b><div class="flow-note" style="margin:2px 0 0">Each staff member starts every month with their starting score. Each accuracy note deducts its reason’s amount — e.g. 5% with two 0.4% notes = 4.2%. It never goes below 0.</div></div>
+   <div class="form-actions" style="margin:0">${dirty?`<span class="pill need">Unsaved</span><button class="btn" data-action="accReset">Undo changes</button>`:''}<button class="btn primary" data-action="accSave" ${dirty?'':'disabled style="opacity:.5"'}>${ic('check',16)} Save</button></div></div>
+  <div class="grid-2 even-rules" style="grid-template-columns:1fr 1fr">
+   <div class="stack"><div class="card card-pad"><h2>Default starting score</h2><div class="switch-row"><div><b>Every staff member</b><span>Unless set differently on the right</span></div><div class="num"><input type="number" min="0" step="0.1" data-accv="base" value="${d.base}" style="width:70px"><span class="num-unit">%</span></div></div></div>
+   <div class="card card-pad ef-card"><h2>Reasons <span class="muted" style="font-weight:500">· deduction per note</span></h2><div data-drag="acc:reasons">${d.reasons.map((x,i)=>`<div class="ef-row acc-row" data-idx="${i}">${grip}<input class="input" data-accv="reasons.${i}.name" value="${esc(x.name)}" placeholder="Reason"><div class="num"><input type="number" min="0" step="0.1" data-accv="reasons.${i}.impact" value="${x.impact}" style="width:62px"><span class="num-unit">%</span></div><button class="btn sm icon bad" data-action="accDelReason" data-i="${i}" ${d.reasons.length>1?'':'disabled style="opacity:.35"'} title="Remove">${ic('trash',14)}</button></div>`).join('')}</div>
+    <button class="btn sm" data-action="accAddReason" style="margin-top:8px">${ic('plus',14)} Add reason</button></div></div>
+   <div class="card card-pad"><h2>Starting score per staff <span class="muted" style="font-weight:500">· leave empty to use ${d.base}%</span></h2><div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Starting score</th><th class="num-cell">This month</th></tr></thead><tbody>
+   ${staffUsers().map(u=>{const v=d.perStaff[u.id];return `<tr><td><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:12px">${esc(teamName(u.team))}</div></td><td class="num-cell"><div class="num" style="margin-left:auto"><input type="number" min="0" step="0.1" data-accu="${u.id}" value="${v==null?'':v}" placeholder="${d.base}" style="width:70px"><span class="num-unit">%</span></div></td><td class="num-cell">${accScore(u.id,ma,mb)}% <span class="muted" style="font-size:12px">· ${accNotes(u.id,ma,mb).length} note(s)</span></td></tr>`}).join('')}</tbody></table></div></div></div>`;
+}
 function adminLists(){
   ui.listDraft=ui.listDraft||{};
   return `<div class="list-grid">${Object.entries(LIST_META).map(([k,m])=>{
@@ -1525,17 +1630,17 @@ function staffDrawer(uid){
 }
 function exportCycle(){
   const Q=qScope(),from=Q.from,fromIso=iso(new Date(from)),star=mostImproved(Q.ids),trendTxt={up:'Improving',down:'Slipping',flat:'Steady',new:'Too few calls'};
-  const head=['Employee','Employee ID','Team','Evaluations','Avg call score %','Trend','Flags','Latest daily performance %','Avg daily performance % (period)','KPI requests accepted','Violations','Adherence notes'];
+  const head=['Employee','Employee ID','Team','Evaluations','Avg call score %','Trend','Flags','Latest daily performance %','Avg daily performance % (period)','Accuracy notes (period)','Accuracy deducted % (period)','KPI requests accepted','Violations','Adherence notes'];
   const rows=Q.staff.map(u=>{const e=Q.cur.filter(r=>r.recipients[0]===u.id),q=staffQuality(u.id),ps=perfOf(u.id),pp=ps.filter(p=>p.date>=fromIso);
     const fl=[q.coaching?'Needs coaching':'',...q.repeat.map(c=>'Repeat issue: '+c),star===u.id?'Most improved':''].filter(Boolean).join('; ');
-    return [u.name,u.emp,teamName(u.team),e.length,avgOf(e.map(r=>evScore(r)))??'',trendTxt[q.trend],fl,ps.length?ps.at(-1).score:'',pp.length?Math.round(pp.reduce((a,p)=>a+p.score,0)/pp.length*10)/10:'',
+    return [u.name,u.emp,teamName(u.team),e.length,avgOf(e.map(r=>evScore(r)))??'',trendTxt[q.trend],fl,ps.length?ps.at(-1).score:'',pp.length?Math.round(pp.reduce((a,p)=>a+p.score,0)/pp.length*10)/10:'',accNotes(u.id,fromIso,iso(new Date(Q.to))).length,r2(accNotes(u.id,fromIso,iso(new Date(Q.to))).reduce((t,r)=>t+(+r.data.impact||0),0)),
       S.requests.filter(r=>r.type==='kpi'&&r.userId===u.id&&r.status==='approved'&&r.createdAt>=from).length,
       S.records.filter(r=>r.kind==='vio'&&r.recipients.includes(u.id)&&r.createdAt>=from).length,
       S.records.filter(r=>r.kind==='adh'&&r.recipients.includes(u.id)&&r.createdAt>=from).length]});
   const secN=EVAL_FORM.sections.map(x=>x.name);
   const evRows=[['Date','Employee','Employee ID','Team','Call type','Call ID','Evaluator',...secN.map(n=>n+' %'),'Bonus %','Monitor score %','Tag deductions %','Overall score %','Quality tags not achieved','Feedback','Acknowledged']];
   Q.cur.slice().sort((a,b)=>evalTime(a)-evalTime(b)).forEach(r=>{const u=user(r.recipients[0]);const R=r.data.result;evRows.push([{d:r.data.date},u.name,u.emp,teamName(u.team),r.data.callType||'',r.data.callId||'',user(r.createdBy).name,...secN.map(n=>{const x=R&&R.sec.find(z=>z.name===n);return x?x.pct:''}),R?R.bonus:'',R?R.monitor:'',R?R.pen:'',evScore(r),R?R.tags.filter(t=>t.a==='no').map(t=>t.name).join('; '):'',r.data.feedback||'',r.acks[u.id]?'Yes':'No'])});
-  downloadXlsx(`cycle-summary-${iso(today())}.xlsx`,[{name:'Cycle summary',rows:[head,...rows],widths:[22,13,24,12,15,14,40,18,20,14,11,14]},{name:'Call evaluations',rows:evRows,widths:[12,22,13,24,16,16,18,...secN.map(()=>16),10,14,14,14,34,50,13]}]);
+  downloadXlsx(`cycle-summary-${iso(today())}.xlsx`,[{name:'Cycle summary',rows:[head,...rows],widths:[22,13,24,12,15,14,40,18,20,14,16,14,11,14]},{name:'Call evaluations',rows:evRows,widths:[12,22,13,24,16,16,18,...secN.map(()=>16),10,14,14,14,34,50,13]}]);
   toast(`Cycle summary exported · ${rows.length} staff`);
 }
 
@@ -1705,6 +1810,7 @@ function viewMyPerf(){
    ${tile('Violation tickets',recs.filter(r=>r.kind==='vio').length,'',recs.some(r=>r.kind==='vio')?'var(--bad)':'')}
    ${tile('Minutes of meeting',recs.filter(r=>r.kind==='mom').length,'')}
    ${tile('Waiting for you',recs.filter(r=>r.requireAck&&!r.acks[uid]).length,'to acknowledge',recs.some(r=>r.requireAck&&!r.acks[uid])?'var(--warn)':'')}
+   ${(()=>{const p=ui.my.period,mm=/^\d{4}-\d{2}$/.test(p)?p:p==='lastmonth'?R.a.slice(0,7):p==='month'?R.a.slice(0,7):iso(today()).slice(0,7),[a,b]=monthBounds(parse(mm+'-01'));return tile(`Accuracy · ${MONL[+mm.slice(5)-1]}`,accScore(uid,a,b)+'%',`starting ${accBase(uid)}% · ${accNotes(uid,a,b).length} note(s)`,accNotes(uid,a,b).length?'var(--warn)':'var(--ok)')})()}
    ${tile('Tasks',tasks.length,`${tasks.filter(r=>tState(r,uid).status==='confirmed').length} completed · ${tasks.filter(r=>tState(r,uid).status==='open').length} to do`)}
    ${tile('Requests accepted',reqs.filter(r=>r.status==='approved').length,`of ${reqs.filter(r=>['approved','rejected'].includes(r.status)).length} decided`,'var(--ok)')}
    ${tile('Requests rejected',reqs.filter(r=>r.status==='rejected').length,'')}
@@ -1790,7 +1896,7 @@ function reqDetails(r){
     case 'swap':return kv('Dates',rngL(x))+kv('Days',daysBetween(dS(x),dE(x)))+kv('Swap with',esc(user(r.partnerId).name),1)+kv(`${esc(user(r.userId).name.split(' ')[0])}’s shift`,esc(x.myShift===OFF&&x.myOffDate?`Day off · ${fmtL(x.myOffDate)}`:x.myShift))+kv(`${esc(user(r.partnerId).name.split(' ')[0])}’s shift`,esc(x.theirShift===OFF&&x.theirOffDate?`Day off · ${fmtL(x.theirOffDate)}`:x.theirShift));
     case 'change':return kv('Dates',rngL(x))+kv('Days',daysBetween(dS(x),dE(x)))+kv('Current shift',esc(x.current===OFF&&x.currentOffDate?`Day off · ${fmtL(x.currentOffDate)}`:x.current))+kv('Requested shift',esc(x.requested===OFF&&x.requestedOffDate?`Day off · ${fmtL(x.requestedOffDate)}`:x.requested));
     case 'dispute':return kv('Score date',fmtL(x.date))+kv('Score',fmtScore(x.score))+(x.corrected!=null?kv('Corrected score',fmtScore(x.corrected),1):'');
-    case 'special':return kv('For schedule',esc(x.schedule))+kv('Period',esc(x.period==='Specific dates'?x.dates:x.period))+kv('Preference',esc((x.prefs||[]).join(', ')),1);
+    case 'special':return kv('For schedule',esc(x.schedule))+kv('Period',esc(x.period==='Specific dates'?((x.days||[]).length?x.days.map(fmt).join(', '):x.dates||'—'):x.period))+kv('Preferred shift(s)',esc((x.prefs||[]).join(', ')),1);
     case 'kpi':return kv('KPI affected',esc(x.kpi))+kv('Date',fmtL(x.date));
   }
 }
@@ -1850,6 +1956,14 @@ function evalBreakdownHtml(x){
   ${(form.bonus||[]).length?`<div class="d-section"><h4>Bonus</h4><div class="ev-list">${form.bonus.map((b2,i)=>`<div><span>${esc(b2.name)}</span><span class="achip ${(x.ans.bonus||{})[i]==='yes'?'good':'na'}">${(x.ans.bonus||{})[i]==='yes'?'Yes +'+b2.value:'No'}</span></div>`).join('')}</div></div>`:''}
   ${R.tags.length?`<div class="d-section"><h4>Quality tags</h4><div class="ev-list">${R.tags.map(t=>`<div><span>${esc(t.name)}</span><span class="achip ${t.a==='no'?'below':'good'}">${t.a==='no'?'Not achieved −'+t.penalty:'Achieved'}</span></div>`).join('')}</div></div>`:''}`;
 }
+function discussionHtml(r){
+  const cs=r.comments||[],am=(r.data.amended||[]);
+  return `<div class="d-section disc"><h4>Discussion${cs.length?` · ${cs.length}`:''}</h4>
+  ${am.length?`<div class="amend-log">${am.map(a=>`<div>${ic('edit',13)} Amended by ${esc(user(a.by).name)} · ${fmtTs(a.at)}${a.before!=null?` · ${a.before}% → ${a.after}%`:''}</div>`).join('')}</div>`:''}
+  ${cs.length?`<div class="comments">${cs.map(c=>{const u=user(c.by),w=u.role==='wfm';return `<div class="cmt${w?' wfm':''}"><span class="av">${initials(u.name)}</span><div><b>${esc(u.name)}</b> <span class="muted">${w?'WFM / Manager · ':''}${fmtTs(c.at)}</span><p>${esc(c.text)}</p></div></div>`}).join('')}</div>`
+   :`<div class="empty-mini" style="padding:2px 0 10px">${isWfm()?'No comments yet.':'Questions about this evaluation? Write to your team leader here.'}</div>`}
+  <div class="cmt-new"><textarea class="input" id="commentText" rows="2" placeholder="Write a comment…"></textarea><button class="btn" data-action="postComment" data-id="${r.id}">${ic('check',15)} Post</button></div></div>`;
+}
 function recDrawer(r){
   const x=r.data,uid=S.current,wfm=isWfm();let body='';
   if(r.kind==='eval'&&x.result){
@@ -1865,12 +1979,18 @@ function recDrawer(r){
     <div class="d-section"><h4>Summary</h4><div class="note-box">${esc(x.summary)}</div></div>${x.actions?`<div class="d-section"><h4>Action items</h4><div class="note-box">${esc(x.actions)}</div></div>`:''}`;
   }else if(r.kind==='vio'){
     body=`<div class="d-section"><div class="kv">${kv('Violation type',esc(x.vtype))+kv('Date',fmtL(x.date))+kv('Issued by',esc(user(r.createdBy).name),1)}</div></div><div class="d-section"><h4>Details</h4><div class="note-box">${esc(x.details)}</div></div>`;
+  }else if(r.kind==='acc'){
+    const sid=r.recipients[0],[ma,mb]=monthBounds(parse(x.date));
+    body=`<div class="d-section"><div class="kv">${kv('Staff member',esc(user(sid).name))+kv('Date',fmtL(x.date))+kv('Reason',esc(x.reason),1)+kv('Deduction',`−${x.impact}%`)+kv('Issued by',esc(user(r.createdBy).name))}</div></div>
+    ${x.details?`<div class="d-section"><h4>Details</h4><div class="note-box">${esc(x.details)}</div></div>`:''}
+    <div class="d-section"><h4>Accuracy score · ${MONL[parse(ma).getMonth()]} ${parse(ma).getFullYear()}</h4><div class="ev-break"><div><span>Starting score</span><b>${accBase(sid)}%</b></div><div><span>Accuracy notes this month</span><b>${accNotes(sid,ma,mb).length}</b></div><div class="tot"><span>Current score</span><b>${accScore(sid,ma,mb)}%</b></div></div></div>`;
   }else if(r.kind==='task'){
     body=`<div class="d-section"><div class="kv">${kv('Task',esc(x.title),1)+kv('Due',fmtL(x.due))+kv('Assigned by',esc(user(r.createdBy).name))}</div></div>${x.details?`<div class="d-section"><h4>Details</h4><div class="note-box">${esc(x.details)}</div></div>`:''}`;
   }else if(r.kind==='adh'){
     body=`<div class="d-section"><div class="kv">${kv('Staff member',esc(user(r.recipients[0]).name))+kv('Reason',esc(x.reason))+kv('Date',fmtL(x.date||x.from))+kv('Created by',esc(user(r.createdBy).name),1)}</div></div>${x.note?`<div class="d-section"><h4>Note</h4><div class="note-box">${esc(x.note)}</div></div>`:''}`;
   }
   if(r.files.length)body+=`<div class="d-section"><h4>Attachments</h4>${fileList(r.files)}</div>`;
+  if(r.kind==='eval')body+=discussionHtml(r);
   let foot='';
   if(r.kind==='task'){
     if(wfm){
@@ -1891,6 +2011,7 @@ function recDrawer(r){
     if(a)foot=`<div class="d-foot"><div class="ack-done">${ic('check',16)} You acknowledged this on ${fmtTs(a.at)}</div>${a.reply?`<div class="note-box">Your reply: ${esc(a.reply)}</div>`:''}</div>`;
     else foot=`<div class="d-foot"><textarea class="input" id="ackReply" rows="2" placeholder="Reply (optional)"></textarea><div class="row"><button class="btn ok" data-action="ack" data-id="${r.id}">${ic('check',16)} I’ve read this · Acknowledge</button></div></div>`;
   }
+  if(wfm&&r.kind==='eval'&&x.result)foot=`<div class="d-foot"><div class="row"><button class="btn" data-action="amendEval" data-id="${r.id}">${ic('edit',16)} Edit evaluation</button></div></div>`;
   return `<div class="sheet-handle"></div><div class="d-head">${bubble(r.kind,1,1)}<div><h3>${RECS[r.kind].name}</h3><small>${r.id} · ${fmtTs(r.createdAt)}</small></div><button class="btn icon" data-action="closeDrawer" aria-label="Close">${ic('x',18)}</button></div><div class="d-body">${body}</div>${foot}`;
 }
 
@@ -1919,13 +2040,14 @@ function submitRequest(){
       data={start:st,end:en,current:v.current,requested:v.requested,currentOffDate:v.current===OFF?v.currentOffDate:'',requestedOffDate:v.requested===OFF?v.requestedOffDate:'',reason:v.reason||''}}
   }else if(f.type==='special'){
     if(!f.prefs.length)e.prefs='Pick at least one preference';if(!(v.details||'').trim())e.details='Please explain your request';
-    if(v.period==='Specific dates'&&!(v.dates||'').trim())e.dates='Enter the dates';
-    {const [ma,mb]=monthRange(v.schedule);if(blockedInRange(uid,'special',ma,mb).length)e.schedule=`Requests for ${v.schedule} are blocked by WFM`}
-    data={schedule:v.schedule,period:v.period,dates:v.dates||'',prefs:[...f.prefs],details:v.details||''};
+    const [ma,mb]=monthRange(v.schedule),days=(f.days||[]).filter(d=>d>=ma&&d<=mb).sort();
+    if(v.period==='Specific dates'){if(!days.length)e.days='Pick at least one day';else if(days.some(d=>blockOn(uid,'special',d)))e.days='Some picked days are blocked by WFM'}
+    else if(blockedInRange(uid,'special',ma,mb).length)e.schedule=`Requests for ${v.schedule} are blocked by WFM`;
+    data={schedule:v.schedule,period:v.period,days:v.period==='Specific dates'?days:[],prefs:[...f.prefs],details:v.details||''};
   }else if(f.type==='kpi'){
-    if(!v.date)e.date='Pick the date';if(!(v.justification||'').trim())e.justification='Please explain what happened';if(!f.files.length)e.files='Attach at least one supporting file';
+    if(!(f.kpis||[]).length)e.kpis='Pick at least one KPI';if(!v.date)e.date='Pick the date';if(!(v.justification||'').trim())e.justification='Please explain what happened';if(!f.files.length)e.files='Attach at least one supporting file';
     if(!e.date&&v.date&&blockOn(uid,'kpi',v.date))e.date=`This date is blocked by WFM: ${blockOn(uid,'kpi',v.date).reason||'no reason given'}`;
-    data={kpi:v.kpi,date:v.date,justification:v.justification||''};
+    data={kpi:(f.kpis||[])[0],date:v.date,justification:v.justification||''};
   }
   f.errors=e;
   if(Object.keys(e).length){render();toast('Please fix the highlighted fields',true);return}
@@ -1936,20 +2058,23 @@ function submitRequest(){
       r.data=data;r.files=f.files;r.status=status;if(f.type==='swap')r.partnerId=v.partnerId;const act=orig.status==='returned'?'Resubmitted':'Edited';r.history.push(mkH(act));
       await patchReq(r,orig.status);await fetchAll();ui.mineFilter='all';go('mine');toast(`${r.id} ${act==='Edited'?'updated':'resubmitted'}`);
     }else{
-      const r={type:f.type,userId:uid,partnerId:f.type==='swap'?v.partnerId:null,status,data,files:f.files,history:[mkH('Submitted')]};
-      const rows=await api('requests',{method:'POST',prefer:'return=representation',body:reqToDb(r)});
-      await fetchAll();ui.mineFilter='all';go('mine');toast(f.type==='swap'?`Sent to ${user(v.partnerId).name} for approval`:`${rows[0].id} submitted to WFM`);
+      const list=f.type==='kpi'?f.kpis.map(k=>({...data,kpi:k})):[data];
+      const body=list.map(d=>reqToDb({type:f.type,userId:uid,partnerId:f.type==='swap'?v.partnerId:null,status,data:d,files:f.files,history:[mkH('Submitted')]}));
+      const rows=await api('requests',{method:'POST',prefer:'return=representation',body:body.length===1?body[0]:body});
+      await fetchAll();ui.mineFilter='all';go('mine');toast(f.type==='swap'?`Sent to ${user(v.partnerId).name} for approval`:rows.length>1?`${rows.length} KPI requests submitted (${rows.map(x=>x.id).join(', ')})`:`${rows[0].id} submitted to WFM`);
     }
   });
 }
 function submitRecord(){
   const f=ui.form,v=f.vals,e={};let data={},recipients=[v.staff];
-  if(f.kind==='eval'){if(!v.date)e.date='Pick the date';if(!(v.feedback||'').trim())e.feedback='Feedback is required';const form=JSON.parse(JSON.stringify(EVAL_FORM));data={date:v.date,time:v.time||'',callId:v.callId||'',callType:v.callType||LISTS.call_types[0],form,ans:JSON.parse(JSON.stringify(f.ans)),result:calcEval(form,f.ans),feedback:v.feedback||'',countInScore:!!v.countInScore}}
+  if(f.kind==='eval'){if(!v.date)e.date='Pick the date';if(!(v.feedback||'').trim())e.feedback='Feedback is required';const form=JSON.parse(JSON.stringify(f.evalForm||EVAL_FORM));data={date:v.date,time:v.time||'',callId:v.callId||'',callType:v.callType||LISTS.call_types[0],form,ans:JSON.parse(JSON.stringify(f.ans)),result:calcEval(form,f.ans),feedback:v.feedback||'',countInScore:!!v.countInScore}}
   if(f.kind==='vio'){if(!v.date)e.date='Pick the date';if(!(v.details||'').trim())e.details='Details are required';data={vtype:v.vtype,date:v.date,details:v.details||''}}
   if(f.kind==='adh'){if(!v.date)e.date='Pick the date';data={reason:v.reason,date:v.date,note:v.note||''}}
+  if(f.kind==='acc'){const rs=ACC.reasons.find(x=>x.name===v.reason);if(!rs)e.reason='Pick a reason';if(!v.date)e.date='Pick the date';if(!(v.details||'').trim())e.details='Please describe what happened';data={reason:v.reason,impact:rs?+rs.impact:0,date:v.date,details:v.details||''}}
   if(f.kind==='task'){recipients=momRecipients(f);if(f.sendTo==='teams'&&!f.teams.length)e.teams='Pick at least one team';if(!recipients.length)e.teams='Nobody to assign to';if(!(v.title||'').trim())e.title='Describe the task';if(!v.due)e.due='Pick a due date';data={title:(v.title||'').trim(),details:v.details||'',due:v.due,sendTo:f.sendTo,teams:[...f.teams]}}
   if(f.kind==='mom'){recipients=momRecipients(f);if(f.sendTo==='teams'&&!f.teams.length)e.teams='Pick at least one team';if(!(v.title||'').trim())e.title='Title is required';if(!v.date)e.date='Pick the date';if(!(v.summary||'').trim())e.summary='Summary is required';data={title:v.title,date:v.date,summary:v.summary||'',actions:v.actions||'',sendTo:f.sendTo,teams:[...f.teams]}}
   f.errors=e;if(Object.keys(e).length){render();toast('Please fix the highlighted fields',true);return}
+  if(f.amendId){const id=f.amendId;busy(async()=>{await rpc('amend_eval',{p_id:id,p_data:data,p_by:S.current});await fetchAll();go('quality');toast(`${id} updated · ${user(recipients[0]).name} will be asked to acknowledge again`)});return}
   const r={kind:f.kind,createdBy:S.current,recipients,requireAck:f.kind==='adh'||f.kind==='task'?false:!!v.requireAck,data,files:f.files};
   busy(async()=>{
     const rows=await api('records',{method:'POST',prefer:'return=representation',body:recToDb(r)});const id=rows[0].id;
@@ -2013,6 +2138,17 @@ document.addEventListener('click',ev=>{
       const clean=JSON.parse(JSON.stringify(d));clean.sections.forEach(sec=>{sec.name=sec.name.trim();sec.items.forEach(it=>{it.name=it.name.trim();it.ar=(it.ar||'').trim();it.good=+it.good;it.avg=+it.avg;it.na=!!it.na})});
       (clean.bonus||[]).forEach(b2=>{b2.value=+b2.value});(clean.tags||[]).forEach(t=>{t.penalty=+t.penalty});
       busy(async()=>{await api('settings?on_conflict=key',{method:'POST',prefer:'resolution=merge-duplicates',body:{key:'eval_form',value:clean}});await fetchAll();ui.formDraft=null;render();toast('Evaluation form saved')});break}
+    case 'postComment':{const t=(($('#commentText')||{}).value||'').trim();if(!t){toast('Write a comment first',true);break}busy(async()=>{await rpc('add_comment',{p_id:id,p_uid:S.current,p_text:t});await fetchAll();renderDrawer();toast('Comment posted')});break}
+    case 'amendEval':{const r=S.records.find(x=>x.id===id);if(!r)break;const f=newRecForm('eval');Object.assign(f.vals,{staff:r.recipients[0],date:r.data.date,time:r.data.time||'',callId:r.data.callId||'',callType:r.data.callType||LISTS.call_types[0],feedback:r.data.feedback||'',countInScore:r.data.countInScore!==false,requireAck:true});
+      f.ans=clone(r.data.ans||{items:{},bonus:{},tags:{}});f.evalForm=clone(r.data.form||EVAL_FORM);f.amendId=r.id;ui.form=f;closeDrawer(true);ui.view='createForm';render();window.scrollTo(0,0);break}
+    case 'accReset':ui.accDraft=null;render();break;
+    case 'accAddReason':ui.accDraft.reasons.push({name:'',impact:0.4});render();break;
+    case 'accDelReason':ui.accDraft.reasons.splice(+el.dataset.i,1);render();break;
+    case 'accSave':{const d=ui.accDraft;if(!(+d.base>=0)){toast('Starting score must be 0 or more',true);break}
+      if(d.reasons.some(x=>!String(x.name).trim())){toast('Every reason needs a name',true);break}if(d.reasons.some(x=>!(+x.impact>=0))){toast('Deductions must be 0 or more',true);break}
+      if(new Set(d.reasons.map(x=>x.name.trim().toLowerCase())).size!==d.reasons.length){toast('Two reasons have the same name',true);break}
+      const clean={base:+d.base,perStaff:Object.fromEntries(Object.entries(d.perStaff||{}).filter(([k,v])=>v!==''&&v!=null&&isFinite(+v)).map(([k,v])=>[k,+v])),reasons:d.reasons.map(x=>({name:x.name.trim(),impact:+x.impact}))};
+      busy(async()=>{await api('settings?on_conflict=key',{method:'POST',prefer:'resolution=merge-duplicates',body:{key:'accuracy',value:clean}});await fetchAll();ui.accDraft=null;render();toast('Accuracy settings saved')});break}
     case 'createTab':ui.createTab=el.dataset.t;render();break;
     case 'taskFilter':ui.taskFilter=el.dataset.f;render();break;
     case 'taskDoneOpen':openDrawer('rec',id);setTimeout(()=>{const n=$('#taskNote');if(n)n.focus()},250);break;
@@ -2080,6 +2216,10 @@ document.addEventListener('click',ev=>{
     case 'calPick':{const c=ui.form.cal,d=el.dataset.d;ui.form.errors.dates=null;c.info=d;
       if(!c.start||c.end||d<c.start){c.start=d;c.end=null}else if(d===c.start){c.start=null}else{const pr=leaveProblem(c.start,d,ui.form.editingId);if(pr){toast(pr,true)}else c.end=d}
       render();break}
+    case 'toggleKpi':{const k=el.dataset.k,f=ui.form;f.kpis=f.kpis||[];if(f.editingId)f.kpis=[k];else{const i=f.kpis.indexOf(k);i>=0?f.kpis.splice(i,1):f.kpis.push(k)}f.errors.kpis=null;render();break}
+    case 'spDay':{const d=el.dataset.d,f=ui.form;f.days=f.days||[];const i=f.days.indexOf(d);i>=0?f.days.splice(i,1):f.days.push(d);f.errors.days=null;render();break}
+    case 'prefMore':ui.form.prefMore=true;render();break;
+    case 'comboPick':{ui.form.vals[el.dataset.n]=el.dataset.id;render();break}
     case 'togglePref':{const p=el.dataset.p,arr=ui.form.prefs,i=arr.indexOf(p);i>=0?arr.splice(i,1):arr.push(p);render();break}
     case 'rmFile':ui.form.files.splice(+el.dataset.i,1);render();break;
     case 'mineFilter':ui.mineFilter=el.dataset.f;render();break;
@@ -2120,11 +2260,13 @@ document.addEventListener('click',ev=>{
     case 'exportCsv':exportCsv();break;
   }
 });
+document.addEventListener('focusin',ev=>{const t=ev.target;if(t.dataset&&t.dataset.cq){const box=t.closest('.combo').querySelector('.combo-list');box.innerHTML=comboItems(t.dataset.cq,staffUsers().filter(x=>x.id!==S.current),'',ui.form&&ui.form.vals[t.dataset.cq]);box.hidden=false;t.select()}});
+document.addEventListener('click',ev=>{if(!ev.target.closest('.combo'))document.querySelectorAll('.combo-list').forEach(l=>l.hidden=true)},true);
 let drag=null;
 document.addEventListener('pointerdown',ev=>{const g=ev.target.closest('.grip');if(!g)return;const row=g.closest('[data-idx]');if(!row||!row.parentElement.dataset.drag)return;ev.preventDefault();drag={row,box:row.parentElement};row.classList.add('dragging');try{g.setPointerCapture(ev.pointerId)}catch(e){}});
 document.addEventListener('pointermove',ev=>{if(!drag)return;ev.preventDefault();const rows=[...drag.box.children].filter(r=>r!==drag.row&&r.dataset.idx!=null);let before=null;for(const r of rows){const b=r.getBoundingClientRect();if(ev.clientY<b.top+b.height/2){before=r;break}}if(drag.row.nextSibling!==before)drag.box.insertBefore(drag.row,before)});
 const endDrag=()=>{if(!drag)return;const key=drag.box.dataset.drag,order=[...drag.box.children].filter(c=>c.dataset.idx!=null).map(c=>+c.dataset.idx);
-  const arr=key.startsWith('list:')?ui.listDraft[key.slice(5)]:getPath(ui.formDraft,key);if(arr){const re=order.map(i=>arr[i]);arr.splice(0,arr.length,...re)}
+  const arr=key.startsWith('list:')?ui.listDraft[key.slice(5)]:key.startsWith('acc:')?getPath(ui.accDraft,key.slice(4)):getPath(ui.formDraft,key);if(arr){const re=order.map(i=>arr[i]);arr.splice(0,arr.length,...re)}
   drag.row.classList.remove('dragging');drag=null;render()};
 document.addEventListener('pointerup',endDrag);document.addEventListener('pointercancel',endDrag);
 document.addEventListener('keydown',ev=>{
@@ -2133,10 +2275,13 @@ document.addEventListener('keydown',ev=>{
 });
 document.addEventListener('input',ev=>{
   const t=ev.target;
+  if(t.dataset.cq){const box=t.closest('.combo').querySelector('.combo-list');const list=staffUsers().filter(x=>x.id!==S.current);box.innerHTML=comboItems(t.dataset.cq,list,t.value,ui.form&&ui.form.vals[t.dataset.cq]);box.hidden=false;return}
   if(t.dataset.filter){ui.filters[t.dataset.filter]=t.value;const res=$('#results');if(res)res.innerHTML=resultsHtml();return}
   if(t.dataset.bf){ui.blockForm[t.dataset.bf]=t.value;return}
   if(t.dataset.rd){ui.rulesDraft[t.dataset.rd]=t.value;return}
   if(t.dataset.li){ui.listDraft[t.dataset.li][+t.dataset.i]=t.value;return}
+  if(t.dataset.accv){setPath(ui.accDraft,t.dataset.accv,t.type==='number'?(t.value===''?0:+t.value):t.value);return}
+  if(t.dataset.accu){ui.accDraft.perStaff=ui.accDraft.perStaff||{};if(t.value==='')delete ui.accDraft.perStaff[t.dataset.accu];else ui.accDraft.perStaff[t.dataset.accu]=+t.value;return}
   if(t.dataset.ef&&t.type!=='checkbox'){setPath(ui.formDraft,t.dataset.ef,t.type==='number'?(t.value===''?0:+t.value):t.value);return}
   if(t.dataset.pd){ui.perfDate=t.value;return}
   if(t.dataset.us){ui.userSearch=t.value;const box=$('#main');if(box){const pos=t.selectionStart;box.innerHTML=renderView();const n=$('[data-us]');if(n){n.focus();n.setSelectionRange(pos,pos)}}return}
@@ -2149,6 +2294,7 @@ document.addEventListener('change',ev=>{
   if(t.matches('[data-file]')){readFiles(t.files);t.value='';return}
   if(t.dataset.ef&&t.type==='checkbox'){setPath(ui.formDraft,t.dataset.ef,t.checked);return}
   if(t.dataset.ef&&t.type==='number'){render();return}
+  if((t.dataset.accv||t.dataset.accu)){render();return}
   if(t.dataset.member){t.checked?ui.teamSel.add(t.dataset.member):ui.teamSel.delete(t.dataset.member);renderDrawer();return}
   if(t.dataset.my){ui.my[t.dataset.my]=t.value;render();return}
   if(t.matches('[data-perf]')){const f=t.files[0];t.value='';if(f)handlePerfFile(f);return}
@@ -2157,7 +2303,7 @@ document.addEventListener('change',ev=>{
   if(t.dataset.filter){ui.filters[t.dataset.filter]=t.value;const res=$('#results');if(res)res.innerHTML=resultsHtml();return}
   if(t.dataset.q){ui.q[t.dataset.q]=t.value;if(t.dataset.q==='team')ui.q.staff='all';if(t.type==='date')return;render();return}
   if(ui.form&&t.name&&t.closest('#reqForm,#recForm')){ui.form.vals[t.name]=t.value;
-    if(['date','partnerId','period','staff','current','start','myShift','theirShift','requested','sendTo'].includes(t.name))render();}
+    if(['date','partnerId','period','staff','current','start','myShift','theirShift','requested','sendTo','schedule'].includes(t.name))render();}
 });
 document.addEventListener('submit',ev=>{ev.preventDefault();const f=ev.target;
   if(f.id==='reqForm')submitRequest();if(f.id==='recForm')submitRecord();
