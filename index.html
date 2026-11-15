@@ -592,7 +592,8 @@ body:has(.ef-row.dragging){user-select:none}
 .cmt .muted{font-size:11.5px}
 .cmt-new{display:flex;gap:8px;align-items:flex-end}
 .cmt-new textarea{flex:1}
-.acc-row{grid-template-columns:28px 1fr auto 34px}
+.acc-row{grid-template-columns:28px 1fr auto auto 34px}
+.acc-cnt{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .combo{position:relative}
 .combo-input{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:0 12px;background:var(--surface)}
 .combo-input svg{color:var(--faint);flex:none}
@@ -675,6 +676,7 @@ body:has(.li-row.dragging){user-select:none}
   .ef-row>input[data-ef$=".avg"]{grid-column:3;grid-row:2}
   .ef-row>.ef-na{grid-column:4;grid-row:2}
   .ef-row.small{grid-template-columns:28px 1fr 58px 34px}
+  .ef-row.acc-row{grid-template-columns:28px 1fr auto 34px}.ef-row.acc-row>.acc-cnt{grid-column:2/4;grid-row:2}
   .ef-row.small>input[dir=rtl]{grid-column:2/4;grid-row:2}
   input,select,textarea,.input{font-size:16px}
   .q-filters select,.q-filters input{flex:1 1 45%;min-width:0}
@@ -753,12 +755,19 @@ let TEAMS={},TEAM_LIST=[],USERS=[];
 const DEFAULT_CRIT=DEFAULT_LISTS.criteria;
 const DEFAULT_FORM={"sections": [{"name": "Opening & Soft Skills", "items": [{"name": "Ready for the call", "ar": "الاستعداد لاستلام المكالمة", "good": 3, "avg": 1, "na": false}, {"name": "Greeting", "ar": "التحية", "good": 3, "avg": 1, "na": false}, {"name": "Mention Warba bank", "ar": "ذكر اسم البنك", "good": 3, "avg": 1, "na": false}, {"name": "Mention your name", "ar": "ذكر اسمك (الموظف) بشكل واضح", "good": 3, "avg": 1, "na": false}, {"name": "Tone of voice (Welcoming, active, warm)", "ar": "نبرة الصوت ترحيبية ,متفاعلة ,دافئة", "good": 3, "avg": 1, "na": false}, {"name": "Volume of voice (balanced \"Not loud or Low\")", "ar": "مستوى الصوت يكون (ليس عالي ولا منخفض)", "good": 3, "avg": 1, "na": false}, {"name": "Use appropriate pace", "ar": "استخدام الرتم(السرعة) المناسب", "good": 3, "avg": 1, "na": false}, {"name": "Voice Quality (Staff & Headset)", "ar": "جودة الصوت سواء من قبل الموظف أو السماعة", "good": 3, "avg": 1, "na": false}, {"name": "Use customer name & title (Beginning, During, End)", "ar": "استخدام اسم العميل مع اللقب في بداية ووسط ونهاية المكالمة", "good": 3, "avg": 1, "na": false}, {"name": "Friendliness & Attitude", "ar": "حسن التصرف والودية", "good": 4, "avg": 2, "na": false}, {"name": "Caring & Patient", "ar": "الاهتمام بالعميل وان تكون صبور", "good": 3, "avg": 1, "na": false}, {"name": "Follow hold protocol (Permission, Duration 45 Sec & Mute 20 Sec)", "ar": "اتباع بروتكول الانتظار والصامت", "good": 4, "avg": 2, "na": true}, {"name": "Avoid interrupting customer", "ar": "تجنب مقاطعة العميل", "good": 4, "avg": 2, "na": false}, {"name": "Ask security questions", "ar": "سؤال العميل الأسئلة الأمنية", "good": 3, "avg": 1, "na": false}, {"name": "Use professional terms", "ar": "استخدام مصطلحات احترافيه - استخدام مصطلحات بنكية / بنكية تقليدية (قرض / فوائد)", "good": 3, "avg": 1, "na": false}, {"name": "Avoid using slang terms", "ar": "تجنب استخدام المصطلحات العاميه", "good": 3, "avg": 1, "na": false}]}, {"name": "Selling Skills & Product Knowledge", "items": [{"name": "Probing further into customer request", "ar": "فهم طلب العميل ( الأسئلة المناسبة )", "good": 5, "avg": 3, "na": false}, {"name": "Listen actively (don't ask the customer to repeat himself)", "ar": "الأستماع الفعال و التركيز مع العميل", "good": 4, "avg": 2, "na": false}, {"name": "Provide accurate information", "ar": "توفير معلومات دقيقة وصحيحه", "good": 5, "avg": 3, "na": false}, {"name": "Explain product/service benefit related to the inquiry (Benefits)", "ar": "شرح كامل لأستفسار العميل / (المميزات)", "good": 6, "avg": 3, "na": false}, {"name": "Mention a direct channel (App, Social Media, Branches, WhatsApp)", "ar": "ذكر القنوات المباشرة", "good": 5, "avg": 3, "na": true}, {"name": "Mention current promotion and/ or cross sell other product", "ar": "ذكر العروض الحالية /او عرض منتج او خدمة", "good": 5, "avg": 3, "na": false}, {"name": "Mentioning documents (when needed)", "ar": "ذكر المستندات المطلوبة", "good": 4, "avg": 2, "na": true}, {"name": "Issue or Problem handled properly (if applicable)", "ar": "معالجة المشكلة او المسألة / توجيه الطلب للجهة المعنية", "good": 4, "avg": 2, "na": true}]}, {"name": "Closure", "items": [{"name": "Call Summary (if applicable)", "ar": "تلخيص المكالمه", "good": 4, "avg": 2, "na": true}, {"name": "Offer additional assistance", "ar": "سؤال العميل عن اي خدمة أخرى", "good": 4, "avg": 2, "na": false}, {"name": "Thank customer and goodbye", "ar": "شكر العميل وتوديعه", "good": 3, "avg": 1, "na": false}]}], "bonus": [{"name": "Mention the notice (Lets be aware)", "ar": "ذكر التنويه ( لنكن على دراية )", "value": 1}], "tags": [{"name": "Voice Quality", "ar": "مستوى الصوت - النشاط - الرتم - التنفس", "penalty": 3}, {"name": "Step Explaining", "ar": "سبب السؤال - توضيح ما سيتم", "penalty": 3}, {"name": "Info Timing", "ar": "اختيار الوقت المناسب", "penalty": 3}, {"name": "Language & Clarity", "ar": "ماسك الحسابات vs مسؤول عن الحسابات", "penalty": 3}, {"name": "Personal Remarks", "ar": "ابداء رأي بخصوص ارصدة العملاء", "penalty": 3}, {"name": "Hold Protocol", "ar": "المدة - السبب - المتابعة", "penalty": 3}, {"name": "Explain Requirements", "ar": "شرح المطلوب حسب حاجة العميل وليس بشكل عام", "penalty": 3}, {"name": "Offer an Action", "ar": "طلب أو تصحيح", "penalty": 3}, {"name": "Engagement", "ar": "التواصل المستمر خلالتنفيذ الطلب", "penalty": 3}, {"name": "Probing Questions", "ar": "أسئلة إضافية للتأكد من طلب العميل", "penalty": 3}]};
 let EVAL_FORM=JSON.parse(JSON.stringify(DEFAULT_FORM));
-const DEFAULT_ACC={base:5,perStaff:{},reasons:[{name:'Wrong information given',impact:0.4},{name:'Missing or wrong documentation',impact:0.4},{name:'Wrong transaction processed',impact:0.5},{name:'Missed follow-up',impact:0.3}]};
+const DEFAULT_ACC={max:100,weight:5,reasons:[{name:"Didn’t inform TL before taking a break",points:10},{name:"Report sick leave after staff shift time",points:5},{name:"Late without informing TL or floor manager (10 min above)",points:5},{name:"Invalid case",points:5},{name:"Swap with another staff and didn’t attend",points:10},{name:"Locked users without applying for a new one or follow up",points:10},{name:"Swap without taking the required approval",points:5},{name:"Invalid e-mail communication (department)",points:5},{name:"Adhering to TL/Floor Manager instructions",points:10},{name:"General mistakes (work/information/process)",points:5},{name:"Multimedia daily report",points:5},{name:"Repeated mistakes",points:10},{name:"Data entry (Outbound)",points:5},{name:"Playing with the phone during a customer call",points:10},{name:"Dress code",points:5},{name:"Clean work place / desk",points:5},{name:"Reject permission",points:0,counter:true}]};
 let ACC=JSON.parse(JSON.stringify(DEFAULT_ACC));
 const r2=v=>Math.round(v*100)/100;
-const accBase=uid=>{const v=ACC.perStaff&&ACC.perStaff[uid];return v===''||v==null||!isFinite(+v)?+ACC.base:+v};
+const accMax=()=>+ACC.max>0?+ACC.max:100,accW=()=>+ACC.weight>=0?+ACC.weight:5;
 const accNotes=(uid,a,b)=>S.records.filter(r=>r.kind==='acc'&&r.recipients.includes(uid)&&(!a||r.data.date>=a)&&(!b||r.data.date<=b));
-const accScore=(uid,a,b)=>Math.max(0,r2(accBase(uid)-accNotes(uid,a,b).reduce((t,r)=>t+(+r.data.impact||0),0)));
+// deduction in points = reason points × level (1–4). Counter-only reasons deduct nothing. Old notes stored a % impact: convert it.
+const noteDeduct=r=>{const x=r.data||{};if(x.counter)return 0;if(x.deduct!=null)return +x.deduct||0;if(x.impact!=null)return r2((+x.impact||0)/(accW()||5)*accMax());return 0};
+const accPoints=(uid,a,b)=>Math.max(0,r2(accMax()-accNotes(uid,a,b).reduce((t,r)=>t+noteDeduct(r),0)));
+const accPct=p=>r2(p*accW()/accMax());
+const accScore=(uid,a,b)=>accPct(accPoints(uid,a,b));
+const accCounters=(uid,a,b)=>accNotes(uid,a,b).filter(r=>r.data.counter).length;
+const accScored=(uid,a,b)=>accNotes(uid,a,b).filter(r=>!r.data.counter).length;
+const accLine=r=>{const x=r.data;return x.counter?'Counter only · no score':x.deduct!=null?`Level ${x.level} × ${x.points} pts = −${x.deduct} pts`:`−${noteDeduct(r)} pts`};
 const monthBounds=d=>[iso(new Date(d.getFullYear(),d.getMonth(),1)),iso(new Date(d.getFullYear(),d.getMonth()+1,0))];
 const ANS={good:'Good',avg:'Avg',below:'Below',na:'N/A'};
 function calcEval(form,ans){
@@ -831,7 +840,7 @@ async function fetchAll(){
   USERS=us.map(u=>({id:u.id,emp:u.emp,name:u.name,role:u.role,title:u.title,team:u.team,active:u.active&&!u.deleted,deleted:!!u.deleted,mustChange:u.must_change}));
   TEAM_LIST=tm.map(t=>({id:t.id,name:t.name,sort:t.sort}));TEAMS=Object.fromEntries(TEAM_LIST.map(t=>[t.id,t.name]));
   LISTS=JSON.parse(JSON.stringify(DEFAULT_LISTS));st.forEach(x=>{if(Array.isArray(x.value)&&x.value.length)LISTS[x.key]=x.value});
-  {const ac=st.find(x=>x.key==='accuracy');ACC=ac&&ac.value&&Array.isArray(ac.value.reasons)?{base:5,perStaff:{},...ac.value}:JSON.parse(JSON.stringify(DEFAULT_ACC))}
+  {const ac=st.find(x=>x.key==='accuracy');ACC=ac&&ac.value&&Array.isArray(ac.value.reasons)&&ac.value.reasons.every(x=>'points' in x)?{max:100,weight:5,...ac.value}:JSON.parse(JSON.stringify(DEFAULT_ACC))}
   {const ef=st.find(x=>x.key==='eval_form');EVAL_FORM=ef&&ef.value&&Array.isArray(ef.value.sections)&&ef.value.sections.length?ef.value:JSON.parse(JSON.stringify(DEFAULT_FORM))}
   S.perf=pf.map(x=>({userId:x.user_id,date:x.date,score:+x.score,at:+x.uploaded_at}));
   const r0=ru[0]||{leave_limit:2,count_pending:true};
@@ -921,7 +930,7 @@ function recSummary(r){
     case 'eval':return `Score ${evScore(r)}% · Call on ${fmt(x.date)} · by ${user(r.createdBy).name}`;
     case 'mom':return `${x.title}${r.files.length?` · ${r.files.length} attachment(s)`:''}`;
     case 'task':return `${x.title}${x.due?` · due ${fmt(x.due)}`:''}`;
-    case 'acc':return `${x.reason} · −${x.impact}% · ${fmt(x.date)}`;
+    case 'acc':return `${x.reason} · ${x.counter?'counter only':`−${noteDeduct(r)} pts`} · ${fmt(x.date)}`;
     case 'vio':return `${x.vtype} · ${fmt(x.date)}`;
     case 'adh':return `${x.reason} · ${fmt(x.date||x.from)}`;
   }
@@ -1273,7 +1282,7 @@ function newRecForm(kind){
   if(kind==='eval'){f.vals.date=iso(T);f.vals.callType=LISTS.call_types[0]}
   if(kind==='mom'){f.vals.date=iso(T)}
   if(kind==='task'){f.vals.due=iso(addDays(T,1));f.sendTo='person'}
-  if(kind==='acc'){f.vals.date=iso(T);f.vals.reason=(ACC.reasons[0]||{}).name||''}
+  if(kind==='acc'){f.vals.date=iso(T);f.vals.reason=(ACC.reasons[0]||{}).name||'';f.vals.level='1'}
   return f;
 }
 function viewCreateForm(){
@@ -1302,12 +1311,13 @@ function viewCreateForm(){
     main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Violation type',`<select name="vtype">${LISTS.vtypes.map(s=>opt(s,s,s===v.vtype)).join('')}</select>`,{req:1})}${field('Date of violation',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}<div></div>${field('Details',ta('details','What happened'),{full:1,req:1,invalid:e.details,hint:e.details})}${files('Optional')}</div>`;
     side=`<div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Staff must tap “I’ve read this”')}</div>`;
   }else if(k==='acc'){
-    const rs=ACC.reasons.find(x=>x.name===v.reason)||ACC.reasons[0]||{name:'',impact:0},[ma,mb]=monthBounds(v.date?parse(v.date):today());
-    const now=accScore(v.staff,ma,mb),after=Math.max(0,r2(now-(+rs.impact||0)));
+    const rs=ACC.reasons.find(x=>x.name===v.reason)||ACC.reasons[0]||{name:'',points:0},[ma,mb]=monthBounds(v.date?parse(v.date):today());
+    const lv=Math.min(4,Math.max(1,+v.level||1)),ded=rs.counter?0:(+rs.points||0)*lv,pts=accPoints(v.staff,ma,mb),after=Math.max(0,r2(pts-ded));
     main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}
-    ${field('Reason',`<select name="reason">${ACC.reasons.map(x=>opt(x.name,`${x.name} · −${x.impact}%`,x.name===v.reason)).join('')}</select>`,{req:1,full:1,invalid:e.reason,hint:e.reason})}
+    ${field('Reason',`<select name="reason">${ACC.reasons.map(x=>opt(x.name,`${x.name} · ${x.counter?'counter only':x.points+' pts'}`,x.name===v.reason)).join('')}</select>`,{req:1,full:1,invalid:e.reason,hint:e.reason})}
+    ${rs.counter?`<div class="field full"><div class="flow-note" style="margin:0">This reason is only counted. It doesn’t change the accuracy score.</div></div>`:field('Level',`<div class="seg">${[1,2,3,4].map(n=>`<button type="button" class="${lv===n?'on':''}" data-action="accLevel" data-n="${n}">${n} · −${(+rs.points||0)*n}</button>`).join('')}</div>`,{full:1,req:1,hint:`Deduction = ${rs.points} pts × level`})}
     ${field('Details',ta('details','What happened (shown to the staff member)'),{full:1,req:1,invalid:e.details,hint:e.details})}${files('Optional')}</div>`;
-    side=`<div class="card card-pad"><h2>Accuracy score · ${MONL[parse(ma).getMonth()]}</h2><div class="ev-break"><div><span>Starting score</span><b>${accBase(v.staff)}%</b></div><div><span>Notes so far (${accNotes(v.staff,ma,mb).length})</span><b class="neg">−${r2(accBase(v.staff)-now)}</b></div><div><span>This note</span><b class="neg">−${rs.impact}</b></div><div class="tot"><span>Score after this note</span><b>${after}%</b></div></div></div>
+    side=`<div class="card card-pad"><h2>Accuracy · ${MONL[parse(ma).getMonth()]}</h2><div class="ev-break"><div><span>Full score</span><b>${accMax()} pts</b></div><div><span>Deducted so far (${accScored(v.staff,ma,mb)} note${accScored(v.staff,ma,mb)===1?'':'s'})</span><b class="neg">−${r2(accMax()-pts)}</b></div><div><span>This note</span><b class="neg">${rs.counter?'0':'−'+ded}</b></div><div class="tot"><span>After this note</span><b>${after} pts · ${accPct(after)}%</b></div></div><div class="flow-note" style="margin:10px 0 0">Accuracy is worth ${accW()}% of the scorecard: ${accMax()} pts = ${accW()}%.</div></div>
     <div class="card card-pad"><h2>Options</h2>${sw('requireAck','Require acknowledgement','Staff must tap “I’ve read this”')}</div>`;
   }else if(k==='adh'){
     main=`<div class="form-grid">${field('Staff member',staffSel,{req:1})}${field('Reason',`<select name="reason">${LISTS.adh_reasons.map(s=>opt(s,s,s===v.reason)).join('')}</select>`,{req:1})}${field('Date',inp('date','date'),{req:1,invalid:e.date,hint:e.date})}${field('Note',ta('note','e.g. certificate received'),{full:1})}${files('e.g. sick certificate')}</div>`;
@@ -1412,14 +1422,16 @@ function adminAccuracy(){
   const d=ui.accDraft||(ui.accDraft=JSON.parse(JSON.stringify(ACC))),dirty=JSON.stringify(d)!==JSON.stringify(ACC);
   const grip=`<span class="grip" title="Drag to reorder" aria-label="Drag to reorder"><i></i><i></i><i></i></span>`;
   const [ma,mb]=monthBounds(today());
-  return `<div class="ef-top card card-pad"><div><b>Accuracy score</b><div class="flow-note" style="margin:2px 0 0">Each staff member starts every month with their starting score. Each accuracy note deducts its reason’s amount — e.g. 5% with two 0.4% notes = 4.2%. It never goes below 0.</div></div>
+  return `<div class="ef-top card card-pad"><div><b>Accuracy score</b><div class="flow-note" style="margin:2px 0 0">Every staff member starts each month with ${d.max} points. Each accuracy note deducts its reason’s points × the level (1–4). Accuracy % = points × ${d.weight}% ÷ ${d.max} — e.g. 90 pts = ${r2(90*d.weight/(d.max||100))}%. Counter-only reasons are counted but don’t deduct.</div></div>
    <div class="form-actions" style="margin:0">${dirty?`<span class="pill need">Unsaved</span><button class="btn" data-action="accReset">Undo changes</button>`:''}<button class="btn primary" data-action="accSave" ${dirty?'':'disabled style="opacity:.5"'}>${ic('check',16)} Save</button></div></div>
   <div class="grid-2 even-rules" style="grid-template-columns:1fr 1fr">
-   <div class="stack"><div class="card card-pad"><h2>Default starting score</h2><div class="switch-row"><div><b>Every staff member</b><span>Unless set differently on the right</span></div><div class="num"><input type="number" min="0" step="0.1" data-accv="base" value="${d.base}" style="width:70px"><span class="num-unit">%</span></div></div></div>
-   <div class="card card-pad ef-card"><h2>Reasons <span class="muted" style="font-weight:500">· deduction per note</span></h2><div data-drag="acc:reasons">${d.reasons.map((x,i)=>`<div class="ef-row acc-row" data-idx="${i}">${grip}<input class="input" data-accv="reasons.${i}.name" value="${esc(x.name)}" placeholder="Reason"><div class="num"><input type="number" min="0" step="0.1" data-accv="reasons.${i}.impact" value="${x.impact}" style="width:62px"><span class="num-unit">%</span></div><button class="btn sm icon bad" data-action="accDelReason" data-i="${i}" ${d.reasons.length>1?'':'disabled style="opacity:.35"'} title="Remove">${ic('trash',14)}</button></div>`).join('')}</div>
+   <div class="stack"><div class="card card-pad"><h2>Scoring</h2>
+    <div class="switch-row"><div><b>Full score</b><span>Points every staff member starts the month with</span></div><div class="num"><input type="number" min="1" step="1" data-accv="max" value="${d.max}" style="width:70px"><span class="num-unit">pts</span></div></div>
+    <div class="switch-row"><div><b>Weight in the scorecard</b><span>What full score is worth</span></div><div class="num"><input type="number" min="0" step="0.1" data-accv="weight" value="${d.weight}" style="width:70px"><span class="num-unit">%</span></div></div></div>
+   <div class="card card-pad ef-card"><h2>Reasons <span class="muted" style="font-weight:500">· points per level</span></h2><div data-drag="acc:reasons">${d.reasons.map((x,i)=>`<div class="ef-row acc-row" data-idx="${i}">${grip}<input class="input" data-accv="reasons.${i}.name" value="${esc(x.name)}" placeholder="Reason"><div class="num"><input type="number" min="0" step="1" data-accv="reasons.${i}.points" value="${x.points||0}" style="width:56px" ${x.counter?'disabled':''}><span class="num-unit">pts</span></div><label class="acc-cnt" title="Only counted, no score"><input type="checkbox" data-accv="reasons.${i}.counter" ${x.counter?'checked':''}> Count only</label><button class="btn sm icon bad" data-action="accDelReason" data-i="${i}" ${d.reasons.length>1?'':'disabled style="opacity:.35"'} title="Remove">${ic('trash',14)}</button></div>`).join('')}</div>
     <button class="btn sm" data-action="accAddReason" style="margin-top:8px">${ic('plus',14)} Add reason</button></div></div>
-   <div class="card card-pad"><h2>Starting score per staff <span class="muted" style="font-weight:500">· leave empty to use ${d.base}%</span></h2><div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Starting score</th><th class="num-cell">This month</th></tr></thead><tbody>
-   ${staffUsers().map(u=>{const v=d.perStaff[u.id];return `<tr><td><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:12px">${esc(teamName(u.team))}</div></td><td class="num-cell"><div class="num" style="margin-left:auto"><input type="number" min="0" step="0.1" data-accu="${u.id}" value="${v==null?'':v}" placeholder="${d.base}" style="width:70px"><span class="num-unit">%</span></div></td><td class="num-cell">${accScore(u.id,ma,mb)}% <span class="muted" style="font-size:12px">· ${accNotes(u.id,ma,mb).length} note(s)</span></td></tr>`}).join('')}</tbody></table></div></div></div>`;
+   <div class="card card-pad"><h2>This month · ${MONL[today().getMonth()]}</h2><div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Notes</th><th class="num-cell">Points</th><th class="num-cell">Accuracy</th></tr></thead><tbody>
+   ${staffUsers().map(u=>{const c=accCounters(u.id,ma,mb);return `<tr><td><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:12px">${esc(teamName(u.team))}</div></td><td class="num-cell">${accScored(u.id,ma,mb)}${c?` <span class="muted" style="font-size:12px">· ${c} counted</span>`:''}</td><td class="num-cell">${accPoints(u.id,ma,mb)}/${accMax()}</td><td class="num-cell"><b>${accScore(u.id,ma,mb)}%</b></td></tr>`}).join('')}</tbody></table></div></div></div>`;
 }
 function adminLists(){
   ui.listDraft=ui.listDraft||{};
@@ -1630,10 +1642,10 @@ function staffDrawer(uid){
 }
 function exportCycle(){
   const Q=qScope(),from=Q.from,fromIso=iso(new Date(from)),star=mostImproved(Q.ids),trendTxt={up:'Improving',down:'Slipping',flat:'Steady',new:'Too few calls'};
-  const head=['Employee','Employee ID','Team','Evaluations','Avg call score %','Trend','Flags','Latest daily performance %','Avg daily performance % (period)','Accuracy notes (period)','Accuracy deducted % (period)','KPI requests accepted','Violations','Adherence notes'];
+  const head=['Employee','Employee ID','Team','Evaluations','Avg call score %','Trend','Flags','Latest daily performance %','Avg daily performance % (period)','Accuracy notes (period)','Accuracy points deducted (period)','KPI requests accepted','Violations','Adherence notes'];
   const rows=Q.staff.map(u=>{const e=Q.cur.filter(r=>r.recipients[0]===u.id),q=staffQuality(u.id),ps=perfOf(u.id),pp=ps.filter(p=>p.date>=fromIso);
     const fl=[q.coaching?'Needs coaching':'',...q.repeat.map(c=>'Repeat issue: '+c),star===u.id?'Most improved':''].filter(Boolean).join('; ');
-    return [u.name,u.emp,teamName(u.team),e.length,avgOf(e.map(r=>evScore(r)))??'',trendTxt[q.trend],fl,ps.length?ps.at(-1).score:'',pp.length?Math.round(pp.reduce((a,p)=>a+p.score,0)/pp.length*10)/10:'',accNotes(u.id,fromIso,iso(new Date(Q.to))).length,r2(accNotes(u.id,fromIso,iso(new Date(Q.to))).reduce((t,r)=>t+(+r.data.impact||0),0)),
+    return [u.name,u.emp,teamName(u.team),e.length,avgOf(e.map(r=>evScore(r)))??'',trendTxt[q.trend],fl,ps.length?ps.at(-1).score:'',pp.length?Math.round(pp.reduce((a,p)=>a+p.score,0)/pp.length*10)/10:'',accNotes(u.id,fromIso,iso(new Date(Q.to))).length,r2(accNotes(u.id,fromIso,iso(new Date(Q.to))).reduce((t,r)=>t+noteDeduct(r),0)),
       S.requests.filter(r=>r.type==='kpi'&&r.userId===u.id&&r.status==='approved'&&r.createdAt>=from).length,
       S.records.filter(r=>r.kind==='vio'&&r.recipients.includes(u.id)&&r.createdAt>=from).length,
       S.records.filter(r=>r.kind==='adh'&&r.recipients.includes(u.id)&&r.createdAt>=from).length]});
@@ -1810,7 +1822,7 @@ function viewMyPerf(){
    ${tile('Violation tickets',recs.filter(r=>r.kind==='vio').length,'',recs.some(r=>r.kind==='vio')?'var(--bad)':'')}
    ${tile('Minutes of meeting',recs.filter(r=>r.kind==='mom').length,'')}
    ${tile('Waiting for you',recs.filter(r=>r.requireAck&&!r.acks[uid]).length,'to acknowledge',recs.some(r=>r.requireAck&&!r.acks[uid])?'var(--warn)':'')}
-   ${(()=>{const p=ui.my.period,mm=/^\d{4}-\d{2}$/.test(p)?p:p==='lastmonth'?R.a.slice(0,7):p==='month'?R.a.slice(0,7):iso(today()).slice(0,7),[a,b]=monthBounds(parse(mm+'-01'));return tile(`Accuracy · ${MONL[+mm.slice(5)-1]}`,accScore(uid,a,b)+'%',`starting ${accBase(uid)}% · ${accNotes(uid,a,b).length} note(s)`,accNotes(uid,a,b).length?'var(--warn)':'var(--ok)')})()}
+   ${(()=>{const p=ui.my.period,mm=/^\d{4}-\d{2}$/.test(p)?p:p==='lastmonth'?R.a.slice(0,7):p==='month'?R.a.slice(0,7):iso(today()).slice(0,7),[a,b]=monthBounds(parse(mm+'-01'));return tile(`Accuracy · ${MONL[+mm.slice(5)-1]}`,accScore(uid,a,b)+'%',`${accPoints(uid,a,b)}/${accMax()} pts · ${accNotes(uid,a,b).length} note(s)`,accScored(uid,a,b)?'var(--warn)':'var(--ok)')})()}
    ${tile('Tasks',tasks.length,`${tasks.filter(r=>tState(r,uid).status==='confirmed').length} completed · ${tasks.filter(r=>tState(r,uid).status==='open').length} to do`)}
    ${tile('Requests accepted',reqs.filter(r=>r.status==='approved').length,`of ${reqs.filter(r=>['approved','rejected'].includes(r.status)).length} decided`,'var(--ok)')}
    ${tile('Requests rejected',reqs.filter(r=>r.status==='rejected').length,'')}
@@ -1980,10 +1992,10 @@ function recDrawer(r){
   }else if(r.kind==='vio'){
     body=`<div class="d-section"><div class="kv">${kv('Violation type',esc(x.vtype))+kv('Date',fmtL(x.date))+kv('Issued by',esc(user(r.createdBy).name),1)}</div></div><div class="d-section"><h4>Details</h4><div class="note-box">${esc(x.details)}</div></div>`;
   }else if(r.kind==='acc'){
-    const sid=r.recipients[0],[ma,mb]=monthBounds(parse(x.date));
-    body=`<div class="d-section"><div class="kv">${kv('Staff member',esc(user(sid).name))+kv('Date',fmtL(x.date))+kv('Reason',esc(x.reason),1)+kv('Deduction',`−${x.impact}%`)+kv('Issued by',esc(user(r.createdBy).name))}</div></div>
+    const sid=r.recipients[0],[ma,mb]=monthBounds(parse(x.date)),pts=accPoints(sid,ma,mb);
+    body=`<div class="d-section"><div class="kv">${kv('Staff member',esc(user(sid).name))+kv('Date',fmtL(x.date))+kv('Reason',esc(x.reason),1)+kv('Deduction',accLine(r))+kv('Issued by',esc(user(r.createdBy).name))}</div></div>
     ${x.details?`<div class="d-section"><h4>Details</h4><div class="note-box">${esc(x.details)}</div></div>`:''}
-    <div class="d-section"><h4>Accuracy score · ${MONL[parse(ma).getMonth()]} ${parse(ma).getFullYear()}</h4><div class="ev-break"><div><span>Starting score</span><b>${accBase(sid)}%</b></div><div><span>Accuracy notes this month</span><b>${accNotes(sid,ma,mb).length}</b></div><div class="tot"><span>Current score</span><b>${accScore(sid,ma,mb)}%</b></div></div></div>`;
+    <div class="d-section"><h4>Accuracy · ${MONL[parse(ma).getMonth()]} ${parse(ma).getFullYear()}</h4><div class="ev-break"><div><span>Full score</span><b>${accMax()} pts</b></div><div><span>Deducted this month (${accScored(sid,ma,mb)} note${accScored(sid,ma,mb)===1?'':'s'})</span><b class="neg">−${r2(accMax()-pts)}</b></div>${accCounters(sid,ma,mb)?`<div><span>Counter-only notes</span><b>${accCounters(sid,ma,mb)}</b></div>`:''}<div class="tot"><span>Current score</span><b>${pts} pts · ${accPct(pts)}%</b></div></div></div>`;
   }else if(r.kind==='task'){
     body=`<div class="d-section"><div class="kv">${kv('Task',esc(x.title),1)+kv('Due',fmtL(x.due))+kv('Assigned by',esc(user(r.createdBy).name))}</div></div>${x.details?`<div class="d-section"><h4>Details</h4><div class="note-box">${esc(x.details)}</div></div>`:''}`;
   }else if(r.kind==='adh'){
@@ -2070,7 +2082,7 @@ function submitRecord(){
   if(f.kind==='eval'){if(!v.date)e.date='Pick the date';if(!(v.feedback||'').trim())e.feedback='Feedback is required';const form=JSON.parse(JSON.stringify(f.evalForm||EVAL_FORM));data={date:v.date,time:v.time||'',callId:v.callId||'',callType:v.callType||LISTS.call_types[0],form,ans:JSON.parse(JSON.stringify(f.ans)),result:calcEval(form,f.ans),feedback:v.feedback||'',countInScore:!!v.countInScore}}
   if(f.kind==='vio'){if(!v.date)e.date='Pick the date';if(!(v.details||'').trim())e.details='Details are required';data={vtype:v.vtype,date:v.date,details:v.details||''}}
   if(f.kind==='adh'){if(!v.date)e.date='Pick the date';data={reason:v.reason,date:v.date,note:v.note||''}}
-  if(f.kind==='acc'){const rs=ACC.reasons.find(x=>x.name===v.reason);if(!rs)e.reason='Pick a reason';if(!v.date)e.date='Pick the date';if(!(v.details||'').trim())e.details='Please describe what happened';data={reason:v.reason,impact:rs?+rs.impact:0,date:v.date,details:v.details||''}}
+  if(f.kind==='acc'){const rs=ACC.reasons.find(x=>x.name===v.reason);if(!rs)e.reason='Pick a reason';if(!v.date)e.date='Pick the date';if(!(v.details||'').trim())e.details='Please describe what happened';const lv=Math.min(4,Math.max(1,+v.level||1));data=rs&&rs.counter?{reason:v.reason,counter:true,date:v.date,details:v.details||''}:{reason:v.reason,points:rs?+rs.points:0,level:lv,deduct:rs?(+rs.points)*lv:0,date:v.date,details:v.details||''}}
   if(f.kind==='task'){recipients=momRecipients(f);if(f.sendTo==='teams'&&!f.teams.length)e.teams='Pick at least one team';if(!recipients.length)e.teams='Nobody to assign to';if(!(v.title||'').trim())e.title='Describe the task';if(!v.due)e.due='Pick a due date';data={title:(v.title||'').trim(),details:v.details||'',due:v.due,sendTo:f.sendTo,teams:[...f.teams]}}
   if(f.kind==='mom'){recipients=momRecipients(f);if(f.sendTo==='teams'&&!f.teams.length)e.teams='Pick at least one team';if(!(v.title||'').trim())e.title='Title is required';if(!v.date)e.date='Pick the date';if(!(v.summary||'').trim())e.summary='Summary is required';data={title:v.title,date:v.date,summary:v.summary||'',actions:v.actions||'',sendTo:f.sendTo,teams:[...f.teams]}}
   f.errors=e;if(Object.keys(e).length){render();toast('Please fix the highlighted fields',true);return}
@@ -2142,12 +2154,13 @@ document.addEventListener('click',ev=>{
     case 'amendEval':{const r=S.records.find(x=>x.id===id);if(!r)break;const f=newRecForm('eval');Object.assign(f.vals,{staff:r.recipients[0],date:r.data.date,time:r.data.time||'',callId:r.data.callId||'',callType:r.data.callType||LISTS.call_types[0],feedback:r.data.feedback||'',countInScore:r.data.countInScore!==false,requireAck:true});
       f.ans=clone(r.data.ans||{items:{},bonus:{},tags:{}});f.evalForm=clone(r.data.form||EVAL_FORM);f.amendId=r.id;ui.form=f;closeDrawer(true);ui.view='createForm';render();window.scrollTo(0,0);break}
     case 'accReset':ui.accDraft=null;render();break;
-    case 'accAddReason':ui.accDraft.reasons.push({name:'',impact:0.4});render();break;
+    case 'accAddReason':ui.accDraft.reasons.push({name:'',points:5});render();break;
+    case 'accLevel':ui.form.vals.level=el.dataset.n;render();break;
     case 'accDelReason':ui.accDraft.reasons.splice(+el.dataset.i,1);render();break;
-    case 'accSave':{const d=ui.accDraft;if(!(+d.base>=0)){toast('Starting score must be 0 or more',true);break}
-      if(d.reasons.some(x=>!String(x.name).trim())){toast('Every reason needs a name',true);break}if(d.reasons.some(x=>!(+x.impact>=0))){toast('Deductions must be 0 or more',true);break}
+    case 'accSave':{const d=ui.accDraft;if(!(+d.max>0)){toast('Full score must be more than 0',true);break}if(!(+d.weight>=0)){toast('Weight must be 0 or more',true);break}
+      if(d.reasons.some(x=>!String(x.name).trim())){toast('Every reason needs a name',true);break}if(d.reasons.some(x=>!x.counter&&!(+x.points>=0))){toast('Points must be 0 or more',true);break}
       if(new Set(d.reasons.map(x=>x.name.trim().toLowerCase())).size!==d.reasons.length){toast('Two reasons have the same name',true);break}
-      const clean={base:+d.base,perStaff:Object.fromEntries(Object.entries(d.perStaff||{}).filter(([k,v])=>v!==''&&v!=null&&isFinite(+v)).map(([k,v])=>[k,+v])),reasons:d.reasons.map(x=>({name:x.name.trim(),impact:+x.impact}))};
+      const clean={max:+d.max,weight:+d.weight,reasons:d.reasons.map(x=>x.counter?{name:x.name.trim(),points:0,counter:true}:{name:x.name.trim(),points:+x.points})};
       busy(async()=>{await api('settings?on_conflict=key',{method:'POST',prefer:'resolution=merge-duplicates',body:{key:'accuracy',value:clean}});await fetchAll();ui.accDraft=null;render();toast('Accuracy settings saved')});break}
     case 'createTab':ui.createTab=el.dataset.t;render();break;
     case 'taskFilter':ui.taskFilter=el.dataset.f;render();break;
@@ -2280,8 +2293,7 @@ document.addEventListener('input',ev=>{
   if(t.dataset.bf){ui.blockForm[t.dataset.bf]=t.value;return}
   if(t.dataset.rd){ui.rulesDraft[t.dataset.rd]=t.value;return}
   if(t.dataset.li){ui.listDraft[t.dataset.li][+t.dataset.i]=t.value;return}
-  if(t.dataset.accv){setPath(ui.accDraft,t.dataset.accv,t.type==='number'?(t.value===''?0:+t.value):t.value);return}
-  if(t.dataset.accu){ui.accDraft.perStaff=ui.accDraft.perStaff||{};if(t.value==='')delete ui.accDraft.perStaff[t.dataset.accu];else ui.accDraft.perStaff[t.dataset.accu]=+t.value;return}
+  if(t.dataset.accv){setPath(ui.accDraft,t.dataset.accv,t.type==='checkbox'?t.checked:t.type==='number'?(t.value===''?0:+t.value):t.value);return}
   if(t.dataset.ef&&t.type!=='checkbox'){setPath(ui.formDraft,t.dataset.ef,t.type==='number'?(t.value===''?0:+t.value):t.value);return}
   if(t.dataset.pd){ui.perfDate=t.value;return}
   if(t.dataset.us){ui.userSearch=t.value;const box=$('#main');if(box){const pos=t.selectionStart;box.innerHTML=renderView();const n=$('[data-us]');if(n){n.focus();n.setSelectionRange(pos,pos)}}return}
@@ -2294,7 +2306,7 @@ document.addEventListener('change',ev=>{
   if(t.matches('[data-file]')){readFiles(t.files);t.value='';return}
   if(t.dataset.ef&&t.type==='checkbox'){setPath(ui.formDraft,t.dataset.ef,t.checked);return}
   if(t.dataset.ef&&t.type==='number'){render();return}
-  if((t.dataset.accv||t.dataset.accu)){render();return}
+  if(t.dataset.accv){if(t.type==='checkbox')setPath(ui.accDraft,t.dataset.accv,t.checked);render();return}
   if(t.dataset.member){t.checked?ui.teamSel.add(t.dataset.member):ui.teamSel.delete(t.dataset.member);renderDrawer();return}
   if(t.dataset.my){ui.my[t.dataset.my]=t.value;render();return}
   if(t.matches('[data-perf]')){const f=t.files[0];t.value='';if(f)handlePerfFile(f);return}
@@ -2303,7 +2315,7 @@ document.addEventListener('change',ev=>{
   if(t.dataset.filter){ui.filters[t.dataset.filter]=t.value;const res=$('#results');if(res)res.innerHTML=resultsHtml();return}
   if(t.dataset.q){ui.q[t.dataset.q]=t.value;if(t.dataset.q==='team')ui.q.staff='all';if(t.type==='date')return;render();return}
   if(ui.form&&t.name&&t.closest('#reqForm,#recForm')){ui.form.vals[t.name]=t.value;
-    if(['date','partnerId','period','staff','current','start','myShift','theirShift','requested','sendTo','schedule'].includes(t.name))render();}
+    if(['date','partnerId','period','staff','current','start','myShift','theirShift','requested','sendTo','schedule'].includes(t.name)||(ui.form.kind==='acc'&&t.name==='reason'))render();}
 });
 document.addEventListener('submit',ev=>{ev.preventDefault();const f=ev.target;
   if(f.id==='reqForm')submitRequest();if(f.id==='recForm')submitRecord();
