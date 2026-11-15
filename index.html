@@ -616,7 +616,7 @@ body:has(.ef-row.dragging){user-select:none}
 .stats-2{grid-template-columns:repeat(2,1fr)!important}.perf-grid>*,.grid-2>*{min-width:0}.table-wrap{max-width:100%;overflow-x:auto}@media (max-width:560px){.hist-table th,.hist-table td{padding-left:6px;padding-right:6px;font-size:12.5px}.prof-acts .btn{flex:1 1 45%}}.prof-acts{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
 .sec-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.sec-head .section-title{margin-bottom:10px}
 .kv-line{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--border)}.staff-table tr{cursor:pointer}
-.kpi-table th small{font-weight:500;opacity:.7;margin-left:1px}.kpi-sort{cursor:pointer;user-select:none;white-space:nowrap}.kpi-sort.on{color:var(--primary)}.kpi-table tbody tr[data-action]{cursor:pointer}
+.kpi-table th small{font-weight:500;opacity:.7;margin-left:1px}.kpi-table tbody tr[data-action]{cursor:pointer}
 .kpi-v{font-weight:650}.kpi-v.g{color:var(--ok)}.kpi-v.a{color:var(--warn)}.kpi-v.b{color:var(--bad)}.kpi-total td{background:var(--surface-2);border-top:2px solid var(--border)}.kpi-final{color:var(--primary);font-size:14.5px}
 .kpi-lvl{flex:0 0 auto}.kpi-lvl button{padding:8px 12px;white-space:nowrap}
 .kpi-table{font-size:13px}.kpi-table th,.kpi-table td{padding:9px 7px}.kpi-table th{white-space:normal;line-height:1.25;vertical-align:bottom}.kpi-table th small{display:block}
@@ -625,6 +625,8 @@ body:has(.ef-row.dragging){user-select:none}
 .dash-tiles{grid-template-columns:repeat(4,1fr)}.stat.dual .dual-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 4px}.stat.dual .dual-row small{display:block;font-size:11.5px;color:var(--muted)}.stat.dual .dual-row b{font-size:26px;margin:0}.stat.dual .dual-row>div+div{border-left:1px solid var(--border);padding-left:10px}
 @media (max-width:1000px){.dash-tiles{grid-template-columns:1fr 1fr}}@media (max-width:560px){.dash-tiles{grid-template-columns:1fr}}
 .team-table th,.team-table td{padding:9px 8px}.team-table .grp,.staff-table .grp{border-left:1px solid var(--border)}.staff-table th,.staff-table td{padding:9px 7px}.staff-table th{white-space:normal;line-height:1.25;vertical-align:bottom}.staff-table td:first-child{white-space:normal!important;min-width:170px}.staff-table td:first-child,.staff-table th:first-child,.team-table td:first-child,.team-table th:first-child{position:sticky;left:0;background:var(--surface);z-index:1}.team-table .kpi-total td:first-child{background:var(--surface-2)}
+.perf-bar{margin-bottom:16px;align-items:center}.kpi-on{color:var(--primary)!important}
+.miss3{display:flex;flex-direction:column;gap:3px;font-size:12.5px}.miss3 span{display:flex;align-items:center;gap:6px}.miss3 i{font-style:normal;width:16px;height:16px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:10.5px;font-weight:700;color:var(--muted);flex:0 0 auto}.miss3 em{font-style:normal;color:var(--muted);margin-left:auto;padding-left:8px}
 .pm-list{display:flex;flex-direction:column}.pm-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}.pm-row:last-child{border-bottom:0}
 .acc-cnt{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .combo{position:relative}
@@ -1022,7 +1024,7 @@ function quick(id){return `<div class="quick"><button class="btn sm bad" data-ac
 function navItems(){
   if(isWfm()){
     const p=S.requests.filter(r=>r.status==='pending'&&inScope(r.userId)).length;
-    return [['dash','grid','Dashboard'],['all','inbox','Requests',p],['staff','users','Staff'],['quality','target','Performance'],['create','upload','Send to staff',tasksToConfirm()],['admin','sliders','Admin']];
+    return [['dash','grid','Dashboard'],['all','inbox','Requests',p],['staff','users','Staff'],['quality','target','Performance'],['uploads','layers','Uploads'],['create','upload','Send to staff',tasksToConfirm()],['admin','sliders','Admin']];
   }
   const uid=S.current,m=S.requests.filter(r=>r.userId===uid&&r.status==='returned').length+incomingSwaps(uid).length;
   const u=myInbox(uid).filter(r=>isUnread(r,uid)).length;
@@ -1058,7 +1060,7 @@ function renderSignin(){
 }
 function renderView(){
   const v=ui.view;
-  if(isWfm()){return v==='staff'?viewStaff():v==='profile'?viewProfile():v==='quality'?viewQuality():v==='all'?viewAll():v==='create'?viewCreate():v==='createForm'?viewCreateForm():v==='admin'?viewAdmin():viewDash()}
+  if(isWfm()){return v==='uploads'?viewUploads():v==='staff'?viewStaff():v==='profile'?viewProfile():v==='quality'?viewQuality():v==='all'?viewAll():v==='create'?viewCreate():v==='createForm'?viewCreateForm():v==='admin'?viewAdmin():viewDash()}
   return v==='form'?viewForm():v==='mine'?viewMine():v==='inbox'?viewInbox():v==='perf'?viewMyPerf():v==='tasks'?viewMyTasks():viewNew();
 }
 
@@ -1655,7 +1657,7 @@ function seriesChart(pts,o={}){
   return `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label||'Trend')}">${g}</svg></div>`;
 }
 function qTabs(){const t=ui.qTab||'calls';return `<div class="tabs">${[['calls','Call quality'],['perf','Daily performance'],['acc','Accuracy'],['vio','Violations']].map(([k,l])=>`<button class="${k===t?'on':''}" data-action="qTab" data-t="${k}">${l}</button>`).join('')}</div>`}
-function viewQuality(){const t=ui.qTab||'calls';if(t==='acc')return head('Performance','Accuracy notes and scores by month.')+qTabs()+viewAccAdmin();if(t==='vio')return head('Performance','Violation tickets by month.')+qTabs()+viewVioAdmin();return t==='perf'?head('Performance','Daily performance from the monthly AD_PER file.',`<button class="btn" data-action="exportCycle">${ic('download',16)} Cycle summary</button>`)+qTabs()+viewPerfAdmin():viewCallQuality()}
+function viewQuality(){const t=ui.qTab||'calls';if(t==='acc')return head('Performance','Accuracy notes and scores by month.')+qTabs()+viewAccAdmin();if(t==='vio')return head('Performance','Violation tickets by month.')+qTabs()+viewVioAdmin();return t==='perf'?head('Performance','Daily performance from the monthly AD_PER files.',`<button class="btn" data-action="exportCycle">${ic('download',16)} Cycle summary</button>`)+qTabs()+viewPerfAdmin():viewCallQuality()}
 function viewCallQuality(){
   const Q=qScope(),tgt=S.rules.qualityTarget,star=mostImproved(Q.ids);
   const curAvg=avgOf(Q.cur.map(r=>evScore(r))),prevAvg=avgOf(Q.prev.map(r=>evScore(r)));
@@ -1899,20 +1901,22 @@ async function handlePerfMonthFile(file,month){
 }
 const monLong=m=>`${MONL[+m.slice(5)-1]} ${m.slice(0,4)}`;
 const pct1=v=>v==null?null:Math.round(v*1000)/10;
-function perfOverviewHtml(staff){
-  const ids=staff.map(u=>u.id),months=[...new Set(S.perfMonths.filter(x=>ids.includes(x.userId)).map(x=>x.month))].sort().reverse();if(!months.length)return '';
-  const m=months.includes(ui.pmMonth)?ui.pmMonth:months[0],st=monthStats(ids,m),fin=st.pm.map(x=>x.final).filter(v=>v!=null);
+function perfOverviewHtml(staff,R){
+  const ids=staff.map(u=>u.id);if(!R.months.length)return '';
+  const st=monthStats(ids,R.months),avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length*10)/10:null;
   const lost=[...st.items].sort((a,b)=>(b.n0?b.fail/b.n0:0)-(a.n0?a.fail/a.n0:0));
-  const perStaff=staff.map(u=>({u,r:st.pm.find(x=>x.userId===u.id),w:monthStats([u.id],m).worst})).filter(x=>x.r).sort((a,b)=>(a.r.final??0)-(b.r.final??0));
-  return `<div class="card card-pad" style="margin-bottom:18px"><div class="pm-head"><h2 style="margin:0">Month overview</h2><select class="input" data-pmmonth="1" style="width:auto">${months.map(x=>opt(x,monLong(x),x===m)).join('')}</select></div>
-   <div class="stats" style="margin:14px 0"><div class="card stat"><span>Average final</span><b style="color:var(--primary)">${fin.length?Math.round(fin.reduce((a,b)=>a+b,0)/fin.length*10)/10+'%':'—'}</b><small>${fin.length} staff</small></div>
+  const perStaff=staff.map(u=>{const rs=st.pm.filter(x=>x.userId===u.id);if(!rs.length)return null;const s1=monthStats([u.id],R.months);
+    return {u,final:avg(rs.map(x=>x.final).filter(v=>v!=null)),ready:avg(rs.map(x=>x.ready).filter(v=>v!=null)),days:rs.reduce((t,x)=>t+(x.days||0),0),top:s1.top3}}).filter(Boolean).sort((a,b)=>(b.final??-1)-(a.final??-1));
+  const fin=perStaff.map(x=>x.final).filter(v=>v!=null);
+  return `<div class="card card-pad" style="margin-bottom:18px"><h2 style="margin:0">Overview · ${esc(R.label)}</h2>
+   <div class="stats" style="margin:14px 0"><div class="card stat"><span>Average final</span><b style="color:var(--primary)">${fin.length?avg(fin)+'%':'—'}</b><small>${fin.length} staff</small></div>
     <div class="card stat"><span>Calls answered</span><b>${st.ans.toLocaleString()}</b><small>of ${st.calls.toLocaleString()} offered</small></div>
     <div class="card stat"><span>Ready-time gap</span><b style="color:${st.gap>0?'var(--warn)':'var(--ok)'}">${st.gap==null?'—':st.gap>0?`−${st.gap} h`:'none'}</b><small>planned minus effective</small></div>
     <div class="card stat"><span>Exceptions given</span><b>${st.exc}</b><small>items adjusted by WFM / TL</small></div></div>
    <div class="grid-2 perf-grid"><div><h3 class="sub-h">Where points are lost</h3><div class="flow-note" style="margin:0 0 10px">Share of scored staff-days where each item was missed.</div>
     ${lost.map(x=>{const pc=x.n0?Math.round(x.fail/x.n0*100):0;return `<div class="it-bar"><div class="it-top"><span>${x.n}</span><b>${x.n0?pc+'%':'—'}</b></div><div class="it-track"><i style="width:${pc}%;background:${pc>=30?'var(--bad)':pc>=10?'var(--warn)':'var(--ok)'}"></i></div><small>${x.fail} missed of ${x.n0} days${x.exc?` · ${x.exc} exceptions`:''}</small></div>`}).join('')}</div>
-    <div><h3 class="sub-h">Staff · lowest first</h3><div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Final</th><th>Most missed</th></tr></thead><tbody>
-    ${perStaff.map(x=>`<tr data-action="openStaff" data-id="${x.u.id}"><td><b style="font-weight:600">${esc(x.u.name)}</b><div class="muted" style="font-size:12px">${x.r.days} days · ready ${x.r.ready??'—'}/50</div></td><td class="num-cell"><b>${x.r.final??'—'}%</b></td><td>${x.w?`${x.w.n} <span class="muted">· ${x.w.fail}d</span>`:'<span class="muted">—</span>'}</td></tr>`).join('')}</tbody></table></div></div></div></div>`;
+    <div><h3 class="sub-h">Staff · by final score</h3><div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Final</th><th>Most missed</th></tr></thead><tbody>
+    ${perStaff.map(x=>`<tr data-action="openStaff" data-id="${x.u.id}" data-ptab="daily"><td><b style="font-weight:600">${esc(x.u.name)}</b><div class="muted" style="font-size:12px">${x.days} days · ready ${x.ready??'—'}/50</div></td><td class="num-cell"><b>${x.final!=null?x.final+'%':'—'}</b></td><td>${x.top.length?`<div class="miss3">${x.top.map((t,i)=>`<span><i>${i+1}</i>${t.n} <em>${t.fail}d</em></span>`).join('')}</div>`:'<span class="muted">nothing missed</span>'}</td></tr>`).join('')}</tbody></table></div></div></div></div>`;
 }
 function perfMonthsHtml(){
   const y=today().getFullYear();
@@ -1974,13 +1978,13 @@ function applyPerfCfg(){
     x.filePerf=x.perf;x.perf=Math.round(ds.reduce((t,p)=>t+p.score,0)/ds.length/2*10)/10;x.final=Math.round(((x.perf||0)+(x.ready||0))*10)/10;x.days=ds.length});
 }
 function monthStats(uids,m){
-  const days=S.perf.filter(p=>uids.includes(p.userId)&&p.date.slice(0,7)===m&&p.data&&p.data.calls!=null);
+  const ms=Array.isArray(m)?m:[m],days=S.perf.filter(p=>uids.includes(p.userId)&&ms.includes(p.date.slice(0,7))&&p.data&&p.data.calls!=null);
   const items=PITEMS.map(([k,n])=>({k,n,fail:0,exc:0,n0:0}));let calls=0,ans=0,exc=0;
   days.forEach(p=>{calls+=p.data.calls||0;ans+=p.data.ans||0;dayItems(p.data).forEach((x,i)=>{if(x.pass==null)return;items[i].n0++;if(x.exc){items[i].exc++;exc++}else if(!x.pass)items[i].fail++})});
-  const pm=S.perfMonths.filter(x=>uids.includes(x.userId)&&x.month===m),wh=pm.filter(x=>x.data&&x.data.plannedH!=null);
+  const pm=S.perfMonths.filter(x=>uids.includes(x.userId)&&ms.includes(x.month)),wh=pm.filter(x=>x.data&&x.data.plannedH!=null);
   const gap=wh.length?Math.round(wh.reduce((t,x)=>t+(x.data.plannedH-x.data.readyH),0)*10)/10:null;
-  const worst=[...items].filter(x=>x.fail).sort((a,b)=>b.fail-a.fail)[0]||null;
-  return {days:days.length,items,calls,ans,exc,pm,gap,worst};
+  const top=[...items].filter(x=>x.fail).sort((a,b)=>b.fail-a.fail),worst=top[0]||null;
+  return {days:days.length,items,calls,ans,exc,pm,gap,worst,top3:top.slice(0,3)};
 }
 const latestPerfMonth=uids=>{const ms=S.perfMonths.filter(x=>!uids||uids.includes(x.userId)).map(x=>x.month).sort();return ms.at(-1)||null};
 function itemBarsHtml(st,labelDays){
@@ -2114,43 +2118,39 @@ function kpiRows(){
   let rows=[];
   if(lvl==='staff')rows=staff.map(u=>({id:u.id,name:u.name,sub:`${u.emp} · ${teamName(u.team)}`,act:'openStaff',ag:kpiAgg([u.id],R)})).filter(r=>r.ag.days);
   else if(lvl==='team')rows=TEAM_LIST.filter(t=>(!scoped()||myTeams().includes(t.id))&&(ui.q.team==='all'||String(t.id)===ui.q.team)).map(t=>{const ids=staff.filter(u=>u.team===t.id).map(u=>u.id);const ld=leadersOf(t.id);return {id:t.id,name:t.name,sub:`${ids.length} staff${ld.length?' · TL '+ld.map(x=>x.name).join(', '):''}`,act:'kpiTeam',ag:kpiAgg(ids,R)}}).filter(r=>r.ag.days);
-  const k=ui.kpi.sort,dir=ui.kpi.dir;
+  const k='final',dir=-1;
   if(k){const val=r=>k==='final'?r.ag.final:k==='daily'?r.ag.daily:k==='days'?r.ag.days:k==='name'?r.name:r.ag.items[KPI_COLS.findIndex(c=>c[0]===k)];
     rows.sort((x,y)=>{const a=val(x),b=val(y);if(a==null&&b==null)return 0;if(a==null)return 1;if(b==null)return -1;return (typeof a==='string'?a.localeCompare(b):a-b)*dir})}
-  const dept={id:'dept',name:scoped()?'Your teams':'Department',sub:`${staff.length} staff`,ag:kpiAgg(staff.map(u=>u.id),R),total:1};
+  const dept={id:'dept',name:ui.q.team!=='all'?teamName(+ui.q.team)+' · total':scoped()?'Your teams':'Department',sub:`${staff.length} staff`,ag:kpiAgg(staff.map(u=>u.id),R),total:1};
   return {R,rows,dept};
 }
 function kpiTableHtml(){
   const {R,rows,dept}=kpiRows(),lvl=ui.kpi.level,w=dept.ag.w;
   const cell=(v,wt)=>{if(v==null)return '<span class="muted">—</span>';const r=wt?v/wt:1;return `<span class="kpi-v ${r>=.95?'g':r>=.8?'a':'b'}" title="${v} of ${wt}">${Math.round(v*10)/10}</span>`};
-  const sh=(k,l)=>`<th class="${k==='name'?'':'num-cell '}kpi-sort${ui.kpi.sort===k?' on':''}" data-action="kpiSort" data-k="${k}">${l}${ui.kpi.sort===k?(ui.kpi.dir>0?' ▲':' ▼'):''}</th>`;
+  const sh=(k,l)=>`<th class="${k==='name'?'':'num-cell '}${k==='final'?'kpi-on':''}">${l}</th>`;
   const tr=r=>`<tr${r.total?' class="kpi-total"':` data-action="${r.act}" data-id="${r.id}"${r.act==='openStaff'?' data-ptab="daily"':''}`}><td style="white-space:nowrap"><b style="font-weight:600">${esc(r.name)}</b><div class="muted" style="font-size:12px">${esc(r.sub)}</div></td><td class="num-cell muted">${r.ag.days}</td>${r.ag.items.map((v,i)=>`<td class="num-cell">${cell(v,w[i])}</td>`).join('')}<td class="num-cell"><b>${r.ag.daily!=null?r.ag.daily+'%':'—'}</b></td><td class="num-cell"><b class="kpi-final">${r.ag.final!=null?r.ag.final+'%':'—'}</b></td></tr>`;
   return `<div class="table-wrap"><table class="mini-table kpi-table"><thead><tr>${sh('name',lvl==='team'?'Team':'Staff')}${sh('days','Days')}${KPI_COLS.map(([k,l],i)=>sh(k,`${l}<small>/${w[i]}</small>`)).join('')}${sh('daily','Daily avg')}${sh('final','Final')}</tr></thead>
    <tbody>${lvl==='dept'?'':rows.map(tr).join('')||`<tr><td colspan="12" class="muted">No scores in ${esc(R.label)}.</td></tr>`}${dept.ag.days?tr(dept):''}</tbody></table></div>`;
-}
-function exportKpi(){
-  const {R,rows,dept}=kpiRows(),w=dept.ag.w,lvl=ui.kpi.level;
-  const head=[lvl==='team'?'Team':'Staff',lvl==='team'?'Staff / TL':'Staff ID · team','Scored days',...KPI_COLS.map(([k,l],i)=>`${l} score (/${w[i]})`),'Daily average %','Final score %'];
-  const line=r=>[r.name,r.sub,r.ag.days,...r.ag.items.map(v=>v??''),r.ag.daily??'',r.ag.final??''];
-  downloadXlsx(`performance-kpis-${R.label.replace(/[^\w]+/g,'-')}.xlsx`,[{name:'KPI scores',rows:[head,...(lvl==='dept'?[]:rows.map(line)),line(dept)],widths:[24,28,11,...KPI_COLS.map(()=>13),14,13]}]);
 }
 function viewPerfAdmin(){
   const staff=staffUsers().filter(u=>ui.q.team==='all'||String(u.team)===ui.q.team);
   const months=[...new Set(S.perfMonths.map(x=>x.month))].sort().reverse(),openD=S.requests.filter(r=>r.type==='dispute'&&r.status==='pending'&&inScope(r.userId));
   if(!ui.kpi.period||(!['ytd','last3'].includes(ui.kpi.period)&&!months.includes(ui.kpi.period)))ui.kpi.period=months[0]||'ytd';
   const R=kpiRange(),lvl=ui.kpi.level;
-  return `${perfMonthPreviewHtml()}
-  <div class="card card-pad" style="margin-bottom:18px"><div class="pm-head"><div><h2 style="margin:0">KPI scores</h2><div class="muted" style="font-size:12.5px;margin-top:2px">${esc(R.label)} · average item score per scored day · Final = month result from the file${R.months.length>1?' (average of months)':''}</div></div>
-   <button class="btn sm" data-action="exportKpi" ${months.length?'':'disabled style="opacity:.5"'}>${ic('download',14)} Excel</button></div>
-   <div class="q-filters" style="margin:14px 0">
-    <select class="input" data-kpi="period">${months.map(m=>opt(m,monLong(m),ui.kpi.period===m)).join('')}${opt('last3','Last 3 months',ui.kpi.period==='last3')}${opt('ytd','Year to date',ui.kpi.period==='ytd')}</select>
-    <div class="seg kpi-lvl">${[['staff','By staff'],['team','By team'],['dept','Department']].map(([k,l])=>`<button type="button" class="${lvl===k?'on':''}" data-action="kpiLevel" data-l="${k}">${l}</button>`).join('')}</div>
-    <select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.filter(t=>!scoped()||myTeams().includes(t.id)).map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select></div>
-   ${months.length?kpiTableHtml():'<div class="empty-mini">No monthly file uploaded yet — upload one below.</div>'}
-   ${months.length?`<div class="flow-note" style="margin:10px 0 0"><span class="kpi-v g">green</span> ≥ 95% of the item’s weight · <span class="kpi-v a">amber</span> ≥ 80% · <span class="kpi-v b">red</span> below. Tap a column to sort, a row to open it.</div>`:''}</div>
+  if(!months.length)return `<div class="card empty"><b>No performance files yet</b>Upload the monthly AD_PER file on the <a href="#" data-action="nav" data-view="uploads">Uploads</a> page.</div>`;
+  return `<div class="q-filters perf-bar"><select class="input" data-kpi="period">${months.map(m=>opt(m,monLong(m),ui.kpi.period===m)).join('')}${opt('last3','Last 3 months',ui.kpi.period==='last3')}${opt('ytd','Year to date',ui.kpi.period==='ytd')}</select>
+    <select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.filter(t=>!scoped()||myTeams().includes(t.id)).map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select>
+    <span class="muted" style="font-size:12.5px">Applies to the whole page</span></div>
   ${openD.length?`<div class="callout warn" style="margin-bottom:18px;cursor:pointer" data-action="openDisputes">${ic('alert',18)}<div><b>${openD.length} score dispute${openD.length>1?'s':''} waiting</b>Tap to review.</div></div>`:''}
-  ${perfOverviewHtml(staff)}
-  <div class="card card-pad"><h2>Monthly performance files</h2><div class="flow-note" style="margin:-8px 0 8px">Upload the approved AD_PER file (.xlsb) for a month. Uploading again replaces that month’s numbers.</div>${perfMonthsHtml()}</div>`;
+  <div class="card card-pad" style="margin-bottom:18px"><div class="pm-head"><div><h2 style="margin:0">KPI scores · ${esc(R.label)}</h2><div class="muted" style="font-size:12.5px;margin-top:2px">Average item score per scored day · Final = month result from the file${R.months.length>1?' (average of months)':''} · highest final first</div></div>
+    <div class="seg kpi-lvl">${[['staff','By staff'],['team','By team'],['dept','Department']].map(([k,l])=>`<button type="button" class="${lvl===k?'on':''}" data-action="kpiLevel" data-l="${k}">${l}</button>`).join('')}</div></div>
+   <div style="margin-top:14px">${kpiTableHtml()}</div>
+   <div class="flow-note" style="margin:10px 0 0"><span class="kpi-v g">green</span> ≥ 95% of the item’s weight · <span class="kpi-v a">amber</span> ≥ 80% · <span class="kpi-v b">red</span> below. Tap a row to open it.</div></div>
+  ${perfOverviewHtml(staff,R)}`;
+}
+function viewUploads(){
+  return head('Uploads','Files that feed the site. Each upload replaces that month’s numbers.')+perfMonthPreviewHtml()+
+  `<div class="card card-pad"><h2>Daily performance · AD_PER file</h2><div class="flow-note" style="margin:-8px 0 8px">Upload the approved AD_PER file (.xlsb or .xlsx) for each month. Staff are matched by Staff ID; anyone not on the site is skipped.</div>${perfMonthsHtml()}</div>`;
 }
 async function handlePerfFile(file){
   try{
@@ -2468,8 +2468,8 @@ function viewAccAdmin(){
   const top=Object.entries(reasons).sort((x,y)=>y[1].n-x[1].n),mx=Math.max(1,...top.map(x=>x[1].n));
   const rows=staff.map(u=>({u,pts:accPoints(u.id,a,b),n:accScored(u.id,a,b),c:accCounters(u.id,a,b)})).sort((x,y)=>x.pts-y.pts);
   const avg=rows.length?r2(rows.reduce((t,x)=>t+accPct(x.pts),0)/rows.length):null;
-  return `<div class="q-filters" style="margin-bottom:14px"><select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.filter(t=>!scoped()||myTeams().includes(t.id)).map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select>${monthPick('data-pmonth="1"',m)}<button class="btn primary sm" data-action="pickRec" data-kind="acc">${ic('plus',14)} Accuracy note</button></div>
-  <div class="stats"><div class="card stat"><span>Average accuracy</span><b style="color:var(--primary)">${avg!=null?avg+'%':'—'}</b><small>of ${accW()}% · ${rows.length} staff</small></div><div class="card stat"><span>Notes this month</span><b>${notes.filter(r=>!r.data.counter).length}</b><small>${notes.filter(r=>r.data.counter).length} counted only</small></div><div class="card stat"><span>Full marks</span><b style="color:var(--ok)">${rows.filter(x=>x.pts>=accMax()).length}</b><small>staff with no deductions</small></div></div>
+  return `<div class="q-filters" style="margin-bottom:14px"><select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.filter(t=>!scoped()||myTeams().includes(t.id)).map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select>${monthPick('data-pmonth="1"',m)}</div>
+  <div class="stats"><div class="card stat"><span>Average accuracy</span><b style="color:var(--primary)">${avg!=null?avg+'%':'—'}</b><small>of ${accW()}% · ${rows.length} staff</small></div><div class="card stat"><span>Notes this month</span><b>${notes.filter(r=>!r.data.counter).length}</b><small>${notes.filter(r=>r.data.counter).length} counted only</small></div><div class="card stat"><span>Staff affected</span><b style="color:${rows.filter(x=>x.n||x.c).length?'var(--warn)':'var(--ok)'}">${rows.filter(x=>x.n||x.c).length}</b><small>of ${rows.length} staff have a note</small></div></div>
   <div class="grid-2 perf-grid"><div class="card card-pad"><h2>By staff · lowest first</h2><div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Points</th><th class="num-cell">Accuracy</th><th class="num-cell">Notes</th></tr></thead><tbody>
    ${rows.map(x=>`<tr data-action="openStaff" data-id="${x.u.id}" data-ptab="conduct"><td><b style="font-weight:600">${esc(x.u.name)}</b><div class="muted" style="font-size:12px">${esc(teamName(x.u.team))}</div></td><td class="num-cell">${x.pts}/${accMax()}</td><td class="num-cell"><b style="color:${x.n?'var(--warn)':'var(--ok)'}">${accPct(x.pts)}%</b></td><td class="num-cell">${x.n}${x.c?` <span class="muted" style="font-size:12px">+${x.c}</span>`:''}</td></tr>`).join('')}</tbody></table></div></div>
    <div class="card card-pad"><h2>Most common reasons</h2>${top.length?top.map(([k,v])=>`<div class="it-bar"><div class="it-top"><span>${esc(k)}</span><b>${v.n}</b></div><div class="it-track"><i style="width:${Math.round(v.n/mx*100)}%;background:var(--warn)"></i></div><small>${v.p?`−${v.p} points in total`:'counted only'}</small></div>`).join(''):'<div class="empty-mini">No accuracy notes this month.</div>'}</div></div>
@@ -2481,8 +2481,8 @@ function viewVioAdmin(){
   const byCat={},byType={},byStaff={};vios.forEach(r=>{const c=r.data.category||'Other';byCat[c]=(byCat[c]||0)+1;(r.data.types||[]).forEach(t=>{byType[t]=(byType[t]||0)+1});byStaff[r.recipients[0]]=(byStaff[r.recipients[0]]||0)+1});
   const cats=Object.entries(byCat).sort((x,y)=>y[1]-x[1]),mx=Math.max(1,...cats.map(x=>x[1])),types=Object.entries(byType).sort((x,y)=>y[1]-x[1]).slice(0,6);
   const unack=vios.filter(r=>r.requireAck&&!r.acks[r.recipients[0]]).length;
-  return `<div class="q-filters" style="margin-bottom:14px"><select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.filter(t=>!scoped()||myTeams().includes(t.id)).map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select>${monthPick('data-pmonth="1"',m)}<button class="btn primary sm" data-action="pickRec" data-kind="vio">${ic('plus',14)} Violation ticket</button></div>
-  <div class="stats"><div class="card stat"><span>Tickets</span><b style="color:${vios.length?'var(--bad)':'var(--ok)'}">${vios.length}</b><small>${Object.keys(byStaff).length} staff involved</small></div><div class="card stat"><span>Not acknowledged</span><b style="color:${unack?'var(--warn)':'var(--ok)'}">${unack}</b><small>waiting for staff</small></div><div class="card stat"><span>Clean record</span><b style="color:var(--ok)">${staff.filter(u=>!byStaff[u.id]).length}</b><small>staff with no tickets</small></div></div>
+  return `<div class="q-filters" style="margin-bottom:14px"><select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.filter(t=>!scoped()||myTeams().includes(t.id)).map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select>${monthPick('data-pmonth="1"',m)}</div>
+  <div class="stats"><div class="card stat"><span>Tickets</span><b style="color:${vios.length?'var(--bad)':'var(--ok)'}">${vios.length}</b><small>issued this month</small></div><div class="card stat"><span>Not acknowledged</span><b style="color:${unack?'var(--warn)':'var(--ok)'}">${unack}</b><small>waiting for staff</small></div><div class="card stat"><span>Staff affected</span><b style="color:${Object.keys(byStaff).length?'var(--bad)':'var(--ok)'}">${Object.keys(byStaff).length}</b><small>of ${staff.length} staff have a ticket</small></div></div>
   <div class="grid-2 perf-grid"><div class="card card-pad"><h2>By category</h2>${cats.length?cats.map(([k,n])=>`<div class="it-bar"><div class="it-top"><span>${esc(k)}</span><b>${n}</b></div><div class="it-track"><i style="width:${Math.round(n/mx*100)}%;background:var(--bad)"></i></div></div>`).join('')+(types.length?`<h3 class="sub-h" style="margin-top:12px">Most common</h3>${types.map(([k,n])=>`<div class="kv-line"><span>${esc(k)}</span><b>${n}</b></div>`).join('')}`:''):'<div class="empty-mini">No violations this month.</div>'}</div>
    <div class="card card-pad"><h2>By staff</h2>${Object.keys(byStaff).length?`<div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">This month</th><th class="num-cell">This year</th></tr></thead><tbody>${Object.entries(byStaff).sort((x,y)=>y[1]-x[1]).map(([id,n])=>{const u=user(id);return `<tr data-action="openStaff" data-id="${id}" data-ptab="conduct"><td><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:12px">${esc(teamName(u.team))}</div></td><td class="num-cell"><b>${n}</b></td><td class="num-cell">${vioOf(id,`${m.slice(0,4)}-01-01`,`${m.slice(0,4)}-12-31`).length}</td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty-mini">Nobody this month.</div>'}</div></div>
   <h2 class="section-title">Tickets · ${monLong(m)}</h2>${vios.length?`<div class="req-list">${vios.map(r=>sentCard(r)).join('')}</div>`:'<div class="card empty"><b>No tickets this month</b></div>'}`;
@@ -2636,7 +2636,7 @@ document.addEventListener('click',ev=>{
       const clean={categories:cs,closing:String(d.closing||'').trim()};
       busy(async()=>{await api('settings?on_conflict=key',{method:'POST',prefer:'resolution=merge-duplicates',body:{key:'violations',value:clean}});await fetchAll();ui.vioDraft=null;render();toast('Violation categories saved')});break}
     case 'perfMonthDel':{const m=el.dataset.m,n=S.perfMonths.filter(x=>x.month===m).length;if(!confirm(`Remove ${monLong(m)}?\n\nThis deletes its uploaded numbers for ${n} staff — daily scores and month result. Staff will no longer see them.`))break;
-      const [a,b]=monthBounds(parse(m+'-01'));busy(async()=>{await api(`performance?date=gte.${a}&date=lte.${b}`,{method:'DELETE'});await api(`perf_month?month=eq.${m}`,{method:'DELETE'});await fetchAll();if(ui.pmMonth===m)ui.pmMonth=null;render();toast(`${monLong(m)} removed`)});break}
+      const [a,b]=monthBounds(parse(m+'-01'));busy(async()=>{await api(`performance?date=gte.${a}&date=lte.${b}`,{method:'DELETE'});await api(`perf_month?month=eq.${m}`,{method:'DELETE'});await fetchAll();render();toast(`${monLong(m)} removed`)});break}
     case 'perfMonthCancel':ui.perfMonth=null;render();break;
     case 'perfMonthSave':{const pv=ui.perfMonth;if(!pv)break;if(S.perfMonths.some(x=>x.month===pv.month)&&!confirm(`Replace the ${monLong(pv.month)} numbers already on the site?`))break;
       busy(async()=>{const r=await savePerfMonth();await fetchAll();ui.perfMonth=null;render();toast(`${monLong(pv.month)} saved · ${r.staff} staff, ${r.days} daily scores`)});break}
@@ -2728,9 +2728,7 @@ document.addEventListener('click',ev=>{
     case 'openDay':openDrawer('day',el.dataset.u+'|'+el.dataset.d);break;
     case 'pmMonth':break;
     case 'kpiLevel':ui.kpi.level=el.dataset.l;render();break;
-    case 'kpiSort':{const k=el.dataset.k;if(ui.kpi.sort===k)ui.kpi.dir*=-1;else{ui.kpi.sort=k;ui.kpi.dir=k==='name'?1:-1}render();break}
     case 'kpiTeam':ui.q.team=String(id);ui.kpi.level='staff';render();break;
-    case 'exportKpi':exportKpi();break;
     case 'openRec':openDrawer('rec',id);break;
     case 'openStaff':ui.profileId=id;ui.prof={tab:el.dataset.ptab||'overview',period:'month'};closeDrawer(true);ui.view='profile';render();window.scrollTo(0,0);break;
     case 'profTab':ui.prof.tab=el.dataset.t;render();break;
@@ -2846,7 +2844,6 @@ document.addEventListener('change',ev=>{
   if(t.dataset.kpi){ui.kpi[t.dataset.kpi]=t.value;render();return}
   if(t.dataset.sent){ui.sent[t.dataset.sent]=t.value;render();return}
   if(t.dataset.leader){t.checked?ui.leadSel.add(t.dataset.leader):ui.leadSel.delete(t.dataset.leader);renderDrawer();return}
-  if(t.dataset.pmmonth){ui.pmMonth=t.value;render();return}
   if(t.dataset.perfm){const f=t.files[0],m=t.dataset.perfm;t.value='';if(f)handlePerfMonthFile(f,m);return}
   if(t.matches('[data-perf]')){const f=t.files[0];t.value='';if(f)handlePerfFile(f);return}
   if(ui.userForm&&t.name&&t.closest('#userForm')){ui.userForm[t.name]=t.value;if(t.name==='role')renderDrawer();return}
