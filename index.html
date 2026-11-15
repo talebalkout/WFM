@@ -872,9 +872,16 @@ const recFromDb=r=>({id:r.id,kind:r.kind,createdBy:r.created_by,createdAt:+r.cre
 const recToDb=r=>({kind:r.kind,created_by:r.createdBy,recipients:r.recipients,require_ack:r.requireAck,data:r.data,files:r.files});
 const blockFromDb=b=>({id:b.id,scope:b.scope,target:b.target,type:b.type,from:b.from_date,to:b.to_date,reason:b.reason});
 let lastSig='';
+// Supabase returns at most 1000 rows per request — read big tables page by page
+async function apiAll(path){const out=[];for(let off=0;off<200000;off+=1000){const rows=await api(`${path}${path.includes('?')?'&':'?'}limit=1000&offset=${off}`);out.push(...rows);if(rows.length<1000)break}return out}
+let perfCache={sig:null,rows:[]};
 async function fetchAll(){
-  const [rq,rc,ru,bl,us,tm,st,pf,pm]=await Promise.all([api('requests?select=*&order=created_at.desc'),api('records?select=*&order=created_at.desc'),api('rules?select=*'),api('blocks?select=*'),
-    api('app_users?select=id,emp,name,role,title,team,active,must_change,deleted,created_at&order=name'),api('teams?select=*&order=sort,id'),api('settings?select=*'),api('performance?select=user_id,date,score,uploaded_at,data&order=date'),api('perf_month?select=*&order=month')]);
+  const [rq,rc,ru,bl,us,tm,st,pm,pl]=await Promise.all([apiAll('requests?select=*&order=created_at.desc,id'),apiAll('records?select=*&order=created_at.desc,id'),api('rules?select=*'),api('blocks?select=*'),
+    api('app_users?select=id,emp,name,role,title,team,active,must_change,deleted,created_at&order=name'),api('teams?select=*&order=sort,id'),api('settings?select=*'),apiAll('perf_month?select=*&order=month,user_id'),api('performance?select=uploaded_at&order=uploaded_at.desc&limit=1')]);
+  // daily scores are the biggest table: only reload them when an upload, removal or correction happened
+  const psig=JSON.stringify([pm.map(x=>[x.user_id,x.month,x.uploaded_at]),pl[0]&&pl[0].uploaded_at]);
+  if(psig!==perfCache.sig){perfCache={sig:psig,rows:await apiAll('performance?select=user_id,date,score,uploaded_at,data&order=date,user_id')}}
+  const pf=perfCache.rows;
   USERS=us.map(u=>({id:u.id,emp:u.emp,name:u.name,role:u.role,title:u.title,team:u.team,active:u.active&&!u.deleted,deleted:!!u.deleted,mustChange:u.must_change}));
   TEAM_LIST=tm.map(t=>({id:t.id,name:t.name,sort:t.sort,leaders:Array.isArray(t.leaders)?t.leaders:[]}));TEAMS=Object.fromEntries(TEAM_LIST.map(t=>[t.id,t.name]));
   LISTS=JSON.parse(JSON.stringify(DEFAULT_LISTS));st.forEach(x=>{if(Array.isArray(x.value)&&x.value.length)LISTS[x.key]=x.value});
@@ -888,7 +895,7 @@ async function fetchAll(){
   const r0=ru[0]||{leave_limit:2,count_pending:true};
   S.requests=rq.map(reqFromDb);S.records=rc.map(recFromDb);
   S.rules={leaveLimit:r0.leave_limit,countPending:r0.count_pending,qualityTarget:r0.quality_target||85,blocks:bl.map(blockFromDb)};
-  const sig=JSON.stringify([rq,rc,ru,bl,us,tm,st,pf]),changed=sig!==lastSig;lastSig=sig;return changed;
+  const sig=JSON.stringify([rq,rc,ru,bl,us,tm,st,psig]),changed=sig!==lastSig;lastSig=sig;return changed;
 }
 async function patchReq(r,expected){
   const rows=await api(`requests?id=eq.${encodeURIComponent(r.id)}&status=eq.${expected}`,{method:'PATCH',prefer:'return=representation',
