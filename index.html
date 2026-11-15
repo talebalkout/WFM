@@ -1872,6 +1872,7 @@ const empDigits=e=>String(e||'').replace(/\D/g,'').replace(/^0+/,'');
 async function handlePerfMonthFile(file,month){
   try{ui.perfBusy=month;render();
     const res=await parsePerfFile(file);
+    if(res.detected&&res.detected.slice(5)===month.slice(5))month=res.detected;
     const rows=res.people.map(p=>{const u=USERS.find(x=>x.role==='staff'&&!x.deleted&&empDigits(x.emp)===p.sid.replace(/^0+/,''));return {...p,user:u,ok:!!u}});
     if(!rows.length)throw new Error('No staff rows found in the Totals sheet');
     ui.perfMonth={month,file:file.name,detected:res.detected,rows};ui.perfBusy=null;render();
@@ -1896,12 +1897,11 @@ function perfOverviewHtml(staff){
     ${perStaff.map(x=>`<tr data-action="openStaff" data-id="${x.u.id}"><td><b style="font-weight:600">${esc(x.u.name)}</b><div class="muted" style="font-size:12px">${x.r.days} days · ready ${x.r.ready??'—'}/50</div></td><td class="num-cell"><b>${x.r.final??'—'}%</b></td><td>${x.w?`${x.w.n} <span class="muted">· ${x.w.fail}d</span>`:'<span class="muted">—</span>'}</td></tr>`).join('')}</tbody></table></div></div></div></div>`;
 }
 function perfMonthsHtml(){
-  const T=today(),cur=iso(T).slice(0,7),list=[];
-  for(let m=new Date(T.getFullYear(),T.getMonth(),1),i=0;i<12;i++,m=new Date(m.getFullYear(),m.getMonth()-1,1))list.push(iso(m).slice(0,7));
-  S.perfMonths.forEach(x=>{if(!list.includes(x.month))list.push(x.month)});list.sort().reverse();
-  return `<div class="pm-list">${list.map(m=>{const rs=S.perfMonths.filter(x=>x.month===m),f=rs[0];const busy=ui.perfBusy===m;
-    return `<div class="pm-row"><div><b>${monLong(m)}</b>${m===cur?' <span class="muted" style="font-size:12px">· this month</span>':''}<div class="muted" style="font-size:12px">${f?`${rs.length} staff · ${esc(f.file_name||'file')} · uploaded ${fmt(iso(new Date(+f.uploaded_at)))}`:'No file yet'}</div></div>
-    <label class="btn sm${f?'':' primary'}" style="cursor:pointer">${busy?'Reading…':`${ic('upload',14)} ${f?'Replace':'Upload'}`}<input type="file" accept=".xlsb,.xlsx" data-perfm="${m}" hidden ${busy?'disabled':''}></label></div>`}).join('')}</div>`;
+  const y=today().getFullYear();
+  return `<div class="pm-list">${MONL.map((nm,i)=>{const mm=pad(i+1),have=[...new Set(S.perfMonths.filter(x=>x.month.slice(5)===mm).map(x=>x.month))].sort(),cur=have.at(-1),rs=cur?S.perfMonths.filter(x=>x.month===cur):[],f=rs[0],key=cur||`${y}-${mm}`,busy=ui.perfBusy===key;
+    return `<div class="pm-row"><div><b>${nm}</b><div class="muted" style="font-size:12px">${f?`${cur.slice(0,4)} · ${rs.length} staff · ${esc(f.file_name||'file')} · uploaded ${fmt(iso(new Date(+f.uploaded_at)))}`:'No file'}</div></div>
+    <div class="row" style="gap:6px;flex-wrap:nowrap">${f?`<button class="btn sm icon bad" data-action="perfMonthDel" data-m="${cur}" title="Remove ${nm} ${cur.slice(0,4)}" aria-label="Remove ${nm}">${ic('trash',14)}</button>`:''}
+    <label class="btn sm${f?'':' primary'}" style="cursor:pointer">${busy?'Reading…':`${ic('upload',14)} ${f?'Replace':'Upload'}`}<input type="file" accept=".xlsb,.xlsx" data-perfm="${key}" hidden ${busy?'disabled':''}></label></div></div>`}).join('')}</div>`;
 }
 function perfMonthPreviewHtml(){
   const pv=ui.perfMonth;if(!pv)return '';const ok=pv.rows.filter(r=>r.ok),bad=pv.rows.filter(r=>!r.ok),mis=pv.detected&&pv.detected!==pv.month;
@@ -2419,6 +2419,8 @@ document.addEventListener('click',ev=>{
       if(cs.some(c=>new Set(c.types.map(t2=>t2.toLowerCase())).size!==c.types.length)){toast('A category has the same type twice',true);break}
       const clean={categories:cs,closing:String(d.closing||'').trim()};
       busy(async()=>{await api('settings?on_conflict=key',{method:'POST',prefer:'resolution=merge-duplicates',body:{key:'violations',value:clean}});await fetchAll();ui.vioDraft=null;render();toast('Violation categories saved')});break}
+    case 'perfMonthDel':{const m=el.dataset.m,n=S.perfMonths.filter(x=>x.month===m).length;if(!confirm(`Remove ${monLong(m)}?\n\nThis deletes its uploaded numbers for ${n} staff — daily scores and month result. Staff will no longer see them.`))break;
+      const [a,b]=monthBounds(parse(m+'-01'));busy(async()=>{await api(`performance?date=gte.${a}&date=lte.${b}`,{method:'DELETE'});await api(`perf_month?month=eq.${m}`,{method:'DELETE'});await fetchAll();if(ui.pmMonth===m)ui.pmMonth=null;render();toast(`${monLong(m)} removed`)});break}
     case 'perfMonthCancel':ui.perfMonth=null;render();break;
     case 'perfMonthSave':{const pv=ui.perfMonth;if(!pv)break;if(S.perfMonths.some(x=>x.month===pv.month)&&!confirm(`Replace the ${monLong(pv.month)} numbers already on the site?`))break;
       busy(async()=>{const r=await savePerfMonth();await fetchAll();ui.perfMonth=null;render();toast(`${monLong(pv.month)} saved · ${r.staff} staff, ${r.days} daily scores`)});break}
