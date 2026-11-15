@@ -616,6 +616,12 @@ body:has(.ef-row.dragging){user-select:none}
 .stats-2{grid-template-columns:repeat(2,1fr)!important}.perf-grid>*,.grid-2>*{min-width:0}.table-wrap{max-width:100%;overflow-x:auto}@media (max-width:560px){.hist-table th,.hist-table td{padding-left:6px;padding-right:6px;font-size:12.5px}.prof-acts .btn{flex:1 1 45%}}.prof-acts{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
 .sec-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.sec-head .section-title{margin-bottom:10px}
 .kv-line{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--border)}.staff-table tr{cursor:pointer}
+.kpi-table th small{font-weight:500;opacity:.7;margin-left:1px}.kpi-sort{cursor:pointer;user-select:none;white-space:nowrap}.kpi-sort.on{color:var(--primary)}.kpi-table tbody tr[data-action]{cursor:pointer}
+.kpi-v{font-weight:650}.kpi-v.g{color:var(--ok)}.kpi-v.a{color:var(--warn)}.kpi-v.b{color:var(--bad)}.kpi-total td{background:var(--surface-2);border-top:2px solid var(--border)}.kpi-final{color:var(--primary);font-size:14.5px}
+.kpi-lvl{flex:0 0 auto}.kpi-lvl button{padding:8px 12px;white-space:nowrap}
+.kpi-table{font-size:13px}.kpi-table th,.kpi-table td{padding:9px 7px}.kpi-table th{white-space:normal;line-height:1.25;vertical-align:bottom}.kpi-table th small{display:block}
+.kpi-table th:first-child,.kpi-table td:first-child{position:sticky;left:0;background:var(--surface);z-index:1;min-width:150px}.kpi-total td:first-child{background:var(--surface-2)}
+.kpi-table td:first-child b{white-space:normal}.kpi-table td:first-child{white-space:normal!important}
 .pm-list{display:flex;flex-direction:column}.pm-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}.pm-row:last-child{border-bottom:0}
 .acc-cnt{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .combo{position:relative}
@@ -847,7 +853,7 @@ const nextMonths=()=>{const t=today();return [1,2,3].map(k=>{const d=new Date(t.
 
 /* ================= State ================= */
 let S; // persisted
-const ui={my:{period:'month',type:'all',tab:'overview'},prof:{tab:'overview',period:'month'},sent:{kind:'all',month:'all',q:''},q:{preset:'90',team:'all',staff:'all',type:'all',evaluator:'all',outcome:'all'},view:null,form:null,drawer:null,filters:{q:'',type:'all',status:'all',team:'all'},mineFilter:'all',inboxFilter:'all',createKind:null,blockForm:{scope:'user',target:'u1',type:'swap',from:'',to:'',reason:''},rulesDraft:null};
+const ui={kpi:{period:null,level:'staff',sort:null,dir:-1},my:{period:'month',type:'all',tab:'overview'},prof:{tab:'overview',period:'month'},sent:{kind:'all',month:'all',q:''},q:{preset:'90',team:'all',staff:'all',type:'all',evaluator:'all',outcome:'all'},view:null,form:null,drawer:null,filters:{q:'',type:'all',status:'all',team:'all'},mineFilter:'all',inboxFilter:'all',createKind:null,blockForm:{scope:'user',target:'u1',type:'swap',from:'',to:'',reason:''},rulesDraft:null};
 
 /* ---- Server (Supabase) ---- */
 async function api(path,{method='GET',body,prefer}={}){
@@ -2075,23 +2081,62 @@ function disputeDrawer(date){
   ${field('Why should this score be reviewed?',`<textarea class="input" id="disputeText" rows="4" placeholder="e.g. I was moved to email support for 2 hours, which isn’t counted in this score."></textarea>`,{req:1})}</div>
   <div class="d-foot"><div class="row"><button class="btn" data-action="closeDrawer">Cancel</button><button class="btn primary" data-action="disputeSend" data-date="${date}">${ic('check',16)} Send to WFM</button></div></div>`;
 }
+const KPI_COLS=[['calls','Calls'],['ata','ATA'],['aht','AHT'],['hold','Hold'],['login','Login time'],['tlogin','Total login'],['nr','NR'],['wrap','WU']];
+function kpiRange(){
+  const p=ui.kpi.period,T=today(),y=T.getFullYear();
+  if(p==='ytd')return {a:`${y}-01-01`,b:iso(T),label:`Year to date ${y}`,months:[...new Set(S.perfMonths.map(x=>x.month))].filter(m=>m.startsWith(y+'-'))};
+  if(p==='last3'){const ms=[...new Set(S.perfMonths.map(x=>x.month))].sort().slice(-3);return ms.length?{a:ms[0]+'-01',b:monthBounds(parse(ms.at(-1)+'-01'))[1],label:`${monLong(ms[0])} – ${monLong(ms.at(-1))}`,months:ms}:{a:'9999-01-01',b:'9999-01-01',label:'Last 3 months',months:[]}}
+  const [a,b]=monthBounds(parse(p+'-01'));return {a,b,label:monLong(p),months:[p]};
+}
+function kpiAgg(uids,R){
+  const it=PITEMS.map(()=>({sum:0,n:0})),wts=PITEMS.map(([k])=>+(PCFG.items[k]||{}).w||0);let days=0,dsum=0;
+  S.perf.forEach(p=>{if(!uids.includes(p.userId)||p.date<R.a||p.date>R.b)return;days++;dsum+=p.score;if(!p.data||p.data.calls==null)return;
+    dayItems(p.data).forEach((x,i)=>{if(x.pass==null)return;it[i].n++;it[i].sum+=x.pass?wts[i]:0})});
+  const fins=S.perfMonths.filter(x=>uids.includes(x.userId)&&R.months.includes(x.month)&&x.final!=null).map(x=>x.final);
+  return {items:it.map((x,i)=>x.n?Math.round(x.sum/x.n*100)/100:null),w:wts,days,daily:days?Math.round(dsum/days*10)/10:null,final:fins.length?Math.round(fins.reduce((a,b)=>a+b,0)/fins.length*10)/10:null};
+}
+function kpiRows(){
+  const R=kpiRange(),lvl=ui.kpi.level,staff=staffUsers().filter(u=>ui.q.team==='all'||String(u.team)===ui.q.team);
+  let rows=[];
+  if(lvl==='staff')rows=staff.map(u=>({id:u.id,name:u.name,sub:`${u.emp} · ${teamName(u.team)}`,act:'openStaff',ag:kpiAgg([u.id],R)})).filter(r=>r.ag.days);
+  else if(lvl==='team')rows=TEAM_LIST.filter(t=>(!scoped()||myTeams().includes(t.id))&&(ui.q.team==='all'||String(t.id)===ui.q.team)).map(t=>{const ids=staff.filter(u=>u.team===t.id).map(u=>u.id);const ld=leadersOf(t.id);return {id:t.id,name:t.name,sub:`${ids.length} staff${ld.length?' · TL '+ld.map(x=>x.name).join(', '):''}`,act:'kpiTeam',ag:kpiAgg(ids,R)}}).filter(r=>r.ag.days);
+  const k=ui.kpi.sort,dir=ui.kpi.dir;
+  if(k){const val=r=>k==='final'?r.ag.final:k==='daily'?r.ag.daily:k==='days'?r.ag.days:k==='name'?r.name:r.ag.items[KPI_COLS.findIndex(c=>c[0]===k)];
+    rows.sort((x,y)=>{const a=val(x),b=val(y);if(a==null&&b==null)return 0;if(a==null)return 1;if(b==null)return -1;return (typeof a==='string'?a.localeCompare(b):a-b)*dir})}
+  const dept={id:'dept',name:scoped()?'Your teams':'Department',sub:`${staff.length} staff`,ag:kpiAgg(staff.map(u=>u.id),R),total:1};
+  return {R,rows,dept};
+}
+function kpiTableHtml(){
+  const {R,rows,dept}=kpiRows(),lvl=ui.kpi.level,w=dept.ag.w;
+  const cell=(v,wt)=>{if(v==null)return '<span class="muted">—</span>';const r=wt?v/wt:1;return `<span class="kpi-v ${r>=.95?'g':r>=.8?'a':'b'}" title="${v} of ${wt}">${Math.round(v*10)/10}</span>`};
+  const sh=(k,l)=>`<th class="${k==='name'?'':'num-cell '}kpi-sort${ui.kpi.sort===k?' on':''}" data-action="kpiSort" data-k="${k}">${l}${ui.kpi.sort===k?(ui.kpi.dir>0?' ▲':' ▼'):''}</th>`;
+  const tr=r=>`<tr${r.total?' class="kpi-total"':` data-action="${r.act}" data-id="${r.id}"${r.act==='openStaff'?' data-ptab="daily"':''}`}><td style="white-space:nowrap"><b style="font-weight:600">${esc(r.name)}</b><div class="muted" style="font-size:12px">${esc(r.sub)}</div></td><td class="num-cell muted">${r.ag.days}</td>${r.ag.items.map((v,i)=>`<td class="num-cell">${cell(v,w[i])}</td>`).join('')}<td class="num-cell"><b>${r.ag.daily!=null?r.ag.daily+'%':'—'}</b></td><td class="num-cell"><b class="kpi-final">${r.ag.final!=null?r.ag.final+'%':'—'}</b></td></tr>`;
+  return `<div class="table-wrap"><table class="mini-table kpi-table"><thead><tr>${sh('name',lvl==='team'?'Team':'Staff')}${sh('days','Days')}${KPI_COLS.map(([k,l],i)=>sh(k,`${l}<small>/${w[i]}</small>`)).join('')}${sh('daily','Daily avg')}${sh('final','Final')}</tr></thead>
+   <tbody>${lvl==='dept'?'':rows.map(tr).join('')||`<tr><td colspan="12" class="muted">No scores in ${esc(R.label)}.</td></tr>`}${dept.ag.days?tr(dept):''}</tbody></table></div>`;
+}
+function exportKpi(){
+  const {R,rows,dept}=kpiRows(),w=dept.ag.w,lvl=ui.kpi.level;
+  const head=[lvl==='team'?'Team':'Staff',lvl==='team'?'Staff / TL':'Staff ID · team','Scored days',...KPI_COLS.map(([k,l],i)=>`${l} score (/${w[i]})`),'Daily average %','Final score %'];
+  const line=r=>[r.name,r.sub,r.ag.days,...r.ag.items.map(v=>v??''),r.ag.daily??'',r.ag.final??''];
+  downloadXlsx(`performance-kpis-${R.label.replace(/[^\w]+/g,'-')}.xlsx`,[{name:'KPI scores',rows:[head,...(lvl==='dept'?[]:rows.map(line)),line(dept)],widths:[24,28,11,...KPI_COLS.map(()=>13),14,13]}]);
+}
 function viewPerfAdmin(){
   const staff=staffUsers().filter(u=>ui.q.team==='all'||String(u.team)===ui.q.team);
-  const latestDate=S.perf.length?S.perf.reduce((a,p)=>p.date>a?p.date:a,''):null;
-  const rows=staff.map(u=>{const ps=perfOf(u.id),l=ps.at(-1),pr=ps.at(-2),d=l&&pr?Math.round((l.score-pr.score)*10)/10:null;
-    return `<tr data-action="openStaff" data-id="${u.id}"><td style="white-space:nowrap"><span class="av">${initials(u.name)}</span><b style="font-weight:600">${esc(u.name)}</b><div class="muted" style="font-size:12px;margin-left:36px">${esc(teamName(u.team))}</div></td>
-    <td class="num-cell"><span class="score-cell">${l?fmtScore(l.score):'—'}</span></td><td>${d!=null?`<span class="delta ${d>=0?'up':'down'}">${d>=0?'▲':'▼'} ${Math.abs(d)}</span>`:'<span class="muted">—</span>'}</td>
-    <td class="num-cell">${fmtScore(perfStats(ps).mtd)}</td><td class="num-cell">${fmtScore(perfStats(ps).ytd)}</td><td class="num-cell">${(m=>m?`<b>${m.final}%</b> <span class="muted" style="font-size:12px">${MONL[+m.month.slice(5)-1].slice(0,3)}</span>`:'—')(S.perfMonths.filter(x=>x.userId===u.id).sort((a,b)=>b.month.localeCompare(a.month))[0])}</td><td>${perfSpark(ps.map(p=>p.score))}</td><td class="muted" style="white-space:nowrap">${l?fmt(l.date):'No scores'}</td></tr>`}).join('');
-  const latestVals=staff.map(u=>perfOf(u.id).at(-1)).filter(Boolean).map(p=>p.score),openD=S.requests.filter(r=>r.type==='dispute'&&r.status==='pending');
-  return `<div class="q-filters"><select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select></div>
-  <div class="stats"><div class="card stat"><span>Team average (latest)</span><b>${latestVals.length?fmtScore(avgOf(latestVals)):'—'}</b><small>${latestVals.length} of ${staff.length} staff have a score</small></div>
-   <div class="card stat" ${openD.length?'data-action="openDisputes" style="cursor:pointer"':''}><span>Open disputes</span><b style="color:${openD.length?'var(--warn)':'var(--ok)'}">${openD.length}</b><small>${openD.length?'tap to review':'nothing to review'}</small></div>
-   <div class="card stat"><span>Last upload</span><b style="font-size:20px">${latestDate?fmtL(latestDate):'—'}</b><small>${S.perf.length} scores stored</small></div></div>
-  ${perfMonthPreviewHtml()}
+  const months=[...new Set(S.perfMonths.map(x=>x.month))].sort().reverse(),openD=S.requests.filter(r=>r.type==='dispute'&&r.status==='pending'&&inScope(r.userId));
+  if(!ui.kpi.period||(!['ytd','last3'].includes(ui.kpi.period)&&!months.includes(ui.kpi.period)))ui.kpi.period=months[0]||'ytd';
+  const R=kpiRange(),lvl=ui.kpi.level;
+  return `${perfMonthPreviewHtml()}
+  <div class="card card-pad" style="margin-bottom:18px"><div class="pm-head"><div><h2 style="margin:0">KPI scores</h2><div class="muted" style="font-size:12.5px;margin-top:2px">${esc(R.label)} · average item score per scored day · Final = month result from the file${R.months.length>1?' (average of months)':''}</div></div>
+   <button class="btn sm" data-action="exportKpi" ${months.length?'':'disabled style="opacity:.5"'}>${ic('download',14)} Excel</button></div>
+   <div class="q-filters" style="margin:14px 0">
+    <select class="input" data-kpi="period">${months.map(m=>opt(m,monLong(m),ui.kpi.period===m)).join('')}${opt('last3','Last 3 months',ui.kpi.period==='last3')}${opt('ytd','Year to date',ui.kpi.period==='ytd')}</select>
+    <div class="seg kpi-lvl">${[['staff','By staff'],['team','By team'],['dept','Department']].map(([k,l])=>`<button type="button" class="${lvl===k?'on':''}" data-action="kpiLevel" data-l="${k}">${l}</button>`).join('')}</div>
+    <select class="input" data-q="team">${opt('all','All teams',ui.q.team==='all')}${TEAM_LIST.filter(t=>!scoped()||myTeams().includes(t.id)).map(t=>opt(String(t.id),t.name,ui.q.team===String(t.id))).join('')}</select></div>
+   ${months.length?kpiTableHtml():'<div class="empty-mini">No monthly file uploaded yet — upload one below.</div>'}
+   ${months.length?`<div class="flow-note" style="margin:10px 0 0"><span class="kpi-v g">green</span> ≥ 95% of the item’s weight · <span class="kpi-v a">amber</span> ≥ 80% · <span class="kpi-v b">red</span> below. Tap a column to sort, a row to open it.</div>`:''}</div>
+  ${openD.length?`<div class="callout warn" style="margin-bottom:18px;cursor:pointer" data-action="openDisputes">${ic('alert',18)}<div><b>${openD.length} score dispute${openD.length>1?'s':''} waiting</b>Tap to review.</div></div>`:''}
   ${perfOverviewHtml(staff)}
-  <div class="grid-2 perf-grid"><div class="card card-pad"><h2>Monthly performance files</h2><div class="flow-note" style="margin:-8px 0 8px">Upload the approved AD_PER file (.xlsb) for a month. Uploading again replaces that month’s numbers.</div>${perfMonthsHtml()}</div>
-   <div class="card card-pad"><h2>How staff see it</h2><div class="flow-note" style="margin:0 0 12px">Each staff member sees only their own numbers on their “My performance” page, with their history.</div>${staff[0]?monthResultHtml(staff[0].id)+perfSummaryHtml(staff[0].id,1):''}</div></div>
-  <div class="card" style="margin-top:18px"><div class="card-pad" style="padding-bottom:6px"><h2 style="margin:0">Latest scores</h2></div><div class="table-wrap"><table class="mini-table"><thead><tr><th>Staff</th><th class="num-cell">Latest</th><th>Change</th><th class="num-cell">Month to date</th><th class="num-cell">Year to date</th><th class="num-cell">Month result</th><th>Last 10</th><th>Date</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  <div class="card card-pad"><h2>Monthly performance files</h2><div class="flow-note" style="margin:-8px 0 8px">Upload the approved AD_PER file (.xlsb) for a month. Uploading again replaces that month’s numbers.</div>${perfMonthsHtml()}</div>`;
 }
 async function handlePerfFile(file){
   try{
@@ -2666,6 +2711,10 @@ document.addEventListener('click',ev=>{
     case 'openReq':openDrawer('req',id);break;
     case 'openDay':openDrawer('day',el.dataset.u+'|'+el.dataset.d);break;
     case 'pmMonth':break;
+    case 'kpiLevel':ui.kpi.level=el.dataset.l;render();break;
+    case 'kpiSort':{const k=el.dataset.k;if(ui.kpi.sort===k)ui.kpi.dir*=-1;else{ui.kpi.sort=k;ui.kpi.dir=k==='name'?1:-1}render();break}
+    case 'kpiTeam':ui.q.team=String(id);ui.kpi.level='staff';render();break;
+    case 'exportKpi':exportKpi();break;
     case 'openRec':openDrawer('rec',id);break;
     case 'openStaff':ui.profileId=id;ui.prof={tab:el.dataset.ptab||'overview',period:'month'};closeDrawer(true);ui.view='profile';render();window.scrollTo(0,0);break;
     case 'profTab':ui.prof.tab=el.dataset.t;render();break;
@@ -2778,6 +2827,7 @@ document.addEventListener('change',ev=>{
   if(t.dataset.prof){ui.prof[t.dataset.prof]=t.value;render();return}
   if(t.dataset.staffm){ui.staffMonth=t.value;render();return}
   if(t.dataset.pmonth){ui.pMonth=t.value;render();return}
+  if(t.dataset.kpi){ui.kpi[t.dataset.kpi]=t.value;render();return}
   if(t.dataset.sent){ui.sent[t.dataset.sent]=t.value;render();return}
   if(t.dataset.leader){t.checked?ui.leadSel.add(t.dataset.leader):ui.leadSel.delete(t.dataset.leader);renderDrawer();return}
   if(t.dataset.pmmonth){ui.pmMonth=t.value;render();return}
